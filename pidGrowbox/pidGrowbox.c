@@ -9,9 +9,9 @@
 #include <avr/io.h>
 #include <stdio.h>
 #include <string.h>
-#include "TriacDefines.h"
-#include "TriacIntr.h"
-#include "triacPID.h"
+//#include "TriacDefines.h"
+//#include "TriacIntr.h"
+//#include "triacPID.h"
 
 
 void USART_Init( unsigned int baud )
@@ -23,7 +23,7 @@ void USART_Init( unsigned int baud )
 	// Enable receiver and transmitter
 	UCSR0A =  (UCSR0A & 0b11111100) ;
 	
-	UCSR0B=(1<<RXEN0)|(1<<TXEN0);
+	UCSR0B=    (1<<TXEN0);
 	//	UCSR0B = 0b00011000;  // rx compl intr ena - tx compl intr ena - dreg empty intr ena - rx ena - tx ena - sz2 (size bit 2)  - 9. bit rx - 9. tx
 
 	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
@@ -56,9 +56,9 @@ int main(void)
 	stdout = &mystdout;
 	printf("\nSTARTUP\n");
 	
-	initDefines();
-	InitPID();
-	initInterrupts();
+//	initDefines();
+//	InitPID();
+//	initHW();
 	
     while(1)
     {

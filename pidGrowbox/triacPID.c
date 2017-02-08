@@ -18,7 +18,7 @@ enum adcScopeEnum
 
 
 int8_t m_started;
-real m_kPTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_error_thresh, m_integral;
+real m_kTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_error_thresh, m_integral;
 
 real corrCarryOver;     // carry amount if correction in float gives zero correction in int
 
@@ -59,7 +59,7 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
 	// PN 3.Oct 2011, added m_kP for better setting of proportional factor only
 	// though these 4 factors will be linearly dependent
 	m_kP   = kpP;
-    m_kPTot = kpTot;
+    m_kTot = kpTot;
     m_kI = ki;
     m_kD = kd;
     m_error_thresh = error_thresh;
@@ -108,7 +108,7 @@ real nextCorrection(real error)
     m_prev_error = error;
 
     // Return the PID controller actuator command
-	res = m_kPTot*(m_kP*error + m_kI*m_integral + m_kD*deriv);
+	res = m_kTot*(m_kP*error + m_kI*m_integral + m_kD*deriv);
 	if (res > correctionThreshold) {
 		res = correctionThreshold;
 	} else if (res < -1*correctionThreshold) {

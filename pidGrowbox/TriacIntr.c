@@ -305,3 +305,66 @@ void toggleCompletionAlarm()
 */
 
 
+/////////////   USART 2 ///////////////////
+
+enum rxStates {
+	rxIdle,
+	rxReceiving,
+	rxReceived,
+};
+
+uint8_t  rxState;
+uint8_t  rxCurrentPos;
+uint8_t  dataReceived;
+
+float   latestTemperature; 
+float   latestHumidity;
+
+
+void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrosense, called by user functions
+{
+	*pTemp = latestTemperature;
+	*pHum  = latestHumidity
+}
+
+
+void onDataReceived()        // called by main application thread to calculate the latest data
+{
+	
+}
+
+
+ISR (USART1_RX_vect)
+{
+	
+}
+
+void initUsart2()
+{
+	// Set baud rate
+	 uint16_t UBRR = 143;    // baud 4800   fixed on hygrosense sensor
+		
+	UBRR0H = (unsigned char)(UBRR>>8);
+	UBRR0L = (unsigned char)UBRR;
+	
+	//   (UCSR0A & 0b11111100) ;  nothing to do on A-reg	
+	// Enable receiver and transmitte                    
+		
+	UCSR0B |=  (1<<RXEN0) | (1<< RXCIE1) ;               //     |(1<<TXEN0);
+	//	UCSR0B = 0b00011000;  // rx compl intr ena - tx compl intr ena - dreg empty intr ena - rx ena - tx ena - sz2 (size bit 2)  - 9. bit rx - 9. tx
+
+// no change needed:	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
+
+	rxState = rxIdle;
+	dataReceived = 0;
+	latestTemperature = 0.00;
+	latestHumidity  = 0.00;
+}
+
+
+void initHW()
+{
+	initInterrupts();
+	initUsart2;
+}
+
