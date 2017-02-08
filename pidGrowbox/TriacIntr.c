@@ -312,7 +312,7 @@ enum rxStates {
 
 uint8_t  rxState;
 uint8_t  rxCurrentPos;
-uint8_t  dataReceived;
+uint16_t msgCnt;
 
 float   latestTemperature; 
 float   latestHumidity;
@@ -327,13 +327,14 @@ void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrose
 
 void onDataReceived()        // called by main application thread to calculate the latest data
 {
-	
+	++msgCnt;	
 }
 
 
 ISR (USART1_RX_vect)
 {
-	
+	uint8_t rxCh;
+	rxCh = UDR1;
 }
 
 void initUsart2()
@@ -354,6 +355,7 @@ void initUsart2()
 
 	rxState = rxIdle;
 	dataReceived = 0;
+	msgCnt = 0;
 	latestTemperature = 0.00;
 	latestHumidity  = 0.00;
 }

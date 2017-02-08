@@ -63,5 +63,11 @@ int main(void)
     while(1)
     {
         //TODO:: Please write your application code 
+		
+		if (dataReceived == 1)  {
+			dataReceived = 0;
+			onDataReceived();
+		}
+		
     }
 }
