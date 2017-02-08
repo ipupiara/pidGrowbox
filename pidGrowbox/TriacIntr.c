@@ -9,7 +9,6 @@
 #include "TriacDefines.h"
 #include "triacPID.h"
 
-int16_t lastAmpsADCVal;
 
 int16_t remainingTriacTriggerDelayCounts;
 
@@ -18,8 +17,6 @@ int16_t triacTriggerTimeTcnt2;
 int16_t secondsDurationTimerRemaining;
 
 int16_t secondsInDurationTimer;
-
-int8_t adcCnt;
 
 int16_t amtInductiveRepetitions;
 
@@ -145,17 +142,6 @@ ISR(TIMER2_COMPA_vect)
 	sei();	
 }
 
-ISR(ADC_vect)
-{
-	lastAmpsADCVal = ADC;
-	++ adcCnt;
-
-	if (adcCnt == pidStepDelays)  {     
-		adcCnt = 0;
-		adcTick = 1;
-	}
-}
-
 ISR(INT0_vect)
 {
 	cli();
@@ -171,9 +157,6 @@ ISR(INT0_vect)
 	sei();		  
 }   
 
-ISR(TIMER0_COMPA_vect)
-{    // needed for ADC so far..
-}
 
 ISR(TIMER1_COMPA_vect)
 {
@@ -190,9 +173,6 @@ ISR(TIMER1_COMPA_vect)
 void initInterrupts()
 {
 // Ext. Interrupt
-		DDRA = 0b11110000;    // set pin 7 to 4 of port A as output for digital poti (zero adj)
-		PORTA = 0b11100000;
-		DIDR0 = 0x0F;			// disa digital input on a0..a3
 
 		DDRD &= ~0x04;		// set PortD pin 2 as input for trigger Ext Int 0
 		PORTD &=  ~0x04;   // without pullup 
@@ -227,20 +207,6 @@ void initInterrupts()
 		TIMSK1  = 0x00; // disa  Interrupt 
 		//		TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
 
-// Timer 0    used for ADC triggering  in TriaRunning mode
-	  
-		TCCR0A = 0b00000010;  //  CTC 
-
-		OCR0A = 0xFF;  // counter top value, 0xFF means approx 42.18 ADC measures and write to mem per sec
-					// far too much for our needs, but runs parallel except 
-					//  the very short ADC-complete interrrupt
-		TCNT0 = 0x00 ;  
-  
-//		TCCR0B = 0b00000101  ; // CTC on CC0A , set clk / 1024, timer started	  
-//		TIMSK0  = 0b00000010;  // ena  interrupts, and let run ADC
-// 		not yet start Timer0 and ADC, to be tested
-		TCCR0B = 0b00000000  ; // CTC on CC0A , not yet started	  
-		TIMSK0  = 0b00000000;
 
 
 // Timer 2 as Triac Trigger Delay Timer
@@ -258,52 +224,14 @@ void initInterrupts()
 		TIMSK2  = 0x00; // disa  Interrupt 
 		//		TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
 
-//  init ADC
-
-		ADCSRA  = 0b00000111;  // disa ADC, ADATE, ADIE	
-		adcTick = 0;
-		adcCnt = 0;
-		lastAmpsADCVal = 0;
 
 		sei();  // start interrupts if not yet started
-}
-
-void startAmpsADC()
-{
-	ADCSRA  = 0b00000111;  // disa ADC, ADATE, ADIE	
-	adcTick = 0;
-	adcCnt = 0;
-
-	if (ampsInputPin == avg) {
-		ADMUX = 0b01000001;
-	} else {
-		ADMUX = 0b01000010;      // AVCC as ref,  right adjust, mux to adc2/adc1
-	}
-	ADCSRA = 0b10101111;  
-							// int ena, prescale /128
-							// ADC clock will run at 86400 hz, or max 6646. 
-							//  read per sec,what is ok
-							// for our settings of 42. read per sec	
-							// or manuals start 
-
-	ADCSRB = 0x03;  // no ACME, trigger ADC on Timer0 compare match
-
-	TCCR0B = 0b00000101  ; // CTC on CC0A , set clk / 1024, timer 0 started	  
-	TIMSK0  = 0b00000010;  // ena  interrupts, and let run ADC	
-}
-
-void stopAmpsADC()
-{
-	ADCSRA  = 0b00000111;  // disa ADC, ADATE, ADIE	
-
-	TCCR0B = 0b00000000  ; // stop timer 0	  
-	TIMSK0  = 0b00000000;  // 
 }
 
 void startTriacRun()
 {
 	resetPID();
-	startAmpsADC();
+//	startAmpsADC();
 	EIFR = 0x00;
 	EIMSK = 0x01;  				// start external interrupt (zero pass detection)
 }
@@ -314,18 +242,9 @@ void stopTriacRun()
 	cli();
 	stopTimer2();
 	sei();
-	stopAmpsADC();
+//	stopAmpsADC();
 }
 
-int16_t ampsADCValue()
-{
-	int16_t res;
-	cli();
-	res = lastAmpsADCVal;
-	sei();
-//	printf("ampsADC %i ",lastAmpsADCVal);
-	return res;
-}
 
 /*
 int16_t  valueFrom6Bit2Complement(int16_t adcV)
@@ -347,19 +266,6 @@ int16_t diffADCValue()
 }
 */
 
-double adcVoltage()
-{
-	int16_t VHex;
-	double   VFl;
-
-	VFl = 0.0;
-
-	VHex = ampsADCValue();
-	VFl = (VHex * 5.0) / 0x03FF;
-	
-	return VFl;
-}
-
 void startDurationTimer(int16_t secs)
 {
 	durationTimerReachead = 0;
@@ -376,7 +282,7 @@ void stopDurationTimer()
 	TIMSK1 = 0x00;
 	
 }
-
+/*
 void setCompletionAlarmOff()
 {
 	PORTD &= ~0x08; 		
@@ -395,6 +301,6 @@ void toggleCompletionAlarm()
 		setCompletionAlarmOn();
 	}
 }
-
+*/
 
 

@@ -11,15 +11,6 @@
 int8_t durationTimerReachead;
 int8_t runningSecondsTick;
 
-int8_t adcTick;
-void startAmpsADC();
-void stopAmpsADC();
-//void setDiffADC();
-//void closeDiffADC();
-void startSingleADC();
-int16_t ampsADCValue();
-int16_t diffADCValue();
-double adcVoltage();
 
 int16_t triacFireDurationTcnt2;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
 
@@ -34,13 +25,5 @@ void setTriacFireDuration(int16_t cmsecs);
 void startTriacRun();
 void stopTriacRun();
 
-void setCompletionAlarmOn();
-void setCompletionAlarmOff();
-void toggleCompletionAlarm();
-
-
-/*
-opto coupler based 0x (zerocross) handling. optocoupler based diode opens at 
-*/
 
 #endif
