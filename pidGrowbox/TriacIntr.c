@@ -42,18 +42,19 @@ int16_t getSecondsInDurationTimer()
 
 void setTcnt2AndOcra2a(int16_t newTcnt2Val,int16_t newOcra2a)
 {
-	// timer must be stopped to set tcnt, because else, on an 
-	// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
-	// resulting in a more or less random set value.
-	int8_t tccr2bStack;
-	tccr2bStack = TCCR2B;
-	TCCR2B = 0b00000000  ;  // CTC, timer stopped		
-	if (TCNT2 != newTcnt2Val) {  // dont set if not needed , because  .....
-		TCNT2 = newTcnt2Val;	
-		if (newOcra2a == (TCNT2 + 1)) {++ newOcra2a; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
-	}
-	OCR2A = newOcra2a;  
-	TCCR2B = tccr2bStack  ; // set previous value
+	//
+	//// timer must be stopped to set tcnt, because else, on an 
+	//// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
+	//// resulting in a more or less random set value.
+	//int8_t tccr2bStack;
+	//tccr2bStack = TCCR2B;
+	//TCCR2B = 0b00000000  ;  // CTC, timer stopped		
+	//if (TCNT2 != newTcnt2Val) {  // dont set if not needed , because  .....
+		//TCNT2 = newTcnt2Val;	
+		//if (newOcra2a == (TCNT2 + 1)) {++ newOcra2a; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
+	//}
+	//OCR2A = newOcra2a;  
+	//TCCR2B = tccr2bStack  ; // set previous value
 }
 
 void setTriacTriggerDelayValues()
@@ -71,16 +72,16 @@ void setTriacTriggerDelayValues()
 
 void startTimer2()
 {
-	TIFR2 = 0x00;
-	TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable
-	TCCR2B = 0b00000101  ; // CTC on CC2A , set clk / 128, timer 2 started
+	//TIFR2 = 0x00;
+	//TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable
+	//TCCR2B = 0b00000101  ; // CTC on CC2A , set clk / 128, timer 2 started
 }
 
 void stopTimer2()
 {
-	TCCR2B = 0b00000000  ;  // CTC, timer stopped
-	TIMSK2  = 0x00;
-	TIFR2 = (1<< OCF2A);    // cleared by writing a "logic" one to the flag
+	//TCCR2B = 0b00000000  ;  // CTC, timer stopped
+	//TIMSK2  = 0x00;
+	//TIFR2 = (1<< OCF2A);    // cleared by writing a "logic" one to the flag
 }
 
 
@@ -191,38 +192,38 @@ void initInterrupts()
 		EIMSK = 0x00;   
 
 // Timer 1 as Duration Timer
-	  
-			runningSecondsTick = 0;
-	  
-		TCCR1A = 0x00;  // normal mode or CTC dep.on TCCR1B
-		//TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 1024, timer started
-
-		TCCR1B = 0b00001000  ;  // CTC, timer stopped
-
-		TCCR1C = 0x00; // no Force output compare
-
-		OCR1A = 0x2A30;  // counter top value  , this value at clk/1024 will cause a delay of exact 1 sec
-		TCNT1 = 0x00 ;  
-
-		TIMSK1  = 0x00; // disa  Interrupt 
-		//		TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
-
-
-
-// Timer 2 as Triac Trigger Delay Timer
-	  
-		TCCR2A = 0b00000010;  //  CTC 
-
-		//TCCR2B = 0b00000101  ; // CTC on CC0A , set clk / 128, timer started
-
-		TCCR2B = 0b00000000  ;  // CTC, timer stopped
-		ASSR = 0x00;
-
-		OCR2A = ocra2aValueMax;  // counter top value  , just anything for start, will later be set by PID
-		TCNT2 = 0x00 ;  
-
-		TIMSK2  = 0x00; // disa  Interrupt 
-		//		TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
+	  //
+			//runningSecondsTick = 0;
+	  //
+		//TCCR1A = 0x00;  // normal mode or CTC dep.on TCCR1B
+		////TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 1024, timer started
+//
+		//TCCR1B = 0b00001000  ;  // CTC, timer stopped
+//
+		//TCCR1C = 0x00; // no Force output compare
+//
+		//OCR1A = 0x2A30;  // counter top value  , this value at clk/1024 will cause a delay of exact 1 sec
+		//TCNT1 = 0x00 ;  
+//
+		//TIMSK1  = 0x00; // disa  Interrupt 
+		////		TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
+//
+//
+//
+//// Timer 2 as Triac Trigger Delay Timer
+	  //
+		//TCCR2A = 0b00000010;  //  CTC 
+//
+		////TCCR2B = 0b00000101  ; // CTC on CC0A , set clk / 128, timer started
+//
+		//TCCR2B = 0b00000000  ;  // CTC, timer stopped
+		//ASSR = 0x00;
+//
+		//OCR2A = ocra2aValueMax;  // counter top value  , just anything for start, will later be set by PID
+		//TCNT2 = 0x00 ;  
+//
+		//TIMSK2  = 0x00; // disa  Interrupt 
+		////		TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
 
 
 		sei();  // start interrupts if not yet started
@@ -272,14 +273,14 @@ void startDurationTimer(int16_t secs)
 	secondsDurationTimerRemaining = secs;
 	secondsInDurationTimer = 0;
 	
-	TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
+//	TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
 	TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 24, timer started 
 }
 
 void stopDurationTimer()
 {
 	TCCR1B = 0b00001000 ;  // CTC, timer stopped
-	TIMSK1 = 0x00;
+//	TIMSK1 = 0x00;
 	
 }
 /*

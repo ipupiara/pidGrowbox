@@ -5,7 +5,7 @@
 #include <avr/eeprom.h>
 #include "triacPID.h"
 #include "TriacIntr.h"
-#include "TWI_master.h"
+
 
 //#define printfPid
 //#define printfAmps
@@ -45,7 +45,7 @@ void onTriacIdleSecondTick_PID()
 {
 	int16_t secs;
 
-//	secs = getSecondsDurationTimerRemaining();
+	secs = getSecondsDurationTimerRemaining();
 	if ((secs & 0x001f) == 0) {
 		printPIDState();
 	} 
@@ -72,7 +72,7 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
     m_integral = 0;
     m_started = 0;
 	
-	 updateGradAmps();
+//	 updateGradAmps();
 
 	 corrCarryOver = 0;
 }
@@ -131,7 +131,8 @@ void calcNextTriacDelay()
 	float corr;
 	int16_t newDelay;
 	int16_t corrInt;
-	err = currentAmps()  - desiredAmps ;
+//	err = currentAmps()  - desiredAmps ;
+	err = 0.0001;
 	corr = nextCorrection(err) + corrCarryOver;
 	corrInt = corr;     
 	corrCarryOver = corr - corrInt;
@@ -148,7 +149,7 @@ void calcNextTriacDelay()
 void InitPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);   
-	InitializePID( -0.45, 1.1, 0.2, 0.2, 5, (pidStepDelays/42.18));
+//	InitializePID( -0.45, 1.1, 0.2, 0.2, 5, (pidStepDelays/42.18));
 
 }
 
