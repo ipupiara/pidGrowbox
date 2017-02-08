@@ -2,9 +2,6 @@
 #include <avr/io.h>
 #include <stdio.h>
 
-//#include "uart.h"
-
-
 #include "TriacIntr.h"
 #include "TriacDefines.h"
 #include "triacPID.h"
@@ -123,25 +120,25 @@ void calcAmtInductiveRepetitions(int16_t triacFireDurationTcnt2)
 		amtInductiveRepetitions = 1;
 	}
 }
-
-ISR(TIMER2_COMPA_vect)
-{
-	cli();
-	if (remainingTriacTriggerDelayCounts <= 0) {
-		PORTD |= 0x10;
-		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
-		PORTD &= ~0x10;			// handled synchronous
-		if ((triacTriggerTimeTcnt2 >= triggerDelayMaxTcnt2) || (amtInductiveRepetitions <= 0)  ) {
-			stopTimer2();
-		} else {
-			startTriacTriggerDelay(delayBetweenTriacTriggers);
-			--amtInductiveRepetitions;
-		}
-	} else {
-		setTriacTriggerDelayValues();
-	}
-	sei();	
-}
+//
+//ISR(TIMER2_COMPA_vect)
+//{
+	//cli();
+	//if (remainingTriacTriggerDelayCounts <= 0) {
+		//PORTD |= 0x10;
+		//delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
+		//PORTD &= ~0x10;			// handled synchronous
+		//if ((triacTriggerTimeTcnt2 >= triggerDelayMaxTcnt2) || (amtInductiveRepetitions <= 0)  ) {
+			//stopTimer2();
+		//} else {
+			//startTriacTriggerDelay(delayBetweenTriacTriggers);
+			//--amtInductiveRepetitions;
+		//}
+	//} else {
+		//setTriacTriggerDelayValues();
+	//}
+	//sei();	
+//}
 
 ISR(INT0_vect)
 {
@@ -231,7 +228,7 @@ void initInterrupts()
 
 void startTriacRun()
 {
-	resetPID();
+//	resetPID();
 //	startAmpsADC();
 	EIFR = 0x00;
 	EIMSK = 0x01;  				// start external interrupt (zero pass detection)
@@ -324,7 +321,7 @@ float   latestHumidity;
 void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrosense, called by user functions
 {
 	*pTemp = latestTemperature;
-	*pHum  = latestHumidity
+	*pHum  = latestHumidity;
 }
 
 
@@ -365,6 +362,6 @@ void initUsart2()
 void initHW()
 {
 	initInterrupts();
-	initUsart2;
+	initUsart2();
 }
 

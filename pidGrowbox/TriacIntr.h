@@ -16,7 +16,7 @@ int16_t triacFireDurationTcnt2;   // centi-millis-secs, not exactly but approxim
 
 void startDurationTimer(int16_t secs);
 int16_t getSecondsDurationTimerRemaining();
-int16_t getSecondsInDurationTimer()
+int16_t getSecondsInDurationTimer();
 
 void stopDurationTimer();
 
@@ -26,7 +26,7 @@ void startTriacRun();
 void stopTriacRun();
 
 
-void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrosense, called by user functions
+void getLatestClimateValues(float* pTemp,float* pHum);    // interface to hygrosense, called by user functions
 
 
 #endif

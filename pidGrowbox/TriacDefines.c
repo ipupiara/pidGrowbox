@@ -1,7 +1,9 @@
 
 #include <stdio.h>
+#include <avr/interrupt.h>
 #include "TriacDefines.h"
-#include "TriacIntr.h"
+
+//#include "TriacIntr.h"
 #define ownEepromMethods 
 
 #ifndef ownEepromMethods
@@ -10,11 +12,11 @@
 
 // ATTENTION: use of EEPROM needs BOD Level of at least 2.7 V, otherwise EEPROM memory
 // is likely to crash on restore when done at mcu startup
-/*
+
 void EEPROM_write(unsigned int uiAddress, unsigned char ucData)
 {
 	// Wait for completion of previous write 
-	while(EECR & (1<<EEPE));
+	while(EECR & (1<<EEWE));
 	// Set up address and Data Registers 
 	EEAR = uiAddress;
 	EEDR = ucData;
@@ -38,7 +40,7 @@ void EEPROM_write(unsigned int uiAddress, unsigned char ucData)
 unsigned char EEPROM_read(unsigned int uiAddress)
 {
 	// Wait for completion of previous write 
-	while(EECR & (1<<EEPE))
+	while(EECR & (1<<EEWE))
 	;
 	// Set up address register 
 	EEAR = uiAddress;
@@ -93,7 +95,7 @@ void eeprom_write_word(uint16_t* adr, uint16_t val)
 	EEPROM_write(adre + 1,*((unsigned char*)&val + 1));
 }
 
-*/
+
 
 #endif
 

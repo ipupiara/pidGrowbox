@@ -9,9 +9,9 @@
 #include <avr/io.h>
 #include <stdio.h>
 #include <string.h>
-//#include "TriacDefines.h"
-//#include "TriacIntr.h"
-//#include "triacPID.h"
+#include "TriacDefines.h"
+#include "TriacIntr.h"
+#include "triacPID.h"
 
 
 void USART_Init( unsigned int baud )
@@ -56,9 +56,9 @@ int main(void)
 	stdout = &mystdout;
 	printf("\nSTARTUP\n");
 	
-//	initDefines();
-//	InitPID();
-//	initHW();
+	initDefines();
+	InitPID();
+	initHW();
 	
     while(1)
     {
