@@ -147,16 +147,24 @@ ISR( TIMER0_COMP_vect)
 	sei();	
 }
 
-ISR(INT0_vect)
+ISR(INT7_vect)
 {
+#warning "tobe tested"
 	cli();
-	if ((PIND & 0x04) != 0) {
+	if ((PINE & (1 << PINE7)) != 0) {
+		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ; 
+		EICRB  |=   (1<< ISC71)  ;   // falling edge  ( each edge change needs to be programmed in the interrupt ::::----(((((
+		EIFR  &=  ~(1 << INTF7);		//  flag might have been set while changing edge mode ??? and would cause an immediate interrupt
+										//  if cli would not have set before, resp. unmasking the interrupt			
 		stopTimer0();		
 	} else {
+		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ; 
+		EICRB  |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each edge change needs to be programmed in the interrupt ::::----(((((
+		EIFR  &=  ~(1 << INTF7);
 		triacTriggerTimeTcnt0 = 0;
 		if (triacFireDurationTcnt0 > 0)  {
 			startTriacTriggerDelay(  triggerDelayMaxTcnt0 - triacFireDurationTcnt0);
-//			calcAmtInductiveRepetitions(triacFireDurationTcnt0);
+//			calcAmtInductiveRepetitions(triacFireDurationTcnt0);  better not needs much cpu time  ! :-(   my mistake, sorry
 		}
 	}
 	sei();		  
@@ -177,23 +185,15 @@ ISR(TIMER1_COMPA_vect)
 
 void initInterrupts()
 {
-// Ext. Interrupt
-
-		DDRD &= ~0x04;		// set PortD pin 2 as input for trigger Ext Int 0
-		PORTD &=  ~0x04;   // without pullup 
-
-		PORTD &= ~0x10; 		// done also before setting DDR to avoid eventual accidental triac trigger
-		DDRD |= 0x10;			// set Portd pin 04 be Triac output
-		PORTD &= ~0x10; 		// and initialize with 0-value
-
-		PORTD &= ~0x08; 		
-		DDRD |= 0x08;			// set Portd pin 03 to be completionAlarm
-		PORTD &= ~0x08; 		// and initialize with 0-value
+	
+///////   0-x detector input pint INT7 on PE7  
+		
+		DDRE  &=  ~(1 << DDE7 ) ;    // input pin
 
 
-
-		EICRA = 0x01;   // both, fall/rise edge trigger    
-		EIMSK = 0x00;   
+		EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each edge needs to be programmed in the interrupt ::::----(((((
+		EIFR  &=  ~(1 << INTF7); 
+		EIMSK |= (1 << INT7);
 
 // Timer 1 as Duration Timer
 	  
