@@ -304,6 +304,8 @@ void toggleCompletionAlarm()
 
 /////////////   USART 2 ///////////////////
 
+#warning: "needs  more work: below constants tobe debugged"
+
 #define startChar 123
 #define stopChar   321
 #define amtChars  68
@@ -336,7 +338,7 @@ void onDataReceived()        // called by main application thread to calculate t
 	++msgCnt;
 	cli();
 	//  extact data bytes to local buffer outside message
-	rxState == rxIdle;	
+	rxState = rxIdle;	
 	sei();
 	//  calculate values out of local buffer
 }
@@ -358,7 +360,7 @@ ISR (USART1_RX_vect)
 		}
 	}
 	if ((rxCh == stopChar)  && (msgCnt == amtChars)) {   // no  chars lost 
-		rxState == rxReceived;
+		rxState = rxReceived;
 		dataReceived = 1;
 	}
 }
