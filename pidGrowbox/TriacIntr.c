@@ -11,13 +11,13 @@
 
 int16_t remainingTriacTriggerDelayCounts;
 
-int16_t triacTriggerTimeTcnt2;
+int16_t triacTriggerTimeTcnt0;
 
 int16_t secondsDurationTimerRemaining;
 
 int16_t secondsInDurationTimer;
 
-int16_t amtInductiveRepetitions;
+//int16_t amtInductiveRepetitions;
 
 int16_t getSecondsDurationTimerRemaining()
 {
@@ -37,50 +37,55 @@ int16_t getSecondsInDurationTimer()
 	return res;
 }
 
-#define ocra2aValueMax 0XFC  // still to be defined
+#define ocra0ValueMax 0XFC  // still to be defined
 
-void setTcnt2AndOcra2a(int16_t newTcnt2Val,int16_t newOcra2a)
-{
-	//
-	//// timer must be stopped to set tcnt, because else, on an 
-	//// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
-	//// resulting in a more or less random set value.
-	//int8_t tccr2bStack;
-	//tccr2bStack = TCCR2B;
-	//TCCR2B = 0b00000000  ;  // CTC, timer stopped		
-	//if (TCNT2 != newTcnt2Val) {  // dont set if not needed , because  .....
-		//TCNT2 = newTcnt2Val;	
-		//if (newOcra2a == (TCNT2 + 1)) {++ newOcra2a; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
-	//}
-	//OCR2A = newOcra2a;  
-	//TCCR2B = tccr2bStack  ; // set previous value
-}
 
-void setTriacTriggerDelayValues()
+void startTimer0()
 {
-	if (remainingTriacTriggerDelayCounts < ocra2aValueMax) {		
-		setTcnt2AndOcra2a (0, remainingTriacTriggerDelayCounts);
-		triacTriggerTimeTcnt2 += remainingTriacTriggerDelayCounts;
-		remainingTriacTriggerDelayCounts = 0;
-	} else {
-		remainingTriacTriggerDelayCounts -= ocra2aValueMax;
-		setTcnt2AndOcra2a(0, ocra2aValueMax);
-		triacTriggerTimeTcnt2 +=  ocra2aValueMax;
-	}
-}
-
-void startTimer2()
-{
-	//TIFR2 = 0x00;
-	//TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable
+	
+	#warning: "todo test if timer 0 (before was timer 2 !) works correct in atmega128"
 	//TCCR2B = 0b00000101  ; // CTC on CC2A , set clk / 128, timer 2 started
+	
+	TCCR0 |=  (1 <<  CS00) |  (1 <<  CS02) ;    //    (1 <<  CS01) |
 }
 
-void stopTimer2()
+void stopTimer0()
 {
 	//TCCR2B = 0b00000000  ;  // CTC, timer stopped
 	//TIMSK2  = 0x00;
 	//TIFR2 = (1<< OCF2A);    // cleared by writing a "logic" one to the flag
+	
+	TCCR0 &=  (1 <<  CS00) |  (1 <<  CS01) | (1 <<  CS02) ;     // (0 prescaler )  timer stopped
+}
+
+
+void setTcnt0AndOcr0(int16_t newTcnt0Val,int16_t newOcr0)
+{
+	
+	// timer must be stopped to set tcnt, because else, on an 
+	// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
+	// resulting in a more or less random set value.
+	// stop timer0
+	int8_t tccr0Stack; 
+	tccr0Stack = TCCR0;
+	stopTimer0();		
+	TCNT0 = newTcnt0Val;		
+	if (newOcr0 == (TCNT0 + 1)) {++ newOcr0; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
+	OCR0 = newOcr0;  
+	TCCR0 = tccr0Stack  ; // set previous value, restart timer0 if it was running
+}
+
+void setTriacTriggerDelayValues()
+{
+	if (remainingTriacTriggerDelayCounts < ocra0ValueMax) {		
+		setTcnt0AndOcr0 (0, remainingTriacTriggerDelayCounts);
+		triacTriggerTimeTcnt0 += remainingTriacTriggerDelayCounts;
+		remainingTriacTriggerDelayCounts = 0;
+	} else {
+		remainingTriacTriggerDelayCounts -= ocra0ValueMax;
+		setTcnt0AndOcr0(0, ocra0ValueMax);
+		triacTriggerTimeTcnt0 +=  ocra0ValueMax;
+	}
 }
 
 
@@ -91,67 +96,67 @@ void startTriacTriggerDelay( int16_t delayDuration)  // must run protected betwe
 	}
 	remainingTriacTriggerDelayCounts = delayDuration;
 	setTriacTriggerDelayValues();
-	startTimer2();		
+	startTimer0();		
 }
 
-void setTriacFireDuration(int16_t durationTcnt2)
+void setTriacFireDuration(int16_t durationTcnt0)
 {
 	cli();
-	if (durationTcnt2 < triggerDelayMaxTcnt2) {
-		if (durationTcnt2 > 0) {
-			triacFireDurationTcnt2 = durationTcnt2;}
+	if (durationTcnt0 < triggerDelayMaxTcnt0) {
+		if (durationTcnt0 > 0) {
+			triacFireDurationTcnt0 = durationTcnt0;}
 		else {
-			triacFireDurationTcnt2 = 0;
+			triacFireDurationTcnt0 = 0;
 		}
 	} else {
-		triacFireDurationTcnt2 = triggerDelayMaxTcnt2;
+		triacFireDurationTcnt0 = triggerDelayMaxTcnt0;
 	}
 	sei();
 }
 
-void calcAmtInductiveRepetitions(int16_t triacFireDurationTcnt2)
-{
-	if ( inductiveLoad)  {
-		float amtInductiveRepetitionsF = 0.0;
-		float triacFireDurationTcnt2F = triacFireDurationTcnt2;
-//		amtInductiveRepetitions = ((triacFireDurationTcnt2 * ( 1  /(11.0592e+6  /128) )) * 1.0e+6  ) /  measuredRepetitionIntervalus; 
-		amtInductiveRepetitionsF = (triacFireDurationTcnt2F * 11.63  )  /  measuredRepetitionIntervalus; 
-		// always cut off modulo part when converting to int
-		amtInductiveRepetitions = amtInductiveRepetitionsF;   // tobe  debugged
-	} else {
-		amtInductiveRepetitions = 1;
-	}
-}
-//
-//ISR(TIMER2_COMPA_vect)
+//void calcAmtInductiveRepetitions(int16_t triacFireDurTcnt0)
 //{
-	//cli();
-	//if (remainingTriacTriggerDelayCounts <= 0) {
-		//PORTD |= 0x10;
-		//delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
-		//PORTD &= ~0x10;			// handled synchronous
-		//if ((triacTriggerTimeTcnt2 >= triggerDelayMaxTcnt2) || (amtInductiveRepetitions <= 0)  ) {
-			//stopTimer2();
-		//} else {
-			//startTriacTriggerDelay(delayBetweenTriacTriggers);
-			//--amtInductiveRepetitions;
-		//}
+	//if ( inductiveLoad)  {
+		//float amtInductiveRepetitionsF = 0.0;
+		//float triacFireDurationTcnt2F = triacFireDurTcnt0;
+////		amtInductiveRepetitions = ((triacFireDurationTcnt2 * ( 1  /(11.0592e+6  /128) )) * 1.0e+6  ) /  measuredRepetitionIntervalus; 
+		//amtInductiveRepetitionsF = (triacFireDurationTcnt2F * 11.63  )  /  measuredRepetitionIntervalus; 
+		//// always cut off modulo part when converting to int
+		//amtInductiveRepetitions = amtInductiveRepetitionsF;   // tobe  debugged
 	//} else {
-		//setTriacTriggerDelayValues();
+		//amtInductiveRepetitions = 1;
 	//}
-	//sei();	
 //}
+
+ISR( TIMER0_COMP_vect)
+{
+	cli();
+	if (remainingTriacTriggerDelayCounts <= 0) {
+		PORTD |= 0x10;
+		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
+		PORTD &= ~0x10;			// handled synchronous
+		if ((triacTriggerTimeTcnt0 >= triggerDelayMaxTcnt0) ) {    //|| (amtInductiveRepetitions <= 0) 
+			stopTimer0();
+		} else {
+			startTriacTriggerDelay(delayBetweenTriacTriggers);
+//			--amtInductiveRepetitions;
+		}
+	} else {
+		setTriacTriggerDelayValues();
+	}
+	sei();	
+}
 
 ISR(INT0_vect)
 {
 	cli();
 	if ((PIND & 0x04) != 0) {
-		stopTimer2();		
+		stopTimer0();		
 	} else {
-		triacTriggerTimeTcnt2 = 0;
-		if (triacFireDurationTcnt2 > 0)  {
-			startTriacTriggerDelay(  triggerDelayMaxTcnt2 - triacFireDurationTcnt2);
-			calcAmtInductiveRepetitions(triacFireDurationTcnt2);
+		triacTriggerTimeTcnt0 = 0;
+		if (triacFireDurationTcnt0 > 0)  {
+			startTriacTriggerDelay(  triggerDelayMaxTcnt0 - triacFireDurationTcnt0);
+//			calcAmtInductiveRepetitions(triacFireDurationTcnt0);
 		}
 	}
 	sei();		  
@@ -191,38 +196,38 @@ void initInterrupts()
 		EIMSK = 0x00;   
 
 // Timer 1 as Duration Timer
-	  //
-			//runningSecondsTick = 0;
-	  //
-		//TCCR1A = 0x00;  // normal mode or CTC dep.on TCCR1B
-		////TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 1024, timer started
-//
-		//TCCR1B = 0b00001000  ;  // CTC, timer stopped
-//
-		//TCCR1C = 0x00; // no Force output compare
-//
-		//OCR1A = 0x2A30;  // counter top value  , this value at clk/1024 will cause a delay of exact 1 sec
-		//TCNT1 = 0x00 ;  
-//
-		//TIMSK1  = 0x00; // disa  Interrupt 
-		////		TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
-//
-//
-//
-//// Timer 2 as Triac Trigger Delay Timer
-	  //
-		//TCCR2A = 0b00000010;  //  CTC 
-//
-		////TCCR2B = 0b00000101  ; // CTC on CC0A , set clk / 128, timer started
-//
-		//TCCR2B = 0b00000000  ;  // CTC, timer stopped
-		//ASSR = 0x00;
-//
-		//OCR2A = ocra2aValueMax;  // counter top value  , just anything for start, will later be set by PID
-		//TCNT2 = 0x00 ;  
-//
-		//TIMSK2  = 0x00; // disa  Interrupt 
-		////		TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
+	  
+		runningSecondsTick = 0;
+	  
+		TCCR1A = 0x00;  // normal mode or CTC dep.on TCCR1B
+		//TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 1024, timer started
+
+		TCCR1B = 0b00001000  ;  // CTC, timer stopped
+
+		TCCR1C = 0x00; // no Force output compare
+
+		OCR1A = 0x2A30;  // counter top value  , this value at clk/1024 will cause a delay of exact 1 sec
+		TCNT1 = 0x00 ;  
+
+		
+//		TIMSK  &=  ~(1 << OCIE1A)  ;// disa  Interrupt    since timsk in atmega128 is global for 3 timers
+//			TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
+			TIMSK |= (1 << OCIE1A)  ;  //  Output Compare A Match Interrupt Enable
+
+
+
+// Timer 0 as Triac Trigger Delay Timer
+	  
+		TCCR0 = (1 << WGM01) ;  // CTC,
+		TCCR0 &=  (1 <<  CS00) |  (1 <<  CS01) | (1 <<  CS02) ;     // (0 prescaler )  timer stopped
+	  
+
+
+		OCR0 = ocra0ValueMax;  // counter top value  , just anything for start, will later be set by PID
+		TCNT0 = 0x00 ;  
+		ASSR = 0x00;
+		//		TIMSK2  = 0x00; // disa  Interrupt 
+		TIMSK   |=  (1<<OCIE0) ;  //  Output Compare A Match Interrupt Enable 
 
 
 		sei();  // start interrupts if not yet started
@@ -240,7 +245,7 @@ void stopTriacRun()
 {
 	EIMSK = 0x00;				// stop external interrupt
 	cli();
-	stopTimer2();
+	stopTimer0();
 	sei();
 //	stopAmpsADC();
 }
@@ -343,11 +348,11 @@ void onDataReceived()        // called by main application thread to calculate t
 	char hydS [8];
 	memset (tempS,0,sizeof(tempS));
 	memset (hydS,0,sizeof(hydS));
-		
+#warning: "todo replace strstr by constants values for less interrupt latency"		
 		cli();
-			if (amtCharRcvd == amtChars)  {}
+			if (amtCharRcvd == amtChars)  {
 				++msgCnt;
-				strncpy(tempS,strstr(rxBuffer,"V01")+3,4);
+				strncpy(tempS,strstr(rxBuffer,"V01")+3,4);  // if interrupt latency causes problems, strstr can be replace by a constant 
 				strncpy(hydS,strstr(rxBuffer,"V02")+3,4);
 				rxState = rxIdle;
 			}  else  {
@@ -355,7 +360,7 @@ void onDataReceived()        // called by main application thread to calculate t
 			}
 		sei();
 	
-		float temp = atof(tempS) ;
+		float temp = atof(tempS);
 		temp = temp / 100;
 		float hyd = atof (hydS);
 		hyd = hyd / 200;
@@ -368,7 +373,7 @@ void onDataReceived()        // called by main application thread to calculate t
 		//		TRACE2("\nV01: %s %f\n",tempS, temp);
 		//		TRACE2("\nV02: %s %f\n",hydS, hyd);
 		
-	} 
+	
 	
 }
 

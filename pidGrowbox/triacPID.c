@@ -136,7 +136,7 @@ void calcNextTriacDelay()
 	corr = nextCorrection(err) + corrCarryOver;
 	corrInt = corr;     
 	corrCarryOver = corr - corrInt;
-	newDelay = triacFireDurationTcnt2 + corrInt;
+	newDelay = triacFireDurationTcnt0 + corrInt;
 	setTriacFireDuration(newDelay);
 #ifdef printfPID
 	double corrD = corr;
