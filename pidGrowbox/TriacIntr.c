@@ -304,6 +304,12 @@ void toggleCompletionAlarm()
 
 /////////////   USART 2 ///////////////////
 
+#define startChar 123
+#define stopChar   321
+#define amtChars  68
+#define rxBufferSz  100
+char rxBuffer [rxBufferSz];
+
 enum rxStates {
 	rxIdle,
 	rxReceiving,
@@ -327,14 +333,34 @@ void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrose
 
 void onDataReceived()        // called by main application thread to calculate the latest data
 {
-	++msgCnt;	
+	++msgCnt;
+	cli();
+	//  extact data bytes to local buffer outside message
+	rxState == rxIdle;	
+	sei();
+	//  calculate values out of local buffer
 }
 
 
 ISR (USART1_RX_vect)
 {
-	uint8_t rxCh;
+	uint8_t rxCh;  
 	rxCh = UDR1;
+	if (rxCh == startChar)  {
+		msgCnt = 0;	
+		dataReceived = 0;
+		rxState = rxReceiving;
+	}
+	if (rxState == rxReceiving)  {
+		++ msgCnt;
+		if (msgCnt < rxBufferSz) {
+			rxBuffer [msgCnt] = rxCh;
+		}
+	}
+	if ((rxCh == stopChar)  && (msgCnt == amtChars)) {   // no  chars lost 
+		rxState == rxReceived;
+		dataReceived = 1;
+	}
 }
 
 void initUsart2()
