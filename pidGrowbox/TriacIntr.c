@@ -1,6 +1,8 @@
 
 #include <avr/io.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "TriacIntr.h"
 #include "TriacDefines.h"
@@ -320,7 +322,9 @@ enum rxStates {
 
 uint8_t  rxState;
 uint8_t  rxCurrentPos;
-uint16_t msgCnt;
+uint8_t  msgCnt;
+uint16_t amtCharRcvd;
+uint16_t errMsgCnt;
 
 float   latestTemperature; 
 float   latestHumidity;
@@ -335,12 +339,37 @@ void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrose
 
 void onDataReceived()        // called by main application thread to calculate the latest data
 {
-	++msgCnt;
-	cli();
-	//  extact data bytes to local buffer outside message
-	rxState = rxIdle;	
-	sei();
-	//  calculate values out of local buffer
+	char tempS [8];
+	char hydS [8];
+	memset (tempS,0,sizeof(tempS));
+	memset (hydS,0,sizeof(hydS));
+		
+		cli();
+			if (amtCharRcvd == amtChars)  {}
+				++msgCnt;
+				strncpy(tempS,strstr(rxBuffer,"V01")+3,4);
+				strncpy(hydS,strstr(rxBuffer,"V02")+3,4);
+				rxState = rxIdle;
+			}  else  {
+				++ errMsgCnt;
+			}
+		sei();
+	
+		float temp = atof(tempS) ;
+		temp = temp / 100;
+		float hyd = atof (hydS);
+		hyd = hyd / 200;
+		
+		latestTemperature = temp;
+		latestHumidity = hyd;
+
+		//		TRACE2("\nreceived: %i  %s\n",amtRcv, buffer);
+
+		//		TRACE2("\nV01: %s %f\n",tempS, temp);
+		//		TRACE2("\nV02: %s %f\n",hydS, hyd);
+		
+	} 
+	
 }
 
 
@@ -349,17 +378,17 @@ ISR (USART1_RX_vect)
 	uint8_t rxCh;  
 	rxCh = UDR1;
 	if (rxCh == startChar)  {
-		msgCnt = 0;	
+		amtCharRcvd = 0;	
 		dataReceived = 0;
 		rxState = rxReceiving;
 	}
 	if (rxState == rxReceiving)  {
-		++ msgCnt;
-		if (msgCnt < rxBufferSz) {
-			rxBuffer [msgCnt] = rxCh;
+		++ amtCharRcvd;
+		if (amtCharRcvd < rxBufferSz) {
+			rxBuffer [amtCharRcvd] = rxCh;
 		}
 	}
-	if ((rxCh == stopChar)  && (msgCnt == amtChars)) {   // no  chars lost 
+	if ((rxCh == stopChar)  && (amtCharRcvd == amtChars)) {   // no  chars lost 
 		rxState = rxReceived;
 		dataReceived = 1;
 	}
@@ -383,7 +412,8 @@ void initUsart2()
 
 	rxState = rxIdle;
 	dataReceived = 0;
-	msgCnt = 0;
+	amtCharRcvd = 0;
+	errMsgCnt = 0;
 	latestTemperature = 0.00;
 	latestHumidity  = 0.00;
 }
