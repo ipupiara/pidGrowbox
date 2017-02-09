@@ -304,7 +304,7 @@ void toggleCompletionAlarm()
 
 /////////////   USART 2 ///////////////////
 
-#warning: "needs  more work: below constants tobe debugged"
+#warning: "needs  more work: below constants are tobe debugged"
 
 #define startChar 123
 #define stopChar   321
