@@ -206,7 +206,7 @@ void initInterrupts()
 
 		TCCR1C = 0x00; // no Force output compare
 
-		OCR1A = 0x2A30;  // counter top value  , this value at clk/1024 will cause a delay of exact 1 sec
+		OCR1A = 0x2A30;  // counter top value  , this value at clk/1024 will cause a delay of exact 1 sec at 11.0592 hz
 		TCNT1 = 0x00 ;  
 
 		
@@ -313,8 +313,8 @@ void toggleCompletionAlarm()
 
 #warning: "needs  more work: below constants are tobe debugged"
 
-#define startChar 123
-#define stopChar   321
+#define startChar 0x40
+#define stopChar   0x24
 #define amtChars  68
 #define rxBufferSz  100
 char rxBuffer [rxBufferSz];
@@ -339,6 +339,12 @@ void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrose
 {
 	*pTemp = latestTemperature;
 	*pHum  = latestHumidity;
+}
+
+
+float getCurrentTemperature() 
+{
+	return latestTemperature;
 }
 
 

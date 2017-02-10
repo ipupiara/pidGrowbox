@@ -28,6 +28,9 @@
 	#define measuredRepetitionIntervalus  200;      //  approx   ( 1s  /(11.0592 E+6  /128) ) * delayBetweenTriacTriggers    [us]
 
 // takes approx  2 us at 10 Mhz with -o0 (no opts. !) ,with all  call/ret, push N Pop
+
+void info_printf( char *emsg, ...);
+
 void delayEmptyProc (); 
 
 

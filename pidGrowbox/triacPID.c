@@ -5,6 +5,7 @@
 #include <avr/eeprom.h>
 #include "triacPID.h"
 #include "TriacIntr.h"
+#include "TriacIntr.h"
 
 
 //#define printfPid
@@ -119,7 +120,7 @@ real nextCorrection(real error)
 	double errD = error;
 	double intD = m_integral;
 	double derivD = deriv;
-	printf("err %f int %f deriv %f \n",errD, intD, derivD);
+	info_printf("err %f int %f deriv %f \n",errD, intD, derivD);
 #endif
     return res;
 }
@@ -131,8 +132,7 @@ void calcNextTriacDelay()
 	float corr;
 	int16_t newDelay;
 	int16_t corrInt;
-//	err = currentAmps()  - desiredAmps ;
-	err = 0.0001;
+	err = getCurrentTemperature()  - desiredTemperature ;
 	corr = nextCorrection(err) + corrCarryOver;
 	corrInt = corr;     
 	corrCarryOver = corr - corrInt;
@@ -142,14 +142,17 @@ void calcNextTriacDelay()
 	double corrD = corr;
 	double carryCorrD = corrCarryOver;
 	double ampsD  = currentAmps();
-	printf(" corr %f corrI %i cry %f delay %x  amps %f\n",corrD,corrInt, carryCorrD, newDelay, ampsD); 
+	info_printf(" corr %f corrI %i cry %f delay %x  amps %f\n",corrD,corrInt, carryCorrD, newDelay, ampsD); 
 #endif
 }
 
 void InitPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);   
-//	InitializePID( -0.45, 1.1, 0.2, 0.2, 5, (pidStepDelays/42.18));
+
+	InitializePID( -0.45, 1.1, 0.2, 0.2, 5, pidIntervalSecs);
+	
+	setTriacFireDuration(initialTriacDelayValue);
 
 }
 
@@ -174,11 +177,17 @@ void printPIDState()
 	res = calibLowAmps +  (gradAmps * ((int16_t) adcAmps - (int16_t) calibLowADC  ));
 	resD = res;
 
-	printf("\nPID State\n");
-	printf("calLowA %i calHighA %i caLowDelay %i caHiDelay %i\n",calibLowAmps,calibHighAmps, calibLowTriacFireDuration, calibHighTriacFireDuration);
-	printf("calLowAdc %i caHiAdc %i \n",calibLowADC, calibHighADC);
-	printf("shows at 0 ADC : %f A  grad %f zeroPotiPos %i\n",resD, gradD,zeroPotiPos);
+	info_printf("\nPID State\n");
+	info_printf("calLowA %i calHighA %i caLowDelay %i caHiDelay %i\n",calibLowAmps,calibHighAmps, calibLowTriacFireDuration, calibHighTriacFireDuration);
+	info_printf("calLowAdc %i caHiAdc %i \n",calibLowADC, calibHighADC);
+	info_printf("shows at 0 ADC : %f A  grad %f zeroPotiPos %i\n",resD, gradD,zeroPotiPos);
 //	checkEEPOROM();
 
 */
+}
+
+
+void onPidStep()
+{
+	calcNextTriacDelay();
 }

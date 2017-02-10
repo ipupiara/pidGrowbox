@@ -1,9 +1,25 @@
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <avr/interrupt.h>
 #include "TriacDefines.h"
 
 //#include "TriacIntr.h"
+
+
+
+void info_printf( char *emsg, ...)
+{
+	va_list ap;
+	
+//	printf( emsg, ap);
+	
+	va_end(ap);
+	//	printf(emsg, ap);
+}
+
+
+
 #define ownEepromMethods 
 
 #ifndef ownEepromMethods
@@ -57,9 +73,9 @@ void eeprom_write_byte (uint8_t *adr, uint8_t val)
 	EEPROM_write(adre,*(&val));
 	checkRes = EEPROM_read(adre); 
 	if (val != checkRes) {
-		printf("eeprom stored %X, but check returned %X\n",val,checkRes);
+		info_printf("eeprom stored %X, but check returned %X\n",val,checkRes);
 	} else {
-		printf("reread ok returned %X\n",checkRes);
+		info_printf("reread ok returned %X\n",checkRes);
 	}
 }
 

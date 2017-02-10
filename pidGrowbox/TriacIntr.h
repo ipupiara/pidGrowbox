@@ -7,6 +7,7 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 	
+#define initialTriacDelayValue   200	
 	
 int8_t durationTimerReachead;
 int8_t runningSecondsTick;
@@ -27,6 +28,7 @@ void stopTriacRun();
 
 
 void getLatestClimateValues(float* pTemp,float* pHum);    // interface to hygrosense, called by user functions
+float getCurrentTemperature();
 uint8_t  dataReceived;
 void onDataReceived();
 

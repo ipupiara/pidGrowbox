@@ -54,19 +54,32 @@ int main(void)
 	//	USART_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
 	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
 	stdout = &mystdout;
-	printf("\nSTARTUP\n");
+	info_printf("\nSTARTUP\n");
 	
 	initDefines();
-	InitPID();
 	initHW();
+	InitPID();
+	
+	startDurationTimer(maxSecsPossible  );
 	
     while(1)
     {
         //TODO:: Please write your application code 
+		uint16_t   pidIntervalCounter = 0;   //  introduced to avoid division 
 		
 		if (dataReceived == 1)  {
 			dataReceived = 0;
 			onDataReceived();
+		}
+		if (runningSecondsTick == 1)  {
+			runningSecondsTick = 0;
+			
+			++ pidIntervalCounter;
+			if (pidIntervalCounter ==  pidIntervalSecs)  {
+				pidIntervalCounter = 0;
+				
+				onPidStep();
+			}
 		}
 		
     }
