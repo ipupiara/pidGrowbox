@@ -440,7 +440,7 @@ void initHW()
 
 /////////////////////////////////////////////////   ADC
 
-
+// approximative temperature measuring. the absolute value of temperature is not so important, but most important is stability in temperature
 
 
 
@@ -453,8 +453,8 @@ typedef struct {
 
 } graphValuesRec ;
 
-//graphValueRec graphValues [amtMux] = {};
-graphValueRec graphValues [amtMux] = {{1.0, 2.0,1.1,2.3},{1.23, 2.34, 4.56, 5.67}};	
+graphValuesRec graphValues [amtMux] = {};
+//graphValuesRec graphValues [amtMux] = {{1.0, 2.0,1.1,2.3},{1.23, 2.34, 4.56, 5.67}};	
 
 uint8_t  adcConnection [amtMux] = { };
 
@@ -462,29 +462,31 @@ uint8_t  adcConnection [amtMux] = { };
 
 uint16_t  adcCnt;
 
-uint16_t  lastADCVal;
+uint16_t  lastADCVal [amtMux];
 float lastVoltageVal [amtMux];			// kept global for debugging reasons
-int8_t  currentMux; 
+int8_t  currentMuxPos; 
 
 
 void initADC()
 {
-		ADMUX |=  (1 << REFS0) | (1 << REFS1) | (1 << ) ;   //  2.56V ref, use ADC0
+		ADMUX |=  (1 << REFS0) | (1 << REFS1)  ;   //  2.56V ref, use ADC0
 //		ADCSRA  |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
-		ADCSRA  |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
+		ADCSRA  |= (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
 		adcTick = 0;
 		adcCnt = 0;
-		lastADCVal = 0;
-		currentMux = -1; 
-		lastVoltageVal = 0.0;
+		memset(lastADCVal,0,sizeof(lastADCVal));
+		memset(lastVoltageVal,0,sizeof(lastVoltageVal));
+		currentMuxPos = -1; 
 }
 
 
 ISR(ADC_vect)
 {
-	lastADCVal[currentMux] = ADC;
+	lastADCVal[currentMuxPos] = ADC;
 	++ adcCnt;
 	adcTick = 1;
+	ADCSRA &= ~((1 << ADIE) | (1<<ADEN)); //disable further adc since we use only single start adc and usually change adcmux pos what needs
+										// aden to get 0 for better synchronisation
 }
 
 
@@ -497,13 +499,14 @@ uint8_t getADCTemperature(uint8_t  pos, float* result)
 	if (pos < amtMux)  {
 		uint16_t  adcV = 0;
 		cli();
-		adcV = lastADCVal;      //  2 bytes, so explicit mutex needed
+		adcV = lastADCVal[pos];      //  2 bytes, so explicit mutex needed
 		sei();
 		adcVf = adcV;
-		lastVoltageVal =  ((adcVf * 2.56)  / 1024);
-		dTbdV = (tempHigh - tempLow) / (VHigh - VLow);            // responsibility to prevent divison by 0 
+		lastVoltageVal[pos] =  ((adcVf * 2.56)  / 1024);
+		dTbdV = (graphValues[pos].tempHigh - graphValues[pos].tempLow ) / (graphValues[pos].VHigh - graphValues[pos].VLow);            
+																// responsibility to prevent divison by 0 
 															// has tobe done manually when evaluating temperature by voltage graph
-		res = tempLow  +   (( lastVoltageVal - VLow)  * dTbdV ) ;
+		res = graphValues[pos].tempLow  +   (( lastVoltageVal[pos] - graphValues[pos].VLow)  * dTbdV ) ;
 		retVal = 1;
 	};
 	*result = res;
@@ -518,14 +521,19 @@ void startADC()
 
 void startCurrentMux()
 {
+	ADCSRA &= ~((1 << ADIE) | (1<<ADEN));
 	
+	ADMUX &= ~ ((1<< MUX0) | (1<< MUX1) |(1<< MUX2) |(1<< MUX3) |(1<< MUX4) );    // set all mux to 0
+	ADMUX |= adcConnection[currentMuxPos]; 
+	
+	ADCSRA |= (1 << ADIE) | (1<<ADEN) | (1<< ADSC);
 }
 
 
 void startADCSequence()
 {
 	if ( amtMux > 0)  {
-		currentMux = 0;
+		currentMuxPos = 0;
 		startCurrentMux();
 	} 
 	
@@ -535,8 +543,8 @@ void startADCSequence()
 int8_t startNextADC ()
 {
 	int8_t res = 0;
-	if (currentMux + 1 < amtMux)  {
-		++ currentMux; 
+	if (currentMuxPos + 1 < amtMux)  {
+		++ currentMuxPos; 
 		res = 1;
 		startCurrentMux();
 	}

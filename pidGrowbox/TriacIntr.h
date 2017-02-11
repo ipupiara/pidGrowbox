@@ -35,7 +35,7 @@ void onDataReceived();
 int8_t adcTick;
 
 void initADC();
-float getADCTemperature(uint8_t  mux);
+uint8_t getADCTemperature(uint8_t  pos, float* result);
 void startADCSequence();
 int8_t startNextADC ();
 
