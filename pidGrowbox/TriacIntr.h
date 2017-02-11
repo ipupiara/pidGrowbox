@@ -32,4 +32,11 @@ float getCurrentTemperature();
 uint8_t  dataReceived;
 void onDataReceived();
 
+int8_t adcTick;
+
+void initADC();
+float getADCTemperature(uint8_t  mux);
+void startADCSequence();
+int8_t startNextADC ();
+
 #endif

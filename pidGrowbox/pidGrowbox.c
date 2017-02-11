@@ -58,7 +58,8 @@ int main(void)
 	
 	initDefines();
 	initHW();
-	InitPID();
+	initPID();
+	initADC();
 	
 	startDurationTimer(maxSecsPossible  );
 	
@@ -79,8 +80,12 @@ int main(void)
 				pidIntervalCounter = 0;
 				
 				onPidStep();
+				startADCSequence();
 			}
 		}
-		
+		if (adcTick == 1)  {
+			adcTick = 0;
+			startNextADC();
+		}
     }
 }

@@ -12,7 +12,7 @@
 typedef double real;
 
 
-void InitPID();
+void initPID();
 
 void resetPID();
 

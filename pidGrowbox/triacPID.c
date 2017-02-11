@@ -146,7 +146,7 @@ void calcNextTriacDelay()
 #endif
 }
 
-void InitPID()
+void initPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);   
 

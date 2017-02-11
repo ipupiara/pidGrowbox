@@ -436,3 +436,110 @@ void initHW()
 	initUsart2();
 }
 
+
+
+/////////////////////////////////////////////////   ADC
+
+
+
+
+
+//#define amtMux 2
+#define amtMux 0
+
+typedef struct {
+	float tempLow, tempHigh;
+	float VLow, VHigh;            // tobe found manually with use of graph printout, could be automated somewhen in future, but now "time to market"
+
+} graphValuesRec ;
+
+//graphValueRec graphValues [amtMux] = {};
+graphValueRec graphValues [amtMux] = {{1.0, 2.0,1.1,2.3},{1.23, 2.34, 4.56, 5.67}};	
+
+uint8_t  adcConnection [amtMux] = { };
+
+//uint8_t  adcConnection [amtMux] = { 0, (1 << MUX0) | (1<< MUX1) };
+
+uint16_t  adcCnt;
+
+uint16_t  lastADCVal;
+float lastVoltageVal [amtMux];			// kept global for debugging reasons
+int8_t  currentMux; 
+
+
+void initADC()
+{
+		ADMUX |=  (1 << REFS0) | (1 << REFS1) | (1 << ) ;   //  2.56V ref, use ADC0
+//		ADCSRA  |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
+		ADCSRA  |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
+		adcTick = 0;
+		adcCnt = 0;
+		lastADCVal = 0;
+		currentMux = -1; 
+		lastVoltageVal = 0.0;
+}
+
+
+ISR(ADC_vect)
+{
+	lastADCVal[currentMux] = ADC;
+	++ adcCnt;
+	adcTick = 1;
+}
+
+
+uint8_t getADCTemperature(uint8_t  pos, float* result)
+{
+	uint8_t retVal = 0;
+	float res = 0.0;
+	float adcVf = 0.0;
+	float dTbdV = 0.0;   // dT by dV, kept for debugging
+	if (pos < amtMux)  {
+		uint16_t  adcV = 0;
+		cli();
+		adcV = lastADCVal;      //  2 bytes, so explicit mutex needed
+		sei();
+		adcVf = adcV;
+		lastVoltageVal =  ((adcVf * 2.56)  / 1024);
+		dTbdV = (tempHigh - tempLow) / (VHigh - VLow);            // responsibility to prevent divison by 0 
+															// has tobe done manually when evaluating temperature by voltage graph
+		res = tempLow  +   (( lastVoltageVal - VLow)  * dTbdV ) ;
+		retVal = 1;
+	};
+	*result = res;
+	return retVal;
+}
+
+
+void startADC()
+{
+	
+}
+
+void startCurrentMux()
+{
+	
+}
+
+
+void startADCSequence()
+{
+	if ( amtMux > 0)  {
+		currentMux = 0;
+		startCurrentMux();
+	} 
+	
+}
+
+
+int8_t startNextADC ()
+{
+	int8_t res = 0;
+	if (currentMux + 1 < amtMux)  {
+		++ currentMux; 
+		res = 1;
+		startCurrentMux();
+	}
+	return res;
+}
+
