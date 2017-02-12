@@ -60,6 +60,7 @@ int main(void)
 	initHW();
 	initPID();
 	initADC();
+	printCsvHeader();
 	
 	startDurationTimer(maxSecsPossible  );
 	
@@ -67,6 +68,7 @@ int main(void)
     {
         //TODO:: Please write your application code 
 		uint16_t   pidIntervalCounter = 0;   //  introduced to avoid division 
+		uint16_t   csvIntervalCounter = 0;
 		
 		if (dataReceived == 1)  {
 			dataReceived = 0;
@@ -76,10 +78,15 @@ int main(void)
 			runningSecondsTick = 0;
 			
 			++ pidIntervalCounter;
-			if (pidIntervalCounter ==  pidIntervalSecs)  {
+			if (pidIntervalCounter >=  pidIntervalSecs)  {
 				pidIntervalCounter = 0;
 				
 				onPidStep();
+			}
+			++csvIntervalCounter;
+			if (csvIntervalCounter >= csvIntervalSecs)   {
+				csvIntervalCounter = 0;
+				printCsvValues();
 			}
 			startADCSequence();
 		}

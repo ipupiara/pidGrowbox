@@ -28,6 +28,7 @@ void stopTriacRun();
 
 void getLatestClimateValues(float* pTemp,float* pHum);    // interface to hygrosense, called by user functions
 float getCurrentTemperature();
+float getCurrentTemperatureVoltage();
 uint8_t  dataReceived;
 void onDataReceived();
 

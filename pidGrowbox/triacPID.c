@@ -52,6 +52,9 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
 
 #define correctionThreshold  30
 
+
+real pVal, dVal, iVal;
+
 real nextCorrection(real error)
 {	
 	real res;
@@ -76,7 +79,7 @@ real nextCorrection(real error)
     m_prev_error = error;
 
     // Return the PID controller actuator command
-	res = m_kTot*(m_kP * error + m_kI * m_integral + m_kD * deriv);
+	res = m_kTot*((pVal =m_kP * error) + (iVal = m_kI * m_integral) + (dVal = m_kD * deriv));
 	if (res > correctionThreshold) {
 		res = correctionThreshold;
 	} else if (res < -1*correctionThreshold) {
@@ -116,7 +119,7 @@ void calcNextTriacDelay()
 void initPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);   
-	InitializePID( -0.45, 1.1, 0.2, 0.2, 5, pidIntervalSecs);
+	InitializePID( -0.45, 1.1, 0.2, 0.5, 2, pidIntervalSecs);
 	setTriacFireDuration(initialTriacDelayValue);
 }
 
@@ -158,14 +161,14 @@ void onPidStep()
 void printCsvHeader()
 {
 #ifdef printCsvDat
-	printf("time,temp_inBox,triacFireDuration\n");
-	printf("seconds,°C,triacTx\n");
+	printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal\n");
+	printf("seconds,°C,triacTx,real,real,real\n");
 #endif
 }
 
 void printCsvValues()
 {
 #ifdef printCsvDat
-	printf("%d,%f,%d\n",getSecondsInDurationTimer(),getCurrentTemperature(),getTriacFireDuration());
+	printf("%d,%5.1f,%d,%6.3f,%f,%f,%f\n",getSecondsInDurationTimer(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal);
 #endif
 }

@@ -141,7 +141,7 @@ ISR( TIMER0_COMP_vect)
 		PORTD |= 0x10;
 		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
 		PORTD &= ~0x10;			// handled synchronous
-		if ((triacTriggerTimeTcnt0 >= triggerDelayMaxTcnt0) ) {    //|| (amtInductiveRepetitions <= 0) 
+		if ((triacTriggerTimeTcnt0 >= triggerDelayMaxTcnt0) || (! inductiveLoad) ) {    //|| (amtInductiveRepetitions <= 0) 
 			stopTimer0();
 		} else {
 			startTriacTriggerDelay(delayBetweenTriacTriggers);
