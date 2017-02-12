@@ -169,6 +169,6 @@ void printCsvHeader()
 void printCsvValues()
 {
 #ifdef printCsvData
-	printf("%d,%5.1f,%d,%6.3f,%f,%f,%f\n",getSecondsInDurationTimer(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal);
+	printf("%d,%5.1f,%d,%f,%f,%f\n",getSecondsInDurationTimer(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal);
 #endif
 }
