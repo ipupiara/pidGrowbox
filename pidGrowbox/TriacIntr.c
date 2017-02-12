@@ -8,22 +8,21 @@
 #include "TriacDefines.h"
 #include "triacPID.h"
 
-
 int16_t remainingTriacTriggerDelayCounts;
 
 int16_t triacTriggerTimeTcnt0;
 
-int16_t secondsDurationTimerRemaining;
+int16_t secondsRemainingInDurationTimer;
 
 int16_t secondsInDurationTimer;
 
 //int16_t amtInductiveRepetitions;
 
-int16_t getSecondsDurationTimerRemaining()
+int16_t getSecondsRemainingInDurationTimer()
 {
 	int16_t res;
 	cli();
-	res = secondsDurationTimerRemaining;
+	res = secondsRemainingInDurationTimer;
 	sei();
 	return res;
 }
@@ -64,8 +63,8 @@ void setTcnt0AndOcr0(int16_t newTcnt0Val,int16_t newOcr0)
 	
 	// timer must be stopped to set tcnt, because else, on an 
 	// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
-	// resulting in a more or less random set value.
-	// stop timer0
+	// resulting in a more or less randomly set value.
+	
 	int8_t tccr0Stack; 
 	tccr0Stack = TCCR0;
 	stopTimer0();		
@@ -173,9 +172,9 @@ ISR(INT7_vect)
 
 ISR(TIMER1_COMPA_vect)
 {
-	secondsDurationTimerRemaining --;
+	secondsRemainingInDurationTimer --;
 	secondsInDurationTimer ++;
-	if (secondsDurationTimerRemaining <= 0) {
+	if (secondsRemainingInDurationTimer <= 0) {
 		stopDurationTimer();
 		durationTimerReachead = 1;
 	} else {
@@ -190,8 +189,7 @@ void initInterrupts()
 		
 		DDRE  &=  ~(1 << DDE7 ) ;    // input pin
 
-
-		EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each edge needs to be programmed in the interrupt ::::----(((((
+		EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each time, edge needs to be programmed in the interrupt ::::----(((((
 		EIFR  &=  ~(1 << INTF7); 
 		EIMSK |= (1 << INT7);
 
@@ -219,7 +217,7 @@ void initInterrupts()
 // Timer 0 as Triac Trigger Delay Timer
 	  
 		TCCR0 = (1 << WGM01) ;  // CTC,
-		TCCR0 &=  (1 <<  CS00) |  (1 <<  CS01) | (1 <<  CS02) ;     // (0 prescaler )  timer stopped
+		TCCR0 &=  ~((1 <<  CS00) |  (1 <<  CS01) | (1 <<  CS02)) ;     // (0 prescaler )  timer stopped
 	  
 
 
@@ -274,7 +272,7 @@ int16_t diffADCValue()
 void startDurationTimer(int16_t secs)
 {
 	durationTimerReachead = 0;
-	secondsDurationTimerRemaining = secs;
+	secondsRemainingInDurationTimer = secs;
 	secondsInDurationTimer = 0;
 	
 //	TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
@@ -354,9 +352,9 @@ void onDataReceived()        // called by main application thread to calculate t
 	char hydS [8];
 	memset (tempS,0,sizeof(tempS));
 	memset (hydS,0,sizeof(hydS));
-#warning: "todo replace strstr by constants values for less interrupt latency"		
+#warning: "todo replace strstr by constants values for less interrupt latency caused by cli/sei mutex or only mask specific interrupt"		
 		cli();
-			if (amtCharRcvd == amtChars)  {
+			if (amtCharRcvd == amtChars)  {      // some valid message check
 				++msgCnt;
 				strncpy(tempS,strstr(rxBuffer,"V01")+3,4);  // if interrupt latency causes problems, strstr can be replace by a constant 
 				strncpy(hydS,strstr(rxBuffer,"V02")+3,4);
@@ -449,12 +447,12 @@ void initHW()
 
 typedef struct {
 	float tempLow, tempHigh;
-	float VLow, VHigh;            // tobe found manually with use of graph printout, could be automated somewhen in future, but now "time to market"
+	float VLow, VHigh;            // tobe found manually with use of graph printout, could be automated some when in future, but now "time to market"
 
 } graphValuesRec ;
 
 graphValuesRec graphValues [amtMux] = {};
-//graphValuesRec graphValues [amtMux] = {{1.0, 2.0,1.1,2.3},{1.23, 2.34, 4.56, 5.67}};	
+//graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3},{1.23, 2.34, 4.56, 5.67}};	
 
 uint8_t  adcConnection [amtMux] = { };
 
@@ -513,11 +511,6 @@ uint8_t getADCTemperature(uint8_t  pos, float* result)
 	return retVal;
 }
 
-
-void startADC()
-{
-	
-}
 
 void startCurrentMux()
 {

@@ -28,25 +28,13 @@ uint8_t idleTickCnt;
 
 #define maxIdleTickCnt  5
 
-/*
-
-it might be needed to add a delay of about 5 seconds after entering idle 
-before a first offsetadjust can be done due to ammeter fall - down time
-
-else start whenever count reaches max, even though the count is not set on reentering
-idle state and will then have just any value
-*/
-void onEntryIdlePID()
-{
-	idleTickCnt = 1;
-}
 
 
 void onTriacIdleSecondTick_PID()
 {
 	int16_t secs;
 
-	secs = getSecondsDurationTimerRemaining();
+	secs = getSecondsRemainingInDurationTimer();
 	if ((secs & 0x001f) == 0) {
 		printPIDState();
 	} 
@@ -117,19 +105,18 @@ real nextCorrection(real error)
 	}
 
 #ifdef printfPID
-	double errD = error;
-	double intD = m_integral;
-	double derivD = deriv;
+	real errD = error;
+	real intD = m_integral;
+	real derivD = deriv;
 	info_printf("err %f int %f deriv %f \n",errD, intD, derivD);
 #endif
     return res;
 }
 
-
 void calcNextTriacDelay()
 {  
-	float err;
-	float corr;
+	real err;
+	real corr;
 	int16_t newDelay;
 	int16_t corrInt;
 	err = getCurrentTemperature()  - desiredTemperature ;
@@ -139,9 +126,10 @@ void calcNextTriacDelay()
 	newDelay = triacFireDurationTcnt0 + corrInt;
 	setTriacFireDuration(newDelay);
 #ifdef printfPID
-	double corrD = corr;
-	double carryCorrD = corrCarryOver;
-	double ampsD  = currentAmps();
+	printPIDState();
+	real corrD = corr;
+	real carryCorrD = corrCarryOver;
+	real ampsD  = currentAmps();
 	info_printf(" corr %f corrI %i cry %f delay %x  amps %f\n",corrD,corrInt, carryCorrD, newDelay, ampsD); 
 #endif
 }
@@ -149,13 +137,9 @@ void calcNextTriacDelay()
 void initPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);   
-
 	InitializePID( -0.45, 1.1, 0.2, 0.2, 5, pidIntervalSecs);
-	
 	setTriacFireDuration(initialTriacDelayValue);
-
 }
-
 
 void resetPID()
 {

@@ -80,8 +80,8 @@ int main(void)
 				pidIntervalCounter = 0;
 				
 				onPidStep();
-				startADCSequence();
 			}
+			startADCSequence();
 		}
 		if (adcTick == 1)  {
 			adcTick = 0;

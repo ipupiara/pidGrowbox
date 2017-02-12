@@ -16,7 +16,7 @@ int8_t runningSecondsTick;
 int16_t triacFireDurationTcnt0;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
 
 void startDurationTimer(int16_t secs);
-int16_t getSecondsDurationTimerRemaining();
+int16_t getSecondsRemainingInDurationTimer();
 int16_t getSecondsInDurationTimer();
 
 void stopDurationTimer();

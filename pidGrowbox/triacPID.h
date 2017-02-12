@@ -9,7 +9,7 @@
 #define desiredTemperature  17.0
 
 // Select 'double' or 'float' here:
-typedef double real;
+typedef float real;
 
 
 void initPID();
@@ -17,8 +17,6 @@ void initPID();
 void resetPID();
 
 void printPIDState();
-
-void onEntryIdlePID();
 
 void onTriacIdleSecondTick_PID();
 
