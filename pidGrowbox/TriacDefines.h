@@ -10,16 +10,13 @@
 	#define TriacDefines_H
 
 
-#include <inttypes.h>
-
-//	#define jtagDebugKeyboardMode	// tobe set if jtag debug is used, it will divert the serial input (terminal)
-									//  to the keyboard and leave the keyboard port (port C) free for jtag
-
-	#define maxSecsPossible  0x7FFF
-
+	#include <inttypes.h>
 
 	#define JT_F_CPU 11095200	
-
+	
+//	#define printCsvData     //  if printCsvValues is set, only csv values must be printed out
+	
+	#define maxSecsPossible  0x7FFF
 	#define triggerDelayMaxTcnt0 810     // works properly with 50 Hz Ac and 11 Mhz
 	
 	#define inductiveLoad   1      // to be set to 0 or 1

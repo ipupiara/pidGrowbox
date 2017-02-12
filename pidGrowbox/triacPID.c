@@ -5,11 +5,7 @@
 #include <avr/eeprom.h>
 #include "triacPID.h"
 #include "TriacIntr.h"
-#include "TriacIntr.h"
 
-
-//#define printfPid
-//#define printfAmps
 
 enum adcScopeEnum
 {
@@ -27,18 +23,6 @@ uint8_t idleTickCnt;
 
 
 #define maxIdleTickCnt  5
-
-
-
-void onTriacIdleSecondTick_PID()
-{
-	int16_t secs;
-
-	secs = getSecondsRemainingInDurationTimer();
-	if ((secs & 0x001f) == 0) {
-		printPIDState();
-	} 
-}
 
 
 
@@ -69,20 +53,15 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
 #define correctionThreshold  30
 
 real nextCorrection(real error)
-{
-    // Set q_fact to 1 if the error magnitude is below
-    // the threshold and 0 otherwise
-    real q_fact;
+{	
 	real res;
+		
     if (fabs(error) < m_error_thresh)
-        q_fact = 1.0;
+         m_integral += m_stepTime * error;
     else  {
-        q_fact = 0.0;
 		m_integral = 0.0;
 	}
 
-    // Update the error integral
-    m_integral += m_stepTime*q_fact*error;
 
     // Compute the error derivative
     real deriv;
@@ -97,7 +76,7 @@ real nextCorrection(real error)
     m_prev_error = error;
 
     // Return the PID controller actuator command
-	res = m_kTot*(m_kP*error + m_kI*m_integral + m_kD*deriv);
+	res = m_kTot*(m_kP * error + m_kI * m_integral + m_kD * deriv);
 	if (res > correctionThreshold) {
 		res = correctionThreshold;
 	} else if (res < -1*correctionThreshold) {
@@ -123,7 +102,7 @@ void calcNextTriacDelay()
 	corr = nextCorrection(err) + corrCarryOver;
 	corrInt = corr;     
 	corrCarryOver = corr - corrInt;
-	newDelay = triacFireDurationTcnt0 + corrInt;
+	newDelay = getTriacFireDuration() + corrInt;
 	setTriacFireDuration(newDelay);
 #ifdef printfPID
 	printPIDState();
@@ -174,4 +153,19 @@ void printPIDState()
 void onPidStep()
 {
 	calcNextTriacDelay();
+}
+
+void printCsvHeader()
+{
+#ifdef printCsvDat
+	printf("time,temp_inBox,triacFireDuration\n");
+	printf("seconds,°C,triacTx\n");
+#endif
+}
+
+void printCsvValues()
+{
+#ifdef printCsvDat
+	printf("%d,%f,%d\n",getSecondsInDurationTimer(),getCurrentTemperature(),getTriacFireDuration());
+#endif
 }

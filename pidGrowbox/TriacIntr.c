@@ -16,6 +16,8 @@ int16_t secondsRemainingInDurationTimer;
 
 int16_t secondsInDurationTimer;
 
+uint16_t triacFireDurationTcnt0;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
+
 //int16_t amtInductiveRepetitions;
 
 int16_t getSecondsRemainingInDurationTimer()
@@ -98,7 +100,7 @@ void startTriacTriggerDelay( int16_t delayDuration)  // must run protected betwe
 	startTimer0();		
 }
 
-void setTriacFireDuration(int16_t durationTcnt0)
+void setTriacFireDuration(uint16_t durationTcnt0)
 {
 	cli();
 	if (durationTcnt0 < triggerDelayMaxTcnt0) {
@@ -111,6 +113,11 @@ void setTriacFireDuration(int16_t durationTcnt0)
 		triacFireDurationTcnt0 = triggerDelayMaxTcnt0;
 	}
 	sei();
+}
+
+uint16_t  getTriacFireDuration()
+{
+	return triacFireDurationTcnt0;
 }
 
 //void calcAmtInductiveRepetitions(int16_t triacFireDurTcnt0)

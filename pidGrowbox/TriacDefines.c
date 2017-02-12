@@ -12,10 +12,11 @@ void info_printf( char *emsg, ...)
 {
 	va_list ap;
 	
-//	printf( emsg, ap);
+#ifndef printCsvData
+	printf( emsg, ap);
+#endif
 	
 	va_end(ap);
-	//	printf(emsg, ap);
 }
 
 

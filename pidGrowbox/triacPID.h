@@ -6,7 +6,11 @@
 #include <math.h>
 
 #define pidIntervalSecs  60
-#define desiredTemperature  17.0
+#define desiredTemperature  27.0
+
+//#define printfPid
+//#define printfAmps
+
 
 // Select 'double' or 'float' here:
 typedef float real;
@@ -16,9 +20,8 @@ void initPID();
 
 void resetPID();
 
-void printPIDState();
-
-void onTriacIdleSecondTick_PID();
+void printCsvHeader();
+void printCsvValues();
 
 real Update(real error);
 
