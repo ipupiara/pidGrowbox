@@ -65,7 +65,6 @@ real nextCorrection(real error)
 		m_integral = 0.0;
 	}
 
-
     // Compute the error derivative
     real deriv;
     if (!m_started)
@@ -118,8 +117,9 @@ void calcNextTriacDelay()
 
 void initPID()
 {
-//	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);   
-	InitializePID( -0.45, 1.1, 0.2, 0.5, 2, pidIntervalSecs);
+//	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);  
+#warning "todo check all the signs :-)" 
+	InitializePID( -0.45, 1.1, 0.05, 0.5, 2, pidIntervalSecs);
 	setTriacFireDuration(initialTriacDelayValue);
 }
 

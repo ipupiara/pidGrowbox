@@ -48,6 +48,11 @@ static int uart_putchar(char c, FILE *stream)
 }
 
 
+uint16_t   pidIntervalCounter = 0;   //  introduced to avoid division
+uint16_t   csvIntervalCounter = 0;
+uint16_t   secsCounter = 0;
+        
+		
 int main(void)
 {
 	//	USART_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
@@ -58,41 +63,41 @@ int main(void)
 	
 	initDefines();
 	initHW();
-	initPID();
-	initADC();
-	printCsvHeader();
+//	initPID();
+//	initADC();
+//	printCsvHeader();
 	
 	startDurationTimer(maxSecsPossible  );
 	
     while(1)
     {
-        //TODO:: Please write your application code 
-		uint16_t   pidIntervalCounter = 0;   //  introduced to avoid division 
-		uint16_t   csvIntervalCounter = 0;
-		
-		if (dataReceived == 1)  {
-			dataReceived = 0;
-			onDataReceived();
-		}
+	
+ 		if (dataReceived == 1)  {
+ 			dataReceived = 0;
+ 			onDataReceived();
+ 		}
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
+			++secsCounter;
 			
-			++ pidIntervalCounter;
-			if (pidIntervalCounter >=  pidIntervalSecs)  {
-				pidIntervalCounter = 0;
-				
-				onPidStep();
-			}
-			++csvIntervalCounter;
-			if (csvIntervalCounter >= csvIntervalSecs)   {
-				csvIntervalCounter = 0;
-				printCsvValues();
-			}
-			startADCSequence();
-		}
-		if (adcTick == 1)  {
-			adcTick = 0;
-			startNextADC();
-		}
-    }
+			printf("%4i amthygMsg %i tempd %6.2f hyg %6.2f\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity());
+//			printf("sec %4i\n",secsCounter );
+// 			++ pidIntervalCounter;
+// 			if (pidIntervalCounter >=  pidIntervalSecs)  {
+// 				pidIntervalCounter = 0;
+// 				
+// 				onPidStep();
+// 			}
+// 			++csvIntervalCounter;
+// 			if (csvIntervalCounter >= csvIntervalSecs)   {
+// 				csvIntervalCounter = 0;
+// 				printCsvValues();
+// 			}
+// 			startADCSequence();
+		}   
+// 		if (adcTick == 1)  {
+// 			adcTick = 0;
+// 			startNextADC();
+// 		}
+	}
 }

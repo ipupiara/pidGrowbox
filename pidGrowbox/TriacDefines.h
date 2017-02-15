@@ -30,6 +30,7 @@ void info_printf( char *emsg, ...);
 
 void delayEmptyProc (); 
 
+uint8_t  hygrosenseMsgCnt;
 
 void delay6pnt2d5us(unsigned int n);   // description in TriacDefines.c
 

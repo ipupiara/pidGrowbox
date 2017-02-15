@@ -194,7 +194,7 @@ void initInterrupts()
 	
 ///////   0-x detector input pint INT7 on PE7  
 		
-		DDRE  &=  ~(1 << DDE7 ) ;    // input pin
+		DDRE  &=  ~(1 << DDRE7 ) ;    // input pin
 
 		EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each time, edge needs to be programmed in the interrupt ::::----(((((
 		EIFR  &=  ~(1 << INTF7); 
@@ -320,7 +320,7 @@ void toggleCompletionAlarm()
 
 #define startChar 0x40
 #define stopChar   0x24
-#define amtChars  68
+#define amtChars  66
 #define rxBufferSz  100
 char rxBuffer [rxBufferSz];
 
@@ -332,7 +332,6 @@ enum rxStates {
 
 uint8_t  rxState;
 uint8_t  rxCurrentPos;
-uint8_t  msgCnt;
 uint16_t amtCharRcvd;
 uint16_t errMsgCnt;
 
@@ -352,40 +351,74 @@ float getCurrentTemperature()
 	return latestTemperature;
 }
 
+float getCurrentHumidity()
+{
+	return latestHumidity;
+}
+
+
+char * reallyWorkingStrstr(const char *inStr, const char *subStr)
+{
+	char firstSubChar;
+	size_t len;      
+	firstSubChar = *subStr++;
+	if (!firstSubChar)
+	return (char *) inStr;	// Trivial empty string case
+
+	len = strlen(subStr);
+	do {
+		char currentInChar;
+
+		do {
+			currentInChar = *inStr++;
+			if (!currentInChar)
+			return (char *) 0;
+		} while (currentInChar != firstSubChar);
+	} while (strncmp(inStr, subStr, len) != 0);
+	
+	return (char *) (inStr - 1);
+}
+
+char * v01Pos;
+char *  v02Pos;
 
 void onDataReceived()        // called by main application thread to calculate the latest data
 {
-	char tempS [8];
-	char hydS [8];
+	char tempS [5];
+	char hydS [5];
+	uint8_t validMsg = 0;
+
 	memset (tempS,0,sizeof(tempS));
 	memset (hydS,0,sizeof(hydS));
-#warning: "todo replace strstr by constants values for less interrupt latency caused by cli/sei mutex or only mask specific interrupt"		
-		cli();
-			if (amtCharRcvd == amtChars)  {      // some valid message check
-				++msgCnt;
-				strncpy(tempS,strstr(rxBuffer,"V01")+3,4);  // if interrupt latency causes problems, strstr can be replace by a constant 
-				strncpy(hydS,strstr(rxBuffer,"V02")+3,4);
-				rxState = rxIdle;
-			}  else  {
-				++ errMsgCnt;
+			
+	cli();
+		if ((rxState = rxReceived) && ( amtCharRcvd == amtChars))  {      // some valid message check
+			validMsg = 1;
+			if (v01Pos == 0) { 
+				v01Pos = reallyWorkingStrstr((char* )&rxBuffer,"V01");
 			}
-		sei();
-	
-		float temp = atof(tempS);
+			if (v02Pos == 0) { 
+				v02Pos = reallyWorkingStrstr((char*)&rxBuffer,"V02");
+			}
+			++hygrosenseMsgCnt;
+			strncpy(tempS,v01Pos+3,4);  
+			strncpy(hydS,v02Pos+3,4);
+			rxState = rxIdle;
+		}  else  {
+			++ errMsgCnt;
+		}
+	sei();
+	if (validMsg != 0)  {
+		char* endP = tempS+3;
+		float temp = strtoul(tempS ,&endP,0x10) ;
 		temp = temp / 100;
-		float hyd = atof (hydS);
+		endP = hydS + 3;
+		float hyd = strtoul(hydS ,&endP,0x10) ;
 		hyd = hyd / 200;
 		
 		latestTemperature = temp;
-		latestHumidity = hyd;
-
-		//		TRACE2("\nreceived: %i  %s\n",amtRcv, buffer);
-
-		//		TRACE2("\nV01: %s %f\n",tempS, temp);
-		//		TRACE2("\nV02: %s %f\n",hydS, hyd);
-		
-	
-	
+		latestHumidity = hyd;	
+	}
 }
 
 
@@ -396,42 +429,48 @@ ISR (USART1_RX_vect)
 	if (rxCh == startChar)  {
 		amtCharRcvd = 0;	
 		dataReceived = 0;
+		rxBuffer [amtCharRcvd] = rxCh;
 		rxState = rxReceiving;
-	}
+	} else
 	if (rxState == rxReceiving)  {
 		++ amtCharRcvd;
 		if (amtCharRcvd < rxBufferSz) {
 			rxBuffer [amtCharRcvd] = rxCh;
 		}
-	}
-	if ((rxCh == stopChar)  && (amtCharRcvd == amtChars)) {   // no  chars lost 
-		rxState = rxReceived;
-		dataReceived = 1;
+		if (rxCh == stopChar) {   // no  chars lost 
+			rxState = rxReceived;
+			dataReceived = 1;
+		}
 	}
 }
 
 void initUsart2()
 {
-	// Set baud rate
-	 uint16_t UBRR = 143;    // baud 4800   fixed on hygrosense sensor
-		
-	UBRR0H = (unsigned char)(UBRR>>8);
-	UBRR0L = (unsigned char)UBRR;
 	
-	//   (UCSR0A & 0b11111100) ;  nothing to do on A-reg	
-	// Enable receiver and transmitte                    
-		
-	UCSR0B |=  (1<<RXEN0) | (1<< RXCIE1) ;               //     |(1<<TXEN0);
-	//	UCSR0B = 0b00011000;  // rx compl intr ena - tx compl intr ena - dreg empty intr ena - rx ena - tx ena - sz2 (size bit 2)  - 9. bit rx - 9. tx
-
-// no change needed:	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
-
 	rxState = rxIdle;
 	dataReceived = 0;
 	amtCharRcvd = 0;
 	errMsgCnt = 0;
 	latestTemperature = 0.00;
 	latestHumidity  = 0.00;
+	hygrosenseMsgCnt = 0;
+	v01Pos = (char *) 0;
+	v02Pos = (char *) 0;
+		
+	// Set baud rate
+	 uint16_t UBRR = 143;    // baud 4800   fixed on hygrosense sensor
+		
+	UBRR1H = (unsigned char)(UBRR>>8);
+	UBRR1L = (unsigned char)UBRR;
+	
+	//   (UCSR0A & 0b11111100) ;  nothing to do on A-reg	
+	// Enable receiver and transmitte                    
+		
+	UCSR1B |=  (1<<RXEN1) | (1<< RXCIE1) ;               //     |(1<<TXEN0);
+	//	UCSR0B = 0b00011000;  // rx compl intr ena - tx compl intr ena - dreg empty intr ena - rx ena - tx ena - sz2 (size bit 2)  - 9. bit rx - 9. tx
+
+// no change needed:	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
+
 }
 
 
