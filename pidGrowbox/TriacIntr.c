@@ -141,7 +141,7 @@ ISR( TIMER0_COMP_vect)
 		PORTD |= 0x10;
 		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
 		PORTD &= ~0x10;			// handled synchronous
-		if ((triacTriggerTimeTcnt0 >= triggerDelayMaxTcnt0) || (! inductiveLoad) ) {    //|| (amtInductiveRepetitions <= 0) 
+		if ((triacTriggerTimeTcnt0 >= triggerDelayMaxTcnt0) || (! (inductiveLoad == 1)) ) {    //|| (amtInductiveRepetitions <= 0) 
 			stopTimer0();
 		} else {
 			startTriacTriggerDelay(delayBetweenTriacTriggers);
@@ -153,6 +153,7 @@ ISR( TIMER0_COMP_vect)
 	sei();	
 }
 
+// int7 on port PE7
 ISR(INT7_vect)
 {
 #warning "tobe tested"
@@ -170,7 +171,7 @@ ISR(INT7_vect)
 		triacTriggerTimeTcnt0 = 0;
 		if (triacFireDurationTcnt0 > 0)  {
 			startTriacTriggerDelay(  triggerDelayMaxTcnt0 - triacFireDurationTcnt0);
-//			calcAmtInductiveRepetitions(triacFireDurationTcnt0);  better not needs much cpu time  ! :-(   my mistake, sorry
+//			calcAmtInductiveRepetitions(triacFireDurationTcnt0);  better not needs much cpu time and interrupt latency... ! :-(   my mistake, sorry
 		}
 	}
 	sei();		  
