@@ -63,7 +63,7 @@ int main(void)
 	
 	initDefines();
 	initHW();
-//	initPID();
+	initPID();
 //	initADC();
 //	printCsvHeader();
 	

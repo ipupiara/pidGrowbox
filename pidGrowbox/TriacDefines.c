@@ -140,6 +140,10 @@ void delay6pnt2d5us(unsigned int enn)
 
 //  accurate enough for our keyboard delays
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+
 uint8_t ix;  
 	ix= 0;
 
@@ -147,7 +151,7 @@ uint8_t ix;
   }
 } 
 
-
+#pragma GCC diagnostic pop
 
 void initDefines()
 {

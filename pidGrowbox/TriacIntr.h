@@ -7,8 +7,6 @@
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 	
-#define initialTriacDelayValue   200	
-	
 int8_t durationTimerReachead;
 int8_t runningSecondsTick;
 
