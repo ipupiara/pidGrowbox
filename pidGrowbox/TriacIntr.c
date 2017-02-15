@@ -20,7 +20,7 @@ uint16_t triacFireDurationTcnt0;   // centi-millis-secs, not exactly but approxi
 
 int16_t amtInductiveRepetitions;
 
-//int16_t amtInductiveRepetitions;
+int16_t inductiveRepetitionsCounter;
 
 int16_t getSecondsRemainingInDurationTimer()
 {
@@ -164,21 +164,19 @@ uint16_t  getTriacFireDuration()
 
 ISR( TIMER0_COMP_vect)
 {
-	cli();
 	if (remainingTriacTriggerDelayCounts <= 0) {
 		PORTE |= (1<< PORTE6) ;
 		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
 		PORTE &= ~(1<< PORTE6) ;		// handled synchronous
-		if ((triacTriggerTimeTcnt0 >= triggerDelayMaxTcnt0) || (amtInductiveRepetitions <= 0) ) {   
+		if ((triacTriggerTimeTcnt0 >= triggerDelayMaxTcnt0) || (inductiveRepetitionsCounter <= 0) ) {   
 			stopTimer0();
 		} else {
 			startTriacTriggerDelay(delayBetweenTriacTriggers);
-			--amtInductiveRepetitions;
+			--inductiveRepetitionsCounter;
 		}
 	} else {
 		setTriacTriggerDelayValues();
-	}
-	sei();	
+	}	
 }
 
 
@@ -186,8 +184,8 @@ void fireTriacTriggerDelay()
 {
 	triacTriggerTimeTcnt0 = 0;
 	if (triacFireDurationTcnt0 > 0)  {
+		inductiveRepetitionsCounter = amtInductiveRepetitions;
 		startTriacTriggerDelay(  triggerDelayMaxTcnt0 - triacFireDurationTcnt0);
-		//			calcAmtInductiveRepetitions(triacFireDurationTcnt0);  better not needs much cpu time and interrupt latency... ! :-(   my mistake, sorry
 	}	
 }
 
@@ -234,6 +232,7 @@ void initInterrupts()
 		EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each time, edge needs to be programmed in the interrupt ::::----(((((
 		EIFR  &=  ~(1 << INTF7); 
 		EIMSK |= (1 << INT7);
+#warning "todo start int7 only after initilization of timer0....."		
 
 // Timer 1 as Duration Timer
 	  
