@@ -67,24 +67,27 @@ void stopTimer0()
 }
 
 
-void setOcr0(int16_t newOcr0)
+void setOcr0Delay(int16_t newOcr0)
 {
 #warning "urgent todo, check all the call stacks if timer stop start cli and sei is set ok so that no data/thread violation can occur"	
+	// timer0 must be stopped before running this method (was the case per 17 Feb 2017
 	// timer must be stopped to set tcnt, because else, on an 
 	// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
 	// resulting in a more or less randomly set value.
-	
-	if (newOcr0 <= TCNT0 + 1) { newOcr0 = TCNT0 + 1; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
+//	stopTimer0();
+	if (newOcr0 <= 1) { newOcr0 = 2; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
+	TCNT0 = 0;
 	OCR0 = newOcr0;  
 }
 
 void setTriacTriggerDelayValues()
 {
 	if (remainingTriacTriggerDelayCounts < ocra0ValueMax) {		
-		setOcr0 ( remainingTriacTriggerDelayCounts);
+		setOcr0Delay ( remainingTriacTriggerDelayCounts);
 		remainingTriacTriggerDelayCounts = 0;
 	} else {
-		setOcr0( ocra0ValueMax);
+		setOcr0Delay( ocra0ValueMax);
+		remainingTriacTriggerDelayCounts -= ocra0ValueMax;
 	}
 }
 
