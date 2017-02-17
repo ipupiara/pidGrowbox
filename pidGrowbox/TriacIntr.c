@@ -20,6 +20,8 @@ int16_t amtInductiveRepetitions;
 
 int16_t inductiveRepetitionsCounter;
 
+int8_t withinZeroCross;
+
 int16_t getSecondsRemainingInDurationTimer()
 {
 	int16_t res;
@@ -43,12 +45,11 @@ int16_t getSecondsInDurationTimer()
 
 void startTimer0()
 {
-	//TCCR2B = 0b00000101  ; // CTC on CC2A , set clk / 128, timer 2 started
-	
-	TIFR  &= ~(1 << OCF0);    // clear interrupt flags
-	TIMSK   |=  (1<<OCIE0) ;  //  Output Compare A Match Interrupt Enable
-	TCCR0 |=  (1 <<  CS00) |  (1 <<  CS02) ;    //    (1 <<  CS01) |
-
+	if (withinZeroCross == 0) {
+		TIFR  &= ~(1 << OCF0);    // clear interrupt flags
+		TIMSK   |=  (1<<OCIE0) ;  //  Output Compare A Match Interrupt Enable
+		TCCR0 |=  (1 <<  CS00) |  (1 <<  CS02) ;    //    (1 <<  CS01) |
+	}
 
 }
 
@@ -179,6 +180,7 @@ ISR(INT7_vect)
 		EICRB  |=   (1<< ISC71)  ;   // falling edge  ( each edge change needs to be programmed in the interrupt ::::----(((((
 		EIFR  &=  ~(1 << INTF7);		//  flag might have been set while changing edge mode ??? and would cause an immediate interrupt
 										//  if cli would not have set before, resp. unmasking the interrupt			
+		withinZeroCross = 0;
 		if (triacFireDurationTcnt0 > 0)  {
 			inductiveRepetitionsCounter = amtInductiveRepetitions;
 			startTriacTriggerDelay(  triggerDelayMaxTcnt0 - triacFireDurationTcnt0);
@@ -187,6 +189,7 @@ ISR(INT7_vect)
 		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ; 
 		EICRB  |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each edge change needs to be programmed in the interrupt ::::----(((((
 		EIFR  &=  ~(1 << INTF7);
+		withinZeroCross = 1;
 		stopTimer0();		
 	}
 	sei();		  
