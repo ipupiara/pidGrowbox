@@ -623,7 +623,7 @@ int16_t getTriacDelayValueFromADC(uint8_t pos)
 	float adcF = adcV * 1.0;  // tobe tested
 	float maxDelay = triggerDelayMaxTcnt0 ;  // tobe tested
 	
-	float  adcFactor = adcF / 1024.0;
+	float  adcFactor = adcF / 1023.0;
 	
 	float resF = adcFactor * maxDelay;
 	res = (int16_t)  resF ; // tobe tested maybe needs to use conversion methods
