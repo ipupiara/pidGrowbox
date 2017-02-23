@@ -45,8 +45,8 @@ int16_t getSecondsInDurationTimer()
 
 void startTimer0()
 {
+	TIFR  &= ~(1 << OCF0);    // clear interrupt flags if it should ever have been set by any reason...
 	if (withinZeroCross == 0) {
-		TIFR  &= ~(1 << OCF0);    // clear interrupt flags
 		TIMSK   |=  (1<<OCIE0) ;  //  Output Compare A Match Interrupt Enable
 		TCCR0 |=  (1 <<  CS00) |  (1 <<  CS02) ;    //    (1 <<  CS01) |
 	}
@@ -94,6 +94,7 @@ void setTriacTriggerDelayValues()
 
 void startTriacTriggerDelay( int16_t delayDuration)  // must run protected between cli and sei
 {
+	stopTimer0();
 	if (delayDuration <= 0) { 
 		delayDuration = 1;   // just a very short duration, but one that will happen in future
 	}
@@ -157,7 +158,6 @@ ISR( TIMER0_COMP_vect)
 			stopTimer0();
 		} else {
 			cli();
-			stopTimer0();
 			startTriacTriggerDelay(delayBetweenTriacTriggers);
 			--inductiveRepetitionsCounter;
 			sei();
@@ -178,11 +178,11 @@ ISR( TIMER0_COMP_vect)
 ISR(INT7_vect)
 {
 	cli();
+	EIFR  &=  ~(1 << INTF7);
 	if ((PINE & (1 << PINE7)) != 0) {
 		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ; 
-		EICRB  |=   (1<< ISC71)  ;   // falling edge  ( each edge change needs to be programmed in the interrupt ::::----(((((
-		EIFR  &=  ~(1 << INTF7);		//  flag might have been set while changing edge mode ??? and would cause an immediate interrupt
-										//  if cli would not have set before, resp. unmasking the interrupt			
+		EICRB  |=   (1<< ISC71)  ;   
+		EIFR  &=  ~(1 << INTF7);												
 		withinZeroCross = 0;
 		if (triacFireDurationTcnt0 > 0)  {
 			inductiveRepetitionsCounter = amtInductiveRepetitions;
@@ -190,7 +190,7 @@ ISR(INT7_vect)
 		}		
 	} else {
 		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ; 
-		EICRB  |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each edge change needs to be programmed in the interrupt ::::----(((((
+		EICRB  |=  (1<< ISC70) |  (1<< ISC71)  ;   
 		EIFR  &=  ~(1 << INTF7);
 		withinZeroCross = 1;
 		stopTimer0();		
@@ -510,7 +510,7 @@ void initHW()
 
 
 //#define amtMux 2
-#define amtMux 0
+#define amtMux 1
 
 typedef struct {
 	float tempLow, tempHigh;
@@ -518,10 +518,11 @@ typedef struct {
 
 } graphValuesRec ;
 
-graphValuesRec graphValues [amtMux] = {};
+graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3}};
 //graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3},{1.23, 2.34, 4.56, 5.67}};	
+	
 
-uint8_t  adcConnection [amtMux] = { };
+uint8_t  adcConnection [amtMux] = {(1 << MUX0) };
 
 //uint8_t  adcConnection [amtMux] = { 0, (1 << MUX0) | (1<< MUX1) };
 
@@ -534,7 +535,8 @@ int8_t  currentMuxPos;
 
 void initADC()
 {
-		ADMUX |=  (1 << REFS0) | (1 << REFS1)  ;   //  2.56V ref, use ADC0
+//		ADMUX =  (1 << REFS0) | (1 << REFS1)  ;   //  2.56V ref, use ADC0, with external capacitor
+		ADMUX =   (1 << REFS0);      // use AVcc with external capacitor, with ADC0
 //		ADCSRA  |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
 		ADCSRA  |= (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
 		adcTick = 0;
@@ -611,3 +613,18 @@ int8_t startNextADC ()
 	return res;
 }
 
+
+int16_t getTriacDelayValueFromADC(uint8_t pos)
+{
+	int16_t res = 0;
+	int16_t adcV = lastADCVal[pos];
+	float adcF = adcV * 1.0;  // tobe tested
+	float maxDelay = triggerDelayMaxTcnt0 ;  // tobe tested
+	
+	float  adcFactor = adcF / 1024.0;
+	
+	float resF = adcFactor * maxDelay;
+	res = (int16_t)  resF ; // tobe tested maybe needs to use conversion methods
+	
+	return res;
+}

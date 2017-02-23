@@ -9,7 +9,7 @@
 #define desiredTemperature  27.0
 #define csvIntervalSecs  20
 
-#define initialTriacDelayValue   400	
+#define initialTriacDelayValue   0x0110	
 
 //#define printfPid
 //#define printfAmps
