@@ -39,5 +39,5 @@ uint8_t getADCTemperature(uint8_t  pos, float* result);
 void startADCSequence();
 int8_t startNextADC ();
 int16_t getTriacDelayValueFromADC(uint8_t pos);
-
+uint16_t getLastAdcValue(uint8_t  pos);
 #endif

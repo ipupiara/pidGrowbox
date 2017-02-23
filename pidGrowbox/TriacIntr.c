@@ -522,7 +522,7 @@ graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3}};
 //graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3},{1.23, 2.34, 4.56, 5.67}};	
 	
 
-uint8_t  adcConnection [amtMux] = {(1 << MUX0) };
+uint8_t  adcConnection [amtMux] = {0x00 };
 
 //uint8_t  adcConnection [amtMux] = { 0, (1 << MUX0) | (1<< MUX1) };
 
@@ -538,12 +538,12 @@ void initADC()
 //		ADMUX =  (1 << REFS0) | (1 << REFS1)  ;   //  2.56V ref, use ADC0, with external capacitor
 		ADMUX =   (1 << REFS0);      // use AVcc with external capacitor, with ADC0
 //		ADCSRA  |= (1 << ADEN) | (1 << ADIE) | (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
-		ADCSRA  |= (1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; //  freq 11.05 E+6 / 128 approx. 86 E+3
+		ADCSRA  = ((1 << ADIE) |(1 << ADEN) |1 << ADPS0)  | (1 << ADPS1)  | (1 << ADPS2)  ; // aden,  freq 11.05 E+6 / 128 approx. 86 E+3
 		adcTick = 0;
 		adcCnt = 0;
 		memset(lastADCVal,0,sizeof(lastADCVal));
 		memset(lastVoltageVal,0,sizeof(lastVoltageVal));
-		currentMuxPos = -1; 
+		currentMuxPos = 0; 
 }
 
 
@@ -552,10 +552,20 @@ ISR(ADC_vect)
 	lastADCVal[currentMuxPos] = ADC;
 	++ adcCnt;
 	adcTick = 1;
-	ADCSRA &= ~((1 << ADIE) | (1<<ADEN)); //disable further adc since we use only single start adc and usually change adcmux pos what needs
+//	ADCSRA &= ~((1 << ADIE) | (1<<ADEN)); //disable further adc since we use only single start adc and usually change adcmux pos what needs
 										// aden to get 0 for better synchronisation
 }
 
+uint16_t getLastAdcValue(uint8_t  pos)
+{
+	uint16_t res = 0;
+	if ((pos >= 0) && (pos < amtMux))  {
+		cli();
+		res = lastADCVal[pos];
+		sei();
+	}
+	return res;
+}
 
 uint8_t getADCTemperature(uint8_t  pos, float* result)
 {
@@ -583,12 +593,14 @@ uint8_t getADCTemperature(uint8_t  pos, float* result)
 
 void startCurrentMux()
 {
-	ADCSRA &= ~((1 << ADIE) | (1<<ADEN));
+//	ADCSRA &= ~((1 << ADIE) | (1<<ADEN));
 	
 	ADMUX &= ~ ((1<< MUX0) | (1<< MUX1) |(1<< MUX2) |(1<< MUX3) |(1<< MUX4) );    // set all mux to 0
 	ADMUX |= adcConnection[currentMuxPos]; 
 	
-	ADCSRA |= (1 << ADIE) | (1<<ADEN) | (1<< ADSC);
+//	ADCSRA |= (1 << ADIE) | (1<<ADEN) | (1<< ADSC);
+	ADCSRA |=  (1<< ADSC);
+
 }
 
 
