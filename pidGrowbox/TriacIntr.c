@@ -614,6 +614,8 @@ int8_t startNextADC ()
 }
 
 
+
+// debug method used for testing triac triggering behaviour
 int16_t getTriacDelayValueFromADC(uint8_t pos)
 {
 	int16_t res = 0;
