@@ -155,11 +155,13 @@ void printPIDState()
 
 void onPidStep()
 {
-	calcNextTriacDelay();
+	info_printf("onPidStep\n");
+//	calcNextTriacDelay();
 }
 
 void printCsvHeader()
 {
+	info_printf("printCsvHeader\n");
 #ifdef printCsvData
 	printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal\n");
 	printf("seconds,°C,triacTx,real,real,real\n");
@@ -168,6 +170,7 @@ void printCsvHeader()
 
 void printCsvValues()
 {
+	info_printf("printCsvValues\n");
 #ifdef printCsvData
 	printf("%d,%5.1f,%d,%f,%f,%f\n",getSecondsInDurationTimer(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal);
 #endif

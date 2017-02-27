@@ -81,18 +81,18 @@ int main(void)
 			++secsCounter;
 			
 			printf("%4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),getLastAdcValue(0));
-//			printf("sec %4i\n",secsCounter );
-// 			++ pidIntervalCounter;
-// 			if (pidIntervalCounter >=  pidIntervalSecs)  {
-// 				pidIntervalCounter = 0;
-// 				
-// 				onPidStep();
-// 			}
-// 			++csvIntervalCounter;
-// 			if (csvIntervalCounter >= csvIntervalSecs)   {
-// 				csvIntervalCounter = 0;
+			printf("sec %4i\n",secsCounter );
+ 			++ pidIntervalCounter;
+ 			if (pidIntervalCounter >=  pidIntervalSecs)  {
+ 				pidIntervalCounter = 0;
+ 				
+ 				onPidStep();
+ 			}
+ 			++csvIntervalCounter;
+ 			if (csvIntervalCounter >= csvIntervalSecs)   {
+ 				csvIntervalCounter = 0;
 // 				printCsvValues();
-// 			}
+ 			}
  			startADCSequence();
 		}   
  		if (adcTick == 1)  {
