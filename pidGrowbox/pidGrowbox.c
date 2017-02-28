@@ -67,7 +67,8 @@ int main(void)
 	initADC();
 //	printCsvHeader();
 	
-	startDurationTimer(maxSecsPossible  );
+//	startDurationTimer(maxSecsPossible  );
+#warning " timer1 changes tobe tested"
 	
     while(1)
     {

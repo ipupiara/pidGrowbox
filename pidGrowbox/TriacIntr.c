@@ -198,17 +198,40 @@ ISR(INT7_vect)
 	sei();		  
 }   
 
+void printfTime()
+{
+	printf("h: %5i m: %29 s: %2i ", hoursCounter, minutesCounter, secondsCounter);  
+}
+
+uint32_t overallSeconds() 
+{
+	uint32_t res = 0;
+	res = hoursCounter * 3600 + minutesCounter * 60 + secondsCounter;
+	return res;
+}
 
 ISR(TIMER1_COMPA_vect)
 {
-	secondsRemainingInDurationTimer --;
-	secondsInDurationTimer ++;
-	if (secondsRemainingInDurationTimer <= 0) {
-		stopDurationTimer();
-		durationTimerReachead = 1;
-	} else {
-		runningSecondsTick = 1;
+	++ secondsCounter;
+	if (secondsCounter == 59) {
+		++ minutesCounter;
+		secondsCounter = 0;
+		if (minutesCounter == 59) {
+			++ hoursCounter;
+			minutesCounter = 0;
+		}
 	}
+	
+	if (secondsRemainingInDurationTimer >= 0) {
+		secondsRemainingInDurationTimer --;
+		secondsInDurationTimer ++;
+		if (secondsRemainingInDurationTimer <= 0) {
+			stopDurationTimer();
+			durationTimerReachead = 1;
+		} 
+	}
+	runningSecondsTick = 1;
+	
 }
 
 void initInterrupts()
@@ -298,22 +321,33 @@ int16_t diffADCValue()
 }
 */
 
+void startSecondTick()
+{
+//	TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable
+	TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 24, timer started
+	secondsCounter = 0;
+	minutesCounter = 0;
+	hoursCounter = 0;
+}
+
 void startDurationTimer(int16_t secs)
 {
+	cli();   // may not be interrupted by secondTick
 	durationTimerReachead = 0;
 	secondsRemainingInDurationTimer = secs;
 	secondsInDurationTimer = 0;
+	sei();
 	
 //	TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
-	TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 24, timer started 
+//	TCCR1B = 0b00001101  ; // CTC on CC1A , set clk / 24, timer started 
 }
 
 void stopDurationTimer()
 {
-	TCCR1B = 0b00001000 ;  // CTC, timer stopped
-//	TIMSK1 = 0x00;
-	
+//	TCCR1B = 0b00001000 ;  // CTC, timer stopped
+//	TIMSK1 = 0x00;	
 }
+
 /*
 void setCompletionAlarmOff()
 {
@@ -499,6 +533,7 @@ void initHW()
 {
 	initInterrupts();
 	initUsart2();
+	startSecondTick();
 }
 
 

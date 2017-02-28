@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <avr/eeprom.h>
+#include "TriacDefines.h"
 #include "triacPID.h"
 #include "TriacIntr.h"
 
@@ -20,9 +21,8 @@ real m_kTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_error
 real corrCarryOver;     // carry amount if correction in float gives zero correction in int
 
 uint8_t idleTickCnt;
+real pidError;
 
-
-#define maxIdleTickCnt  5
 
 
 
@@ -96,12 +96,11 @@ real nextCorrection(real error)
 
 void calcNextTriacDelay()
 {  
-	real err;
 	real corr;
 	int16_t newDelay;
 	int16_t corrInt;
-	err = getCurrentTemperature()  - desiredTemperature ;
-	corr = nextCorrection(err) + corrCarryOver;
+	pidError = getCurrentTemperature()  - desiredTemperature ;
+	corr = nextCorrection(pidError) + corrCarryOver;
 	corrInt = corr;     
 	corrCarryOver = corr - corrInt;
 	newDelay = getTriacFireDuration() + corrInt;
@@ -111,14 +110,14 @@ void calcNextTriacDelay()
 	real corrD = corr;
 	real carryCorrD = corrCarryOver;
 	real ampsD  = currentAmps();
-	info_printf(" corr %f corrI %i cry %f delay %x  amps %f\n",corrD,corrInt, carryCorrD, newDelay, ampsD); 
+	info_printf("err %6.2f corr %f corrI %i cryOv %f delay %x  amps %f\n",pidError, corrD,corrInt, carryCorrD, newDelay, ampsD); 
 #endif
 }
 
 void initPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);  
-#warning "todo check all the signs :-)" 
+#warning "todo check all the signs and values :-)" 
 	InitializePID( -0.45, 1.1, 0.05, 0.5, 2, pidIntervalSecs);
 	setTriacFireDuration(initialTriacDelayValue);
 }
@@ -172,6 +171,6 @@ void printCsvValues()
 {
 	info_printf("printCsvValues\n");
 #ifdef printCsvData
-	printf("%d,%5.1f,%d,%f,%f,%f\n",getSecondsInDurationTimer(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal);
+	printf("%d,%5.1f,%d,%f,%f,%f, %f\n",overallSeconds(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
 #endif
 }
