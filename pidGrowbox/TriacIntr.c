@@ -200,7 +200,7 @@ ISR(INT7_vect)
 
 void printfTime()
 {
-	printf("h: %5i m: %29 s: %2i ", hoursCounter, minutesCounter, secondsCounter);  
+	info_printf("h: %5i m: %29i s: %2i ", hoursCounter, minutesCounter, secondsCounter);  
 }
 
 uint32_t overallSeconds() 

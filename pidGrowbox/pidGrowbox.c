@@ -81,8 +81,8 @@ int main(void)
 			runningSecondsTick = 0;
 			++secsCounter;
 			
-			printf("%4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),getLastAdcValue(0));
-			printf("sec %4i\n",secsCounter );
+			info_printf("%4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),getLastAdcValue(0));
+			info_printf("sec %4i\n",secsCounter );
  			++ pidIntervalCounter;
  			if (pidIntervalCounter >=  pidIntervalSecs)  {
  				pidIntervalCounter = 0;

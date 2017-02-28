@@ -45,4 +45,5 @@ int16_t getTriacDelayValueFromADC(uint8_t pos);
 uint16_t getLastAdcValue(uint8_t  pos);
 void startSecondTick();
 uint32_t overallSeconds();
+void printfTime();
 #endif

@@ -169,8 +169,9 @@ void printCsvHeader()
 
 void printCsvValues()
 {
-	info_printf("printCsvValues\n");
 #ifdef printCsvData
 	printf("%d,%5.1f,%d,%f,%f,%f, %f\n",overallSeconds(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
+#else
+	printfTime();  info_printf("printCsvValues\n");
 #endif
 }
