@@ -123,7 +123,7 @@ uStInt evStateNonVentilating(void)
 {
 	info_printf("check for event in State evStateNonVentilating\n");
 
-	if ((currentEvent->evType == eVentilationStartTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
+	if ((currentEvent->evType == evTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
 			// No event action.
@@ -139,7 +139,7 @@ uStInt evStateVentilating(void)
 {
 	info_printf("check for event in State evStateVentilating\n");
 
-	if ((currentEvent->evType == eVentilationStopTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))  {
+	if ((currentEvent->evType == evTimeOutDurationTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))  {
 		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateNonVentilating);
 			// No event action.
 		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );

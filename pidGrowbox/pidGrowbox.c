@@ -80,6 +80,10 @@ int main(void)
  		if (dataReceived == 1)  {
  			dataReceived = 0;
  			onDataReceived();
+			ev.evType = eValueAssignement;
+			ev.humidity = getCurrentHumidity(); 
+			ev.temperature = getCurrentTemperature();
+			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
  		}
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
@@ -104,5 +108,10 @@ int main(void)
  			adcTick = 0;
  			startNextADC();
  		}
+		if (durationTimerReachead == 1) {
+			durationTimerReachead = 0;
+			ev.evType = evTimeOutDurationTimer;
+			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
+		} 
 	}
 }

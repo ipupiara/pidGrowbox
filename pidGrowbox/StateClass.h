@@ -44,6 +44,7 @@ enum eEventTypes
 typedef struct  {
 	int evType;
 	floatType humidity;
+	floatType temperature;
 	union {
 		int8_t keyCode;
 		struct {			// currently not in use
