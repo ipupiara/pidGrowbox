@@ -15,7 +15,7 @@
 extern const uStInt uStIntHandlingDone;
 extern const uStInt uStIntNoMatch;
 
-CJoesTriacEvent* currentEvent;
+CGrowBoxEvent* currentEvent;
 
 
 
@@ -23,50 +23,19 @@ CJoesTriacEvent* currentEvent;
 #warning  attention: sequence must be the same as in xaStates (below)  !!!
 
 
-//// This defines and names the states the class has.
-//enum eStates
-//{
-	//eStateGrowBoxKeepingHumidity,
-	//eStartState = eStateGrowBoxKeepingHumidity,
-	//eStateHumidifying,
-	//eStateIdle,
-	//eStateNonVentilating,
-	//eStateVentilating,
-	//eStateDrying,
-	//eNumberOfStates
-//};
-
+// This defines and names the states the class has.
 enum eStates
 {
-	eStateJoesTriac,
-	eStartState = eStateJoesTriac,
-	eStateTriacOperating,
+	eStateGrowBoxKeepingHumidity,
+	eStartState = eStateGrowBoxKeepingHumidity,
+	eStateHumidifying,
+	eStateIdle,
+	eStateNonVentilating,
+	eStateVentilating,
+	eStateDrying,
 	eStateFatalError,
 	eNumberOfStates
 };
-
-
-uStInt evJoesTriacChecker(void)
-{
-	return (uStIntNoMatch);
-}
-
-uStInt evTriacOperatingChecker(void)
-{
-	uStInt res = uStIntNoMatch;
-//	printf("check for event in State evTriacOperating\n");
-
-	if (currentEvent->evType == evFatalError) 
-	{	
-			BEGIN_EVENT_HANDLER(PJoesTriacStateChart, eStateFatalError);
-				// No event action.
-			END_EVENT_HANDLER(PJoesTriacStateChart);
-			res =  uStIntHandlingDone;
-	}
-	
-	return (res); 
-}
-
 
 
 void entryFatalErrorState(void)
@@ -90,6 +59,231 @@ uStInt evFatalErrorChecker(void)
 }
 
 
+//bool CHumidityStateClass::inState(const uint32 u32State)
+//{
+	//Mutex m(&humidEngineMutex);
+	//bool res;
+	//res = (IN_STATE(CHumidityStateClass, engine, u32State));
+	//return res;
+//}
+
+
+uStInt evStateGrowBoxKeepingHumidity(void)
+{
+//	printf("check for event in State evStateGrowBoxKeepingHumidity\n");
+	if (currentEvent->evType == eReset)  {
+	//{
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateGrowBoxKeepingHumidity );
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass, engine);
+		//
+///*  left this as an original example for history states
+ //
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateGrowBoxKeepingHumidity | u32WithHistory);
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass, engine);
+//*/
+		//return (u32HandlingDone);
+	}
+	return (uStIntNoMatch);
+}
+
+
+uStInt evStateHumidifying(void)
+{
+//	printf("check for event in State evStateHumidifying\n");
+	//if ((event.evType == eValueAssignement) && (CGrowBoxDefines::GetHumidifyingUpperLimit() < event.humidity))
+	//{
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateIdle);
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass, engine);
+		//return (u32HandlingDone);
+	//}
+	return (uStIntNoMatch);
+}
+
+
+uStInt evStateIdle(void)
+{
+//	printf("check for event in State evStateIdle\n");
+
+	//if (event.evType == eValueAssignement) 
+	//{	if (CGrowBoxDefines::GetHumidifyingLowerLimit() > event.humidity)
+		//{
+			//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateHumidifying);
+				//// No event action.
+			//END_EVENT_HANDLER(CHumidityStateClass, engine);
+			//return (u32HandlingDone);
+		//}
+		//if (CGrowBoxDefines::GetDryingUpperLimit() < event.humidity)
+		//{
+			//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateDrying);
+				//// No event action.
+			//END_EVENT_HANDLER(CHumidityStateClass, engine);
+			//return (u32HandlingDone);
+		//}
+	//}
+	return (uStIntNoMatch);
+}
+
+
+uStInt evStateNonVentilating(void)
+{
+//	printf("check for event in State evStateNonVentilating\n");
+
+	//if ((event.evType == eVentilationStartTimer) || (event.evType ==  eVentilationButtonPressed))
+	//{
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateVentilating);
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass, engine);
+		//return (u32HandlingDone);
+	//
+	//}
+	return (uStIntNoMatch);
+}
+
+
+uStInt evStateVentilating(void)
+{
+//	printf("check for event in State evStateVentilating\n");
+
+	//if ((event.evType == eVentilationStopTimer)  || (event.evType ==  eVentilationStopButtonPressed))
+	//{
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateNonVentilating);
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass, engine);
+		//return (u32HandlingDone);
+	//
+	//}
+	return (uStIntNoMatch);
+}
+
+uStInt evStateDrying(void)
+{
+//	printf("check for event in State evStateDrying\n");
+	//if ((event.evType == eValueAssignement) && (CGrowBoxDefines::GetDryingLowerLimit() > event.humidity))
+	//{
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateIdle);
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass, engine);
+		//return (u32HandlingDone);
+	//}
+	return (uStIntNoMatch);
+}
+
+/*
+// State transition/handling methods
+// left as an example of this defEntry method
+
+void CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity(void)
+{
+
+//	printf("CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity\n");
+}
+*/
+
+
+
+void entryStateGrowBoxKeepingHumidity(void)
+{
+	info_printf("CHumidityStateClass::entryStateGrowBoxKeepingHumidity\n");
+}
+
+
+void entryStateHumidifying(void)
+{
+	info_printf("CHumidityStateClass::entryStateHumidifying\n");
+//	owner->startHumidifying();
+}
+
+
+void entryStateIdle(void)
+{
+	info_printf("CHumidityStateClass::entryStateIdle\n");
+}
+
+
+void entryStateNonVentilating(void)
+{
+	info_printf("CHumidityStateClass::entryStateNonVentilating\n");
+	//owner->startVentilatingStartTimer(CGrowBoxDefines::GetIdleVentilationDelayMinutes());
+	//owner->onEntryIdleNotVentilating();
+}
+
+
+void entryStateVentilating(void)
+{
+	info_printf("CHumidityStateClass::entryStateVentilating\n");
+	//owner->startVentilating();
+	//owner->startVentilatingStopTimer(CGrowBoxDefines::GetIdleVentilationMinutes());
+	//owner->onEntryIdleVentilating();
+}
+
+void entryStateDrying(void)
+{
+	info_printf("CHumidityStateClass::entryStateDrying\n");
+//	owner->startDrying();
+}
+
+void exitStateGrowBoxKeepingHumidity(void)
+{
+	//  printf("CHumidityStateClass::exitStateGrowBoxKeepingHumidity\n");
+}
+
+
+void exitStateHumidifying(void)
+{
+	//  printf("CHumidityStateClass::exitStateHumidifying\n");
+//	owner->stopHumidifying();
+}
+
+
+void exitStateIdle(void)
+{
+	//  printf("CHumidityStateClass::exitStateIdle\n");
+}
+
+
+void exitStateNonVentilating(void)
+{
+	//  printf("CHumidityStateClass::exitStateNonVentilating\n");
+	//owner->stopVentilatingStartTimer();
+	//owner->onExitIdleNotVentilating();
+}
+
+
+void exitStateVentilating(void)
+{
+	//  printf("CHumidityStateClass::exitStateVentilating\n");
+	//owner->stopVentilating();
+	//owner->stopVentilatingStopTimer();
+	//owner->onExitIdleVentilating();
+}
+
+
+void exitStateDrying(void)
+{
+	//  printf("CHumidityStateClass::exitStateDrying\n");
+	//owner->stopDrying();
+}
+
+
+
+
+/***   Temperature  ********/
+
+// This defines and names the states the class has.
+enum eTemperatureStates
+{
+	eStateGrowBoxTemperature,
+	eTemperatureStartState = eStateGrowBoxTemperature,
+	eStateTemperatureIdle,
+	eStateHeating,
+	eStateCooling,
+	eNumberOfTemperatureStates
+};
+
+
 
 #ifndef  sdccNULL 
 
@@ -104,29 +298,56 @@ t_fvoid  tfNull;
 // attention: sequence must be the same as above enum eStates
 
 xStateType xaStates[eNumberOfStates] = {
- 	{eStateJoesTriac,    // name
- 	-1,									//parent
- 	eStateTriacOperating,    // default substate
- 	0,    // keep history
- 	evJoesTriacChecker,    // event checking fu
-	tfNull,       // def state entry function
- 	tfNull,     //    entering state
- 	tfNull},     // exiting state
+		{eStateGrowBoxKeepingHumidity,
+			-1,
+			eStateIdle,
+			eStateGrowBoxKeepingHumidity,
+			NULL,  
+			entryStateGrowBoxKeepingHumidity,
+			exitStateGrowBoxKeepingHumidity},
 
- 	{eStateTriacOperating,
- 	eStateJoesTriac,
- 	0,
- 	0,									
- 	evTriacOperatingChecker,
- 	tfNull,
- 	tfNull,
- 	tfNull},
+/* name						*/	{eStateHumidifying,
+	/* parent					*/	eStateGrowBoxKeepingHumidity,
+	/* default_substate			*/	-1,
+	/* event-checking func		*/	eStateHumidifying,
+	/* default state entry func	*/	NULL,
+	/* entering state func		*/	entryStateHumidifying,
+/* exiting state func		*/		exitStateHumidifying},
 
+/* name						*/	{eStateIdle,
+	/* parent					*/	eStateGrowBoxKeepingHumidity,
+	/* default_substate			*/	eStateNonVentilating,
+	/* event-checking func		*/	eStateIdle,
+	/* default state entry func	*/	NULL,
+	/* entering state func		*/	entryStateIdle,
+/* exiting state func		*/		exitStateIdle},
 
- 
+/* name						*/	{eStateNonVentilating,
+	/* parent					*/	eStateIdle,
+	/* default_substate			*/	-1,
+	/* event-checking func		*/	eStateNonVentilating,
+	/* default state entry func	*/	NULL,
+	/* entering state func		*/	entryStateNonVentilating,
+/* exiting state func		*/		exitStateNonVentilating},
+
+/* name						*/	{eStateVentilating,
+	/* parent					*/	eStateIdle,
+	/* default_substate			*/	-1,
+	/* event-checking func		*/	eStateVentilating,
+	/* default state entry func	*/	NULL,
+	/* entering state func		*/	entryStateVentilating,
+/* exiting state func		*/		exitStateVentilating},
+
+/* name						*/	{eStateDrying,
+	/* parent					*/	eStateGrowBoxKeepingHumidity,
+	/* default_substate			*/	-1,
+	/* event-checking func		*/	eStateDrying,
+	/* default state entry func	*/	NULL,
+	/* entering state func		*/	entryStateDrying,
+/* exiting state func		*/		exitStateDrying},
 	
 	{eStateFatalError,
- 	eStateJoesTriac,
+ 	eStateGrowBoxKeepingHumidity,
  	-1,
  	0,
  	evFatalErrorChecker,
@@ -138,111 +359,6 @@ xStateType xaStates[eNumberOfStates] = {
 
 
 
-
-
-
-
-/*
-void entry...State(void)
-{
-//	printf("entry I\n");
-}
-
-void exit...State(void)
-{
-//	printf("exit I\n");
-}
-
-uStInt ev...Checker(void)
-{
-//	printf("check for event in State evStateIdle\n");
-
-//	if (currentEvent->evType == eValueAssignement) 
-//	{	if (HumidifyingLowerLimit > currentEvent->humidity)
-//		{
-//			BEGIN_EVENT_HANDLER(PJoesTriacStateChart, eStateHumidifying);
-//				// No event action.
-//			END_EVENT_HANDLER(PJoesTriacStateChart);
-//			return (u32HandlingDone);
-//		}
-//	}
-	return (u32NoMatch);
-}
-
-*/
-
-/*
-
-enum eStates
-{
-	eStateJoesTriac,
-	eStartState = eStateJoesTriac,
-	eStateAskForCalibration,
-	eStateCalibrating,
-	eNumberOfStates
-};
-
-
-uStInt evJoesTriacChecker(void)
-{
-	return (uStIntNoMatch);
-}
-
-uStInt evAskForCalibrationChecker(void)
-{
-	return (uStIntNoMatch);
-}
-
-uStInt evCalibratingChecker(void)
-{
-	return (uStIntNoMatch);
-}
-
-
-#ifndef  sdccNULL 
-
-#define tfNull 0
-
-#else
-
-t_fvoid  tfNull;
-
-#endif 
-
-xStateType xaStates[eNumberOfStates] = {
- 	{eStateJoesTriac,    // name
- 	-1,									//parent
- 	eStateAskForCalibration,    // default substate
- 	0,    // keep history
- 	evJoesTriacChecker,    // event checking fu
-	tfNull,       // def state entry function
- 	tfNull,     //    entering state
- 	tfNull},     // exiting state
-
- 	{eStateAskForCalibration,
- 	eStateJoesTriac,
- 	-1,
- 	0,									
- 	evAskForCalibrationChecker,
- 	tfNull,
- 	tfNull,
- 	tfNull},
-
- 	{eStateCalibrating,
- 	eStateJoesTriac,
- 	-1,
- 	0,
- 	evCalibratingChecker,
- 	tfNull,
- 	tfNull,
- 	tfNull},
-	 
-
-};
-
-*/
-
-
 void startStateCharts()
 {
 
@@ -252,19 +368,19 @@ void startStateCharts()
 
 #endif 
 
- 	PJoesTriacStateChart = & SJoesTriacStateChart; 
-	createTStatechart (& SJoesTriacStateChart, xaStates, eNumberOfStates, eStartState);
+ 	PTriacHumidityTemperatureChart = & STriacHumidityTemperatureChart; 
+	createTStatechart (& STriacHumidityTemperatureChart, xaStates, eNumberOfStates, eStartState);
 	
 }
 
 
 void stopStateCharts()
 {
-	destructTStatechart(&SJoesTriacStateChart);
+	destructTStatechart(&STriacHumidityTemperatureChart);
 }
 
 
-bool processTriacEvent(TStatechart* t,CJoesTriacEvent* ev)
+bool processTriacEvent(TStatechart* t,CGrowBoxEvent* ev)
 {
 	currentEvent = ev;
 	return ProcessEvent(t);

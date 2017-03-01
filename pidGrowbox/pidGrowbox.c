@@ -52,7 +52,9 @@ static int uart_putchar(char c, FILE *stream)
 uint16_t   pidIntervalCounter = 0;   //  introduced to avoid division
 uint16_t   csvIntervalCounter = 0;
 uint16_t   secsCounter = 0;
-        
+    
+CGrowBoxEvent ev;	
+	    
 		
 int main(void)
 {

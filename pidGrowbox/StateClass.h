@@ -5,8 +5,8 @@
 #include "TStatechart.h"
 #include "TriacDefines.h"
 
-TStatechart SJoesTriacStateChart;
-TStatechart* PJoesTriacStateChart;
+TStatechart	 STriacHumidityTemperatureChart;
+TStatechart* PTriacHumidityTemperatureChart;
 //
 //
 //enum eEventTypes
@@ -21,6 +21,12 @@ TStatechart* PJoesTriacStateChart;
 
 enum eEventTypes
 {
+	eReset,
+	eValueAssignement,
+	eVentilationStartTimer,
+	eVentilationStopTimer,
+	eVentilationButtonPressed,
+	eVentilationStopButtonPressed,
 	evCharEntered,
 	evF1Pressed,
 	evF2Pressed,
@@ -45,7 +51,7 @@ typedef struct  {
 			int8_t  jobType;
 		} zeroAdjustingState;
 	}  evData;
-} CJoesTriacEvent ;
+} CGrowBoxEvent ;
 
 
 
@@ -56,7 +62,7 @@ void startStateCharts();
 void stopStateCharts();
 
 
-bool processTriacEvent(TStatechart* t,CJoesTriacEvent* ev);
+bool processTriacEvent(TStatechart* t,CGrowBoxEvent* ev);
 
 
 
