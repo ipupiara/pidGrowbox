@@ -176,26 +176,26 @@ floatType  GetIdleVentilationDelayMinutes()
 	return IdleVentilationDelayMinutes;
 }
 
-double  GetIdleVentilationMinutes()
+floatType  GetIdleVentilationMinutes()
 {
 	return IdleVentilationMinutes;
 }
 
-double  GetHumidifyingLowerLimit()
+floatType  GetHumidifyingLowerLimit()
 {
 	return HumidifyingLowerLimit;
 }
 
-double GetHumidifyingUpperLimit()
+floatType GetHumidifyingUpperLimit()
 {
 	return HumidifyingUpperLimit;
 }
 
-double  GetDryingUpperLimit()
+floatType  GetDryingUpperLimit()
 {
 	return DryingUpperLimit;
 }
-double  GetDryingLowerLimit()
+floatType  GetDryingLowerLimit()
 {
 	return DryingLowerLimit;
 }

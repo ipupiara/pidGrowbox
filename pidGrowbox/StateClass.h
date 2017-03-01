@@ -43,6 +43,7 @@ enum eEventTypes
 
 typedef struct  {
 	int evType;
+	floatType humidity;
 	union {
 		int8_t keyCode;
 		struct {			// currently not in use
@@ -62,7 +63,7 @@ void startStateCharts();
 void stopStateCharts();
 
 
-bool processTriacEvent(TStatechart* t,CGrowBoxEvent* ev);
+bool processTriacEvent(TStatechart* tStCh,CGrowBoxEvent* ev);
 
 
 
