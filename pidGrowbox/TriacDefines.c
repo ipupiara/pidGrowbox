@@ -7,6 +7,16 @@
 //#include "TriacIntr.h"
 
 
+#define IdleVentilationDelayMinutes   15.0
+#define IdleVentilationMinutes   5.0
+#define HumidifyingLowerLimit  88.0
+#define HumidifyingUpperLimit   90.0
+#define DryingUpperLimit      98.0
+#define DryingLowerLimit     96.0
+
+
+
+
 
 void info_printf( char *emsg, ...)
 {
@@ -160,3 +170,32 @@ void initDefines()
 }
 
 
+
+floatType  GetIdleVentilationDelayMinutes()
+{
+	return IdleVentilationDelayMinutes;
+}
+
+double  GetIdleVentilationMinutes()
+{
+	return IdleVentilationMinutes;
+}
+
+double  GetHumidifyingLowerLimit()
+{
+	return HumidifyingLowerLimit;
+}
+
+double GetHumidifyingUpperLimit()
+{
+	return HumidifyingUpperLimit;
+}
+
+double  GetDryingUpperLimit()
+{
+	return DryingUpperLimit;
+}
+double  GetDryingLowerLimit()
+{
+	return DryingLowerLimit;
+}

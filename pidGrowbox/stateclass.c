@@ -47,36 +47,28 @@ void entryFatalErrorState(void)
 
 void exitFatalErrorState(void)
 {
-	printf("exit FatalError\n");
+	info_printf("exit FatalError\n");
 }
 
 uStInt evFatalErrorChecker(void)
 {
 	uStInt res = uStIntNoMatch;
-	//	printf("check for event in State evStateIdle\n");
+	info_printf("check for event in State evStateIdle\n");
 
 	return (res);
 }
 
 
-//bool CHumidityStateClass::inState(const uint32 u32State)
-//{
-	//Mutex m(&humidEngineMutex);
-	//bool res;
-	//res = (IN_STATE(CHumidityStateClass, engine, u32State));
-	//return res;
-//}
-
 
 uStInt evStateGrowBoxKeepingHumidity(void)
 {
-//	printf("check for event in State evStateGrowBoxKeepingHumidity\n");
+	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
 	if (currentEvent->evType == eReset)  {
-	//{
-		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateGrowBoxKeepingHumidity );
-			//// No event action.
-		//END_EVENT_HANDLER(CHumidityStateClass, engine);
-		//
+	{
+		BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateGrowBoxKeepingHumidity );
+			// No event action.
+		END_EVENT_HANDLER(CHumidityStateClass, engine);
+		
 ///*  left this as an original example for history states
  //
 		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateGrowBoxKeepingHumidity | u32WithHistory);
@@ -91,83 +83,83 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 
 uStInt evStateHumidifying(void)
 {
-//	printf("check for event in State evStateHumidifying\n");
-	//if ((event.evType == eValueAssignement) && (CGrowBoxDefines::GetHumidifyingUpperLimit() < event.humidity))
-	//{
-		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateIdle);
-			//// No event action.
-		//END_EVENT_HANDLER(CHumidityStateClass, engine);
-		//return (u32HandlingDone);
-	//}
+	info_printf("check for event in State evStateHumidifying\n");
+	if ((currentEventevent->evType == eValueAssignement) && (GetHumidifyingUpperLimit() < currentEvent->humidity))
+	{
+		BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateIdle);
+			// No event action.
+		END_EVENT_HANDLER(CHumidityStateClass, engine);
+		return (u32HandlingDone);
+	}
 	return (uStIntNoMatch);
 }
 
 
 uStInt evStateIdle(void)
 {
-//	printf("check for event in State evStateIdle\n");
+	info_printf("check for event in State evStateIdle\n");
 
-	//if (event.evType == eValueAssignement) 
-	//{	if (CGrowBoxDefines::GetHumidifyingLowerLimit() > event.humidity)
-		//{
-			//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateHumidifying);
-				//// No event action.
-			//END_EVENT_HANDLER(CHumidityStateClass, engine);
-			//return (u32HandlingDone);
-		//}
-		//if (CGrowBoxDefines::GetDryingUpperLimit() < event.humidity)
-		//{
-			//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateDrying);
-				//// No event action.
-			//END_EVENT_HANDLER(CHumidityStateClass, engine);
-			//return (u32HandlingDone);
-		//}
-	//}
+	if (currentEvent.evType == eValueAssignement) 
+	{	if (GetHumidifyingLowerLimit() > currentEvent->humidity)
+		{
+			BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateHumidifying);
+				// No event action.
+			END_EVENT_HANDLER(CHumidityStateClass, engine);
+			return (u32HandlingDone);
+		}
+		if (GetDryingUpperLimit() < currentEvent->humidity)
+		{
+			BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateDrying);
+				// No event action.
+			END_EVENT_HANDLER(CHumidityStateClass, engine);
+			return (u32HandlingDone);
+		}
+	}
 	return (uStIntNoMatch);
 }
 
 
 uStInt evStateNonVentilating(void)
 {
-//	printf("check for event in State evStateNonVentilating\n");
+	info_printf("check for event in State evStateNonVentilating\n");
 
-	//if ((event.evType == eVentilationStartTimer) || (event.evType ==  eVentilationButtonPressed))
-	//{
-		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateVentilating);
-			//// No event action.
-		//END_EVENT_HANDLER(CHumidityStateClass, engine);
-		//return (u32HandlingDone);
-	//
-	//}
+	if ((currentEvent->evType == eVentilationStartTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
+	{
+		BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateVentilating);
+			// No event action.
+		END_EVENT_HANDLER(CHumidityStateClass, engine);
+		return (u32HandlingDone);
+	
+	}
 	return (uStIntNoMatch);
 }
 
 
 uStInt evStateVentilating(void)
 {
-//	printf("check for event in State evStateVentilating\n");
+	currentEvent("check for event in State evStateVentilating\n");
 
-	//if ((event.evType == eVentilationStopTimer)  || (event.evType ==  eVentilationStopButtonPressed))
-	//{
-		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateNonVentilating);
-			//// No event action.
-		//END_EVENT_HANDLER(CHumidityStateClass, engine);
-		//return (u32HandlingDone);
-	//
-	//}
+	if ((currentEvent->evType == eVentilationStopTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))
+	{
+		BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateNonVentilating);
+			// No event action.
+		END_EVENT_HANDLER(CHumidityStateClass, engine);
+		return (u32HandlingDone);
+	
+	}
 	return (uStIntNoMatch);
 }
 
 uStInt evStateDrying(void)
 {
-//	printf("check for event in State evStateDrying\n");
-	//if ((event.evType == eValueAssignement) && (CGrowBoxDefines::GetDryingLowerLimit() > event.humidity))
-	//{
-		//BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateIdle);
-			//// No event action.
-		//END_EVENT_HANDLER(CHumidityStateClass, engine);
-		//return (u32HandlingDone);
-	//}
+	currentEvent("check for event in State evStateDrying\n");
+	if ((currentEvent->evType == eValueAssignement) && (CGrowBoxDefines::GetDryingLowerLimit() > event.humidity))
+	{
+		BEGIN_EVENT_HANDLER(CHumidityStateClass, engine, eStateIdle);
+			// No event action.
+		END_EVENT_HANDLER(CHumidityStateClass, engine);
+		return (u32HandlingDone);
+	}
 	return (uStIntNoMatch);
 }
 
@@ -178,7 +170,7 @@ uStInt evStateDrying(void)
 void CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity(void)
 {
 
-//	printf("CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity\n");
+//	currentEvent("CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity\n");
 }
 */
 
@@ -186,7 +178,7 @@ void CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity(void)
 
 void entryStateGrowBoxKeepingHumidity(void)
 {
-	info_printf("CHumidityStateClass::entryStateGrowBoxKeepingHumidity\n");
+	info_currentEvent("CHumidityStateClass::entryStateGrowBoxKeepingHumidity\n");
 }
 
 
@@ -227,26 +219,26 @@ void entryStateDrying(void)
 
 void exitStateGrowBoxKeepingHumidity(void)
 {
-	//  printf("CHumidityStateClass::exitStateGrowBoxKeepingHumidity\n");
+	//  currentEvent("CHumidityStateClass::exitStateGrowBoxKeepingHumidity\n");
 }
 
 
 void exitStateHumidifying(void)
 {
-	//  printf("CHumidityStateClass::exitStateHumidifying\n");
+	//  currentEvent("CHumidityStateClass::exitStateHumidifying\n");
 //	owner->stopHumidifying();
 }
 
 
 void exitStateIdle(void)
 {
-	//  printf("CHumidityStateClass::exitStateIdle\n");
+	//  currentEvent("CHumidityStateClass::exitStateIdle\n");
 }
 
 
 void exitStateNonVentilating(void)
 {
-	//  printf("CHumidityStateClass::exitStateNonVentilating\n");
+	//  currentEvent("CHumidityStateClass::exitStateNonVentilating\n");
 	//owner->stopVentilatingStartTimer();
 	//owner->onExitIdleNotVentilating();
 }
@@ -254,7 +246,7 @@ void exitStateNonVentilating(void)
 
 void exitStateVentilating(void)
 {
-	//  printf("CHumidityStateClass::exitStateVentilating\n");
+	//  currentEvent("CHumidityStateClass::exitStateVentilating\n");
 	//owner->stopVentilating();
 	//owner->stopVentilatingStopTimer();
 	//owner->onExitIdleVentilating();
@@ -263,7 +255,7 @@ void exitStateVentilating(void)
 
 void exitStateDrying(void)
 {
-	//  printf("CHumidityStateClass::exitStateDrying\n");
+	//  currentEvent("CHumidityStateClass::exitStateDrying\n");
 	//owner->stopDrying();
 }
 

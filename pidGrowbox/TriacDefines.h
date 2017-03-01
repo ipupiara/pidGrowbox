@@ -40,6 +40,13 @@ char lastFatalErrorString [20];
 
 int8_t fatalErrorOccurred;
 
+static floatType  GetIdleVentilationDelayMinutes();
+static floatType  GetIdleVentilationMinutes();
+static floatType  GetHumidifyingLowerLimit();
+static floatType  GetHumidifyingUpperLimit();
+static floatType  GetDryingUpperLimit();
+static floatType  GetDryingLowerLimit();
+
 void initDefines();
 
 #endif
