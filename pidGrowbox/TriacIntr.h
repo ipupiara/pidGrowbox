@@ -60,4 +60,12 @@ int16_t getSecondsDurationTimerRemaining();
 int16_t getSecondsRemainingInDurationTimer();
 uint32_t overallSeconds();
 void printfTime();
+
+void startHumidifying();
+void stopHumidifying();
+void startVentilating();
+void stopVentilating();
+void startDrying();
+void stopDrying();
+
 #endif

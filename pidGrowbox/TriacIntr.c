@@ -687,4 +687,32 @@ int16_t getTriacDelayValueFromADC(uint8_t pos)
 	return res;
 }
 
+void startHumidifying()
+{
+	
+}
 
+void stopHumidifying()
+{
+	
+}
+
+void startVentilating()
+{
+	
+}
+
+void stopVentilating()
+{
+	
+}
+
+void startDrying()
+{
+	
+}
+
+void stopDrying()
+{
+	
+}

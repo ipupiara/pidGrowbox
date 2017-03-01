@@ -169,7 +169,7 @@ uStInt evStateDrying(void)
 void CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity(void)
 {
 
-//	currentEvent("CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity\n");
+	info_printf("CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity\n");
 }
 */
 
@@ -184,7 +184,7 @@ void entryStateGrowBoxKeepingHumidity(void)
 void entryStateHumidifying(void)
 {
 	info_printf("CHumidityStateClass::entryStateHumidifying\n");
-//	owner->startHumidifying();
+	startHumidifying();
 }
 
 
@@ -197,65 +197,61 @@ void entryStateIdle(void)
 void entryStateNonVentilating(void)
 {
 	info_printf("CHumidityStateClass::entryStateNonVentilating\n");
-	//owner->startVentilatingStartTimer(CGrowBoxDefines::GetIdleVentilationDelayMinutes());
-	//owner->onEntryIdleNotVentilating();
+	startDurationTimer(GetIdleVentilationDelayMinutes());
 }
 
 
 void entryStateVentilating(void)
 {
 	info_printf("CHumidityStateClass::entryStateVentilating\n");
-	//owner->startVentilating();
-	//owner->startVentilatingStopTimer(CGrowBoxDefines::GetIdleVentilationMinutes());
-	//owner->onEntryIdleVentilating();
+	startVentilating();
+	startDurationTimer(GetIdleVentilationMinutes());
 }
 
 void entryStateDrying(void)
 {
 	info_printf("CHumidityStateClass::entryStateDrying\n");
-//	owner->startDrying();
+	startDrying();
 }
 
 void exitStateGrowBoxKeepingHumidity(void)
 {
-	//  currentEvent("CHumidityStateClass::exitStateGrowBoxKeepingHumidity\n");
+	info_printf("CHumidityStateClass::exitStateGrowBoxKeepingHumidity\n");
 }
 
 
 void exitStateHumidifying(void)
 {
-	//  currentEvent("CHumidityStateClass::exitStateHumidifying\n");
-//	owner->stopHumidifying();
+	info_printf("CHumidityStateClass::exitStateHumidifying\n");
+	stopHumidifying();
 }
 
 
 void exitStateIdle(void)
 {
-	//  currentEvent("CHumidityStateClass::exitStateIdle\n");
+	info_printf("CHumidityStateClass::exitStateIdle\n");
 }
 
 
 void exitStateNonVentilating(void)
 {
-	//  currentEvent("CHumidityStateClass::exitStateNonVentilating\n");
-	//owner->stopVentilatingStartTimer();
-	//owner->onExitIdleNotVentilating();
+	info_printf("CHumidityStateClass::exitStateNonVentilating\n");
+	stopDurationTimer();
 }
 
 
 void exitStateVentilating(void)
 {
-	//  currentEvent("CHumidityStateClass::exitStateVentilating\n");
-	//owner->stopVentilating();
-	//owner->stopVentilatingStopTimer();
-	//owner->onExitIdleVentilating();
+	info_printf("CHumidityStateClass::exitStateVentilating\n");
+	stopVentilating();
+	stopDurationTimer();
 }
 
 
 void exitStateDrying(void)
 {
-	//  currentEvent("CHumidityStateClass::exitStateDrying\n");
-	//owner->stopDrying();
+	info_printf("CHumidityStateClass::exitStateDrying\n");
+	stopDrying();
 }
 
 
