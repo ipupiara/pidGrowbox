@@ -12,6 +12,7 @@
 #include "TriacDefines.h"
 #include "TriacIntr.h"
 #include "triacPID.h"
+#include "StateClass.h"
 
 
 void USART_Init( unsigned int baud )
@@ -65,7 +66,8 @@ int main(void)
 	initHW();
 	initPID();
 	initADC();
-//	printCsvHeader();
+	printCsvHeader();
+	startStateCharts();
 	
 //	startDurationTimer(maxSecsPossible  );
 #warning " timer1 changes tobe tested"

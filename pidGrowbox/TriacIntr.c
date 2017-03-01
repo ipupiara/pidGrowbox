@@ -152,8 +152,7 @@ ISR( TIMER0_COMP_vect)
 		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
 		cli(); 
 		PORTE &= ~(1<< PORTE6) ;		// handled synchronous 	
-		if  ((inductiveRepetitionsCounter <= 0) || (withinZeroCross == 1) ) { 
-			  
+		if  ((inductiveRepetitionsCounter <= 0) || (withinZeroCross == 1) ) {   
 			stopTimer0();
 		} else {
 			--inductiveRepetitionsCounter;
