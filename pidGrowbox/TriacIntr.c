@@ -10,12 +10,6 @@
 
 int16_t remainingTriacTriggerDelayCounts;
 
-int16_t secondsRemainingInDurationTimer;
-
-int16_t secondsInDurationTimer;
-
-uint16_t triacFireDurationTcnt0;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
-
 int16_t amtInductiveRepetitions;
 
 int16_t inductiveRepetitionsCounter;
@@ -92,8 +86,9 @@ void setTriacTriggerDelayValues()
 }
 
 
-void startTriacTriggerDelay( int16_t delayDuration)  // must run protected between cli and sei
+void startTriacTriggerDelay( int16_t delayDuration)  
 {
+	cli();
 	stopTimer0();
 	if (delayDuration <= 0) { 
 		delayDuration = 1;   // just a very short duration, but one that will happen in future
@@ -101,13 +96,14 @@ void startTriacTriggerDelay( int16_t delayDuration)  // must run protected betwe
 	remainingTriacTriggerDelayCounts = delayDuration;
 	setTriacTriggerDelayValues();	
 	startTimer0();
+	sei();
 }
 
 void calcAmtInductiveRepetitions(int16_t tFDurationTcnt0)
 {
 	if ( inductiveLoad == 1)  {
-		float amtInductiveRepetitionsF = 0.0;
-		float tFDurationTcnt0F = tFDurationTcnt0;
+		floatType amtInductiveRepetitionsF = 0.0;
+		floatType tFDurationTcnt0F = tFDurationTcnt0;
 		//		amtInductiveRepetitions = ((triacFireDurationTcnt2 * ( 1  /(11.0592e+6  /128) )) * 1.0e+6  ) /  measuredRepetitionIntervalus;
 //		float tcnt0TickDurationUs  = 128 / 11.0592e+6; 
 //		float calculatedRepetitionInterval = delayBetweenTriacTriggers * tcnt0TickDurationUs + 5;   // trigger takes approx 3- 5us
@@ -149,27 +145,26 @@ uint16_t  getTriacFireDuration()
 
 ISR( TIMER0_COMP_vect)
 {
-	
+	cli();
 	if (remainingTriacTriggerDelayCounts <= 0) {
 		PORTE |= (1<< PORTE6) ;
+		sei();				// allow interrupts during delay and do some manual checks during implemention of source code
 		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
-		PORTE &= ~(1<< PORTE6) ;		// handled synchronous
-		if  (inductiveRepetitionsCounter <= 0)  {   
+		cli(); 
+		PORTE &= ~(1<< PORTE6) ;		// handled synchronous 	
+		if  ((inductiveRepetitionsCounter <= 0) || (withinZeroCross == 1) ) { 
+			  
 			stopTimer0();
 		} else {
-			cli();
-			startTriacTriggerDelay(delayBetweenTriacTriggers);
 			--inductiveRepetitionsCounter;
-			sei();
+			startTriacTriggerDelay(delayBetweenTriacTriggers);
 		}
 	} else {
-		cli();
 		stopTimer0();
 		setTriacTriggerDelayValues();
 		startTimer0();
-		sei();
 	}	
-
+	sei();
 }
 
 
@@ -295,8 +290,10 @@ void startTriacRun()
 
 void stopTriacRun()
 {
+	cli();
 	EIMSK = 0x00;				// stop external interrupt
 	stopTimer0();
+	sei();
 //	stopAmpsADC();
 }
 
@@ -390,23 +387,23 @@ uint8_t  rxCurrentPos;
 uint16_t amtCharRcvd;
 uint16_t errMsgCnt;
 
-float   latestTemperature; 
-float   latestHumidity;
+floatType   latestTemperature; 
+floatType   latestHumidity;
 
 
-void getLatestClimateValues(float* pTemp,float* pHum)    // interface to hygrosense, called by user functions
+void getLatestClimateValues(floatType* pTemp,floatType* pHum)    // interface to hygrosense, called by user functions
 {
 	*pTemp = latestTemperature;
 	*pHum  = latestHumidity;
 }
 
 
-float getCurrentTemperature() 
+floatType getCurrentTemperature() 
 {
 	return latestTemperature;
 }
 
-float getCurrentHumidity()
+floatType getCurrentHumidity()
 {
 	return latestHumidity;
 }
@@ -465,10 +462,10 @@ void onDataReceived()        // called by main application thread to calculate t
 	sei();
 	if (validMsg != 0)  {
 		char* endP = tempS+3;
-		float temp = strtoul(tempS ,&endP,0x10) ;
+		floatType temp = strtoul(tempS ,&endP,0x10) ;
 		temp = temp / 100;
 		endP = hydS + 3;
-		float hyd = strtoul(hydS ,&endP,0x10) ;
+		floatType hyd = strtoul(hydS ,&endP,0x10) ;
 		hyd = hyd / 200;
 		
 		latestTemperature = temp;
@@ -548,8 +545,8 @@ void initHW()
 #define amtMux 1
 
 typedef struct {
-	float tempLow, tempHigh;
-	float VLow, VHigh;            // tobe found manually with use of graph printout, could be automated some when in future, but now "time to market"
+	floatType tempLow, tempHigh;
+	floatType VLow, VHigh;            // tobe found manually with use of graph printout, could be automated some when in future, but now "time to market"
 
 } graphValuesRec ;
 
@@ -560,11 +557,12 @@ graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3}};
 uint8_t  adcConnection [amtMux] = {0x00 };
 
 //uint8_t  adcConnection [amtMux] = { 0, (1 << MUX0) | (1<< MUX1) };
+floatType adcRefVoltage[amtMux] = {adcRefVoltage5} ;
 
 uint16_t  adcCnt;
 
 uint16_t  lastADCVal [amtMux];
-float lastVoltageVal [amtMux];			// kept global for debugging reasons
+floatType debugLastVoltageVal [amtMux];			// a local variable kept global exclusively for debugging reasons
 int8_t  currentMuxPos; 
 
 
@@ -577,7 +575,7 @@ void initADC()
 		adcTick = 0;
 		adcCnt = 0;
 		memset(lastADCVal,0,sizeof(lastADCVal));
-		memset(lastVoltageVal,0,sizeof(lastVoltageVal));
+		memset(debugLastVoltageVal,0,sizeof(debugLastVoltageVal));
 		currentMuxPos = 0; 
 }
 
@@ -591,34 +589,32 @@ ISR(ADC_vect)
 										// aden to get 0 for better synchronisation
 }
 
-uint16_t getLastAdcValue(uint8_t  pos)
+int16_t adcValue(uint8_t  pos)
 {
 	uint16_t res = 0;
 	if ((pos >= 0) && (pos < amtMux))  {
 		cli();
-		res = lastADCVal[pos];
+		res = adcValue(pos);
 		sei();
 	}
 	return res;
 }
 
-uint8_t getADCTemperature(uint8_t  pos, float* result)
+uint8_t getADCTemperature(uint8_t  pos, floatType* result)
 {
 	uint8_t retVal = 0;
-	float res = 0.0;
-	float adcVf = 0.0;
-	float dTbdV = 0.0;   // dT by dV, kept for debugging
+	floatType res = 0.0;
+	floatType adcVf = 0.0;
+	floatType dTbdV = 0.0;   // dT by dV, kept for debugging
 	if (pos < amtMux)  {
-		uint16_t  adcV = 0;
-		cli();
-		adcV = lastADCVal[pos];      //  2 bytes, so explicit mutex needed
-		sei();
-		adcVf = adcV;
-		lastVoltageVal[pos] =  ((adcVf * 2.56)  / 1024);
+//		uint16_t  adcV = 0;
+//		adcV = adcValue(pos);      //  2 bytes, so explicit mutex needed
+		adcVf = adcVoltage(pos);
+		debugLastVoltageVal[pos] =  adcVoltage(pos);
 		dTbdV = (graphValues[pos].tempHigh - graphValues[pos].tempLow ) / (graphValues[pos].VHigh - graphValues[pos].VLow);            
 																// responsibility to prevent divison by 0 
 															// has tobe done manually when evaluating temperature by voltage graph
-		res = graphValues[pos].tempLow  +   (( lastVoltageVal[pos] - graphValues[pos].VLow)  * dTbdV ) ;
+		res = graphValues[pos].tempLow  +   (( adcVf - graphValues[pos].VLow)  * dTbdV ) ;
 		retVal = 1;
 	};
 	*result = res;
@@ -662,17 +658,31 @@ int8_t startNextADC ()
 
 
 
+floatType adcVoltage(uint8_t  pos)      // tobe called outside interrupts
+{
+	int16_t VHex;
+	double   VFl;
+
+	VFl = 0.0;
+
+	VHex = adcValue(pos);
+	VFl = (VHex * adcRefVoltage[pos]) / 0x03FF;
+	
+	return VFl;
+}
+
+
 // debug method used for testing triac triggering behaviour
 int16_t getTriacDelayValueFromADC(uint8_t pos)
 {
 	int16_t res = 0;
-	int16_t adcV = lastADCVal[pos];
-	float adcF = adcV * 1.0;  // tobe tested
-	float maxDelay = triggerDelayMaxTcnt0 ;  // tobe tested
+	int16_t adcV = adcValue(pos);
+	floatType adcF = adcV * 1.0;  // tobe tested
+	floatType maxDelay = triggerDelayMaxTcnt0 ;  // tobe tested
 	
-	float  adcFactor = adcF / 1023.0;
+	floatType  adcFactor = adcF / 1023.0;
 	
-	float resF = adcFactor * maxDelay;
+	floatType resF = adcFactor * maxDelay;
 	res = (int16_t)  resF ; // tobe tested maybe needs to use conversion methods
 	
 	return res;

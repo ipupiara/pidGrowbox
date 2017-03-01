@@ -11,12 +11,14 @@
 
 #define initialTriacDelayValue   0x0110	
 
+double currentAmpsValue;
+
 //#define printfPid
 //#define printfAmps
 
 
 // Select 'double' or 'float' here:
-typedef float real;
+typedef floatType real;
 
 
 void initPID();

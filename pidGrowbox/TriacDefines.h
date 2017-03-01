@@ -23,6 +23,8 @@
 	#define triacTriggerLength   0      // delay approx ( n * 2.5 us ) + 5.5    at 11.0592  mhz
 	#define delayBetweenTriacTriggers  16  //  in timer 2 tcnt values , prescaler at   128
 	#define measuredRepetitionIntervalus  200;      //  approx   ( 1s  /(11.0592 E+6  /128) ) * delayBetweenTriacTriggers    [us]
+	
+typedef float floatType;	
 
 // takes approx  2 us at 10 Mhz with -o0 (no opts. !) ,with all  call/ret, push N Pop
 
@@ -34,6 +36,7 @@ uint8_t  hygrosenseMsgCnt;
 
 void delay6pnt2d5us(unsigned int n);   // description in TriacDefines.c
 
+char lastFatalErrorString [20];
 
 int8_t fatalErrorOccurred;
 
