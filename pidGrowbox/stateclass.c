@@ -123,7 +123,7 @@ uStInt evStateNonVentilating(void)
 {
 	info_printf("check for event in State evStateNonVentilating\n");
 
-	if ((currentEvent->evType == evTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
+	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
 			// No event action.
@@ -139,7 +139,7 @@ uStInt evStateVentilating(void)
 {
 	info_printf("check for event in State evStateVentilating\n");
 
-	if ((currentEvent->evType == evTimeOutDurationTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))  {
+	if ((currentEvent->evType == eTimeOutDurationTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))  {
 		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateNonVentilating);
 			// No event action.
 		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
@@ -288,7 +288,8 @@ xStateType xaStates[eNumberOfStates] = {
 		{eStateGrowBoxKeepingHumidity,
 			-1,
 			eStateIdle,
-			eStateGrowBoxKeepingHumidity,
+			0,
+			evStateGrowBoxKeepingHumidity,
 			NULL,  
 			entryStateGrowBoxKeepingHumidity,
 			exitStateGrowBoxKeepingHumidity},
@@ -296,7 +297,8 @@ xStateType xaStates[eNumberOfStates] = {
 /* name						*/	{eStateHumidifying,
 	/* parent					*/	eStateGrowBoxKeepingHumidity,
 	/* default_substate			*/	-1,
-	/* event-checking func		*/	eStateHumidifying,
+									0,     //(  keep history)
+	/* event-checking func		*/	evStateHumidifying,
 	/* default state entry func	*/	NULL,
 	/* entering state func		*/	entryStateHumidifying,
 /* exiting state func		*/		exitStateHumidifying},
@@ -304,7 +306,8 @@ xStateType xaStates[eNumberOfStates] = {
 /* name						*/	{eStateIdle,
 	/* parent					*/	eStateGrowBoxKeepingHumidity,
 	/* default_substate			*/	eStateNonVentilating,
-	/* event-checking func		*/	eStateIdle,
+									0,
+	/* event-checking func		*/	evStateIdle,
 	/* default state entry func	*/	NULL,
 	/* entering state func		*/	entryStateIdle,
 /* exiting state func		*/		exitStateIdle},
@@ -312,7 +315,8 @@ xStateType xaStates[eNumberOfStates] = {
 /* name						*/	{eStateNonVentilating,
 	/* parent					*/	eStateIdle,
 	/* default_substate			*/	-1,
-	/* event-checking func		*/	eStateNonVentilating,
+									0,
+	/* event-checking func		*/	evStateNonVentilating,
 	/* default state entry func	*/	NULL,
 	/* entering state func		*/	entryStateNonVentilating,
 /* exiting state func		*/		exitStateNonVentilating},
@@ -320,7 +324,8 @@ xStateType xaStates[eNumberOfStates] = {
 /* name						*/	{eStateVentilating,
 	/* parent					*/	eStateIdle,
 	/* default_substate			*/	-1,
-	/* event-checking func		*/	eStateVentilating,
+									0,
+	/* event-checking func		*/	evStateVentilating,
 	/* default state entry func	*/	NULL,
 	/* entering state func		*/	entryStateVentilating,
 /* exiting state func		*/		exitStateVentilating},
@@ -328,7 +333,8 @@ xStateType xaStates[eNumberOfStates] = {
 /* name						*/	{eStateDrying,
 	/* parent					*/	eStateGrowBoxKeepingHumidity,
 	/* default_substate			*/	-1,
-	/* event-checking func		*/	eStateDrying,
+									0,
+	/* event-checking func		*/	evStateDrying,
 	/* default state entry func	*/	NULL,
 	/* entering state func		*/	entryStateDrying,
 /* exiting state func		*/		exitStateDrying},

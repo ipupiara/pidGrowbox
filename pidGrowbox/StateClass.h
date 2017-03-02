@@ -27,17 +27,17 @@ enum eEventTypes
 	eVentilationStopTimer,
 	eVentilationButtonPressed,
 	eVentilationStopButtonPressed,
-	evCharEntered,
-	evF1Pressed,
-	evF2Pressed,
-	evAstPressed,
-	evNumPressed,
-	evTimeOutDurationTimer,
-	evSecondsTick,
-	evStartPressed,
-	evStopPressed,
-	evAdcTick,
-	evFatalError
+	eCharEntered,
+	eF1Pressed,
+	ePressed,
+	eAstPressed,
+	eNumPressed,
+	eTimeOutDurationTimer,
+	eSecondsTick,
+	eStartPressed,
+	eStopPressed,
+	eAdcTick,
+	eFatalError
 };
 
 

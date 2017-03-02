@@ -110,7 +110,7 @@ int main(void)
  		}
 		if (durationTimerReachead == 1) {
 			durationTimerReachead = 0;
-			ev.evType = evTimeOutDurationTimer;
+			ev.evType = eTimeOutDurationTimer;
 			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
 		} 
 	}
