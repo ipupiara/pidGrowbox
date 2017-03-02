@@ -16,6 +16,11 @@ int16_t inductiveRepetitionsCounter;
 
 int8_t withinZeroCross;
 
+void enaRXIntUsart1();
+
+void disaRXIntUsart1();
+
+
 int16_t getSecondsRemainingInDurationTimer()
 {
 	int16_t res;
