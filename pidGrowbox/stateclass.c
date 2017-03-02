@@ -28,6 +28,7 @@ enum eStates
 {
 	eStateGrowBoxKeepingHumidity,
 	eStartState = eStateGrowBoxKeepingHumidity,
+	eStateHumidityControlRunning,
 	eStateHumidifying,
 	eStateIdle,
 	eStateNonVentilating,
@@ -61,6 +62,44 @@ uStInt evFatalErrorChecker(void)
 
 
 uStInt evStateGrowBoxKeepingHumidity(void)
+{
+	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
+	if (currentEvent->evType == eReset)  
+	{
+		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart, eStateGrowBoxKeepingHumidity );
+			// No event action.
+		END_EVENT_HANDLER(PTriacHumidityTemperatureChart);
+		
+///*  left this as an original example for history states
+ //
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass,   eStateGrowBoxKeepingHumidity | u32WithHistory);
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass );
+//*/
+		//return (uStIntHandlingDone);
+	}
+	
+	if (currentEvent->evType == eFatalError)
+	
+	{
+		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart, eStateFatalError );
+			// No event action.
+		END_EVENT_HANDLER(PTriacHumidityTemperatureChart);
+		
+///*  left this as an original example for history states
+ //
+		//BEGIN_EVENT_HANDLER(CHumidityStateClass,   eStateGrowBoxKeepingHumidity | u32WithHistory);
+			//// No event action.
+		//END_EVENT_HANDLER(CHumidityStateClass );
+//*/
+		//return (uStIntHandlingDone);
+	}
+
+	return (uStIntNoMatch);
+}
+
+
+uStInt evStateHumidityControlRunning(void)
 {
 	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
 	if (currentEvent->evType == eReset)  
@@ -180,6 +219,10 @@ void entryStateGrowBoxKeepingHumidity(void)
 	info_printf("CHumidityStateClass::entryStateGrowBoxKeepingHumidity\n");
 }
 
+void entryStateHumidityControlRunning(void)
+{
+	info_printf("CHumidityStateClass::entryStateHumidityControlRunning\n");
+}
 
 void entryStateHumidifying(void)
 {
@@ -219,6 +262,10 @@ void exitStateGrowBoxKeepingHumidity(void)
 	info_printf("CHumidityStateClass::exitStateGrowBoxKeepingHumidity\n");
 }
 
+void exitStateHumidityControlRunning(void)
+{
+	info_printf("CHumidityStateClass::exitStateHumiditiyControlRunning\n");
+}
 
 void exitStateHumidifying(void)
 {
@@ -287,16 +334,25 @@ t_fvoid  tfNull;
 xStateType xaStates[eNumberOfStates] = {
 		{eStateGrowBoxKeepingHumidity,
 			-1,
-			eStateIdle,
+			eStateHumidityControlRunning,
 			0,
 			evStateGrowBoxKeepingHumidity,
 			NULL,  
 			entryStateGrowBoxKeepingHumidity,
 			exitStateGrowBoxKeepingHumidity},
+			
+				{eStateHumidityControlRunning,
+					eStateGrowBoxKeepingHumidity,
+					eStateIdle,
+					0,
+					evStateHumidityControlRunning,
+					NULL,
+					entryStateHumidityControlRunning,
+				exitStateHumidityControlRunning},
 
 /* name						*/	{eStateHumidifying,
 	/* parent					*/	eStateGrowBoxKeepingHumidity,
-	/* default_substate			*/	-1,
+	/* default_substate			*/	0,
 									0,     //(  keep history)
 	/* event-checking func		*/	evStateHumidifying,
 	/* default state entry func	*/	NULL,
@@ -305,7 +361,7 @@ xStateType xaStates[eNumberOfStates] = {
 
 /* name						*/	{eStateIdle,
 	/* parent					*/	eStateGrowBoxKeepingHumidity,
-	/* default_substate			*/	eStateNonVentilating,
+	/* default_substate			*/	eStateVentilating,
 									0,
 	/* event-checking func		*/	evStateIdle,
 	/* default state entry func	*/	NULL,

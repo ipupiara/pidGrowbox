@@ -73,6 +73,340 @@
 			quid       	"58B84C4E0350")
 		    (object ClassAttribute "......."
 			quid       	"58B84C5E01F6"))))
+	statemachine 	(object State_Machine "State/Activity Model"
+	    quid       	"58B84DF8026C"
+	    states     	(list States
+		(object State "eStateGrowBoxKeepingHumidity"
+		    quid       	"58B84E0D013F"
+		    statemachine 	(object State_Machine "State/Activity Model2"
+			quid       	"58B84E8902C6"
+			states     	(list States
+			    (object State "eStateIdle"
+				quid       	"58B84E8902C8"
+				statemachine 	(object State_Machine "State/Activity Model3"
+				    quid       	"58B84EB30189"
+				    states     	(list States
+					(object State "$UNNAMED$0"
+					    quid       	"58B84EB3018B"
+					    type       	"StartState")
+					(object State "eStateNonVentilating"
+					    quid       	"58B84EEC02E5"
+					    statemachine 	(object State_Machine "State/Activity Model4"
+						quid       	"58B84F5101CC"
+						states     	(list States
+						    (object State "$UNNAMED$1"
+							quid       	"58B84F5101CE"
+							type       	"StartState"))
+						partitions 	(list Partitions)
+						objects    	(list Objects)
+						transitions 	(list transition_list)
+						objectflows 	(list objectflow_list)
+						statediagrams 	(list StateDiagrams))
+					    type       	"Normal")
+					(object State "eStateVentilating"
+					    quid       	"58B84EFF03C2"
+					    type       	"Normal"))
+				    partitions 	(list Partitions)
+				    objects    	(list Objects)
+				    transitions 	(list transition_list)
+				    objectflows 	(list objectflow_list)
+				    statediagrams 	(list StateDiagrams))
+				type       	"Normal")
+			    (object ActivityState "$UNNAMED$2"
+				quid       	"58B84F9801DB")
+			    (object State "eStateDrying"
+				quid       	"58B84FB2030D"
+				type       	"Normal")
+			    (object State "NewState2"
+				quid       	"58B84FD60167"
+				type       	"Normal")
+			    (object State "eStateFatalError"
+				quid       	"58B850E403CB"
+				type       	"Normal"))
+			partitions 	(list Partitions)
+			objects    	(list Objects)
+			transitions 	(list transition_list)
+			objectflows 	(list objectflow_list)
+			statediagrams 	(list StateDiagrams))
+		    type       	"Normal")
+		(object State "NewState"
+		    quid       	"58B84E460271"
+		    type       	"Normal"))
+	    partitions 	(list Partitions)
+	    objects    	(list Objects)
+	    transitions 	(list transition_list
+		(object State_Transition
+		    quid       	"58B84F600289"
+		    supplier   	"Logical View::State/Activity Model::eStateGrowBoxKeepingHumidity::State/Activity Model2::eStateIdle::State/Activity Model3::eStateVentilating"
+		    supplier_quidu 	"58B84EFF03C2"
+		    client     	"Logical View::State/Activity Model::eStateGrowBoxKeepingHumidity::State/Activity Model2::eStateIdle::State/Activity Model3::eStateNonVentilating"
+		    client_quidu 	"58B84EEC02E5"
+		    sendEvent  	(object sendEvent
+			quid       	"58B84F60028C"))
+		(object State_Transition
+		    quid       	"58B84F6600A2"
+		    supplier   	"Logical View::State/Activity Model::eStateGrowBoxKeepingHumidity::State/Activity Model2::eStateIdle"
+		    supplier_quidu 	"58B84E8902C8"
+		    client     	"Logical View::State/Activity Model::eStateGrowBoxKeepingHumidity::State/Activity Model2::eStateIdle::State/Activity Model3::eStateVentilating"
+		    client_quidu 	"58B84EFF03C2"
+		    sendEvent  	(object sendEvent
+			quid       	"58B84F6600A5"))
+		(object State_Transition
+		    quid       	"58B84F780085"
+		    supplier   	"Logical View::State/Activity Model::eStateGrowBoxKeepingHumidity::State/Activity Model2::eStateIdle::State/Activity Model3::eStateNonVentilating"
+		    supplier_quidu 	"58B84EEC02E5"
+		    client     	"Logical View::State/Activity Model::eStateGrowBoxKeepingHumidity::State/Activity Model2::eStateIdle::State/Activity Model3::eStateVentilating"
+		    client_quidu 	"58B84EFF03C2"
+		    sendEvent  	(object sendEvent
+			quid       	"58B84F780088")))
+	    objectflows 	(list objectflow_list)
+	    statediagrams 	(list StateDiagrams
+		(object ActivityDiagram "pidGrowboxFSM"
+		    quid       	"58B84DF8026E"
+		    title      	"pidGrowboxFSM"
+		    zoom       	100
+		    max_height 	28350
+		    max_width  	21600
+		    origin_x   	0
+		    origin_y   	138
+		    items      	(list diagram_item_list
+			(object Swimlane "" @1
+			    line_color 	3342489
+			    width      	450)
+			(object StateView "Normal" "eStateGrowBoxKeepingHumidity" @2
+			    Parent_View 	@1
+			    location   	(1616, 841)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object ItemLabel
+				Parent_View 	@2
+				location   	(1616, 156)
+				fill_color 	13434879
+				anchor_loc 	1
+				nlines     	2
+				max_width  	2720
+				justify    	0
+				label      	"eStateGrowBoxKeepingHumidity")
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    fill_color 	13434879
+			    quidu      	"58B84E0D013F"
+			    width      	2816
+			    height     	1482
+			    autoResize 	TRUE)
+			(object StateView "Normal" "eStateIdle" @3
+			    Parent_View 	@2
+			    location   	(1594, 622)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object ItemLabel
+				Parent_View 	@3
+				location   	(1594, 307)
+				fill_color 	13434879
+				anchor_loc 	1
+				nlines     	2
+				max_width  	860
+				justify    	0
+				label      	"eStateIdle")
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    fill_color 	13434879
+			    quidu      	"58B84E8902C8"
+			    width      	956
+			    height     	742
+			    autoResize 	TRUE)
+			(object StateView "StartState" "$UNNAMED$0" @4
+			    Parent_View 	@3
+			    location   	(1379, 310)
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    quidu      	"58B84EB3018B"
+			    autoResize 	TRUE)
+			(object StateView "Normal" "eStateNonVentilating" @5
+			    Parent_View 	@3
+			    location   	(1534, 500)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object ItemLabel
+				Parent_View 	@5
+				location   	(1534, 490)
+				fill_color 	13434879
+				anchor_loc 	1
+				nlines     	2
+				max_width  	562
+				justify    	0
+				label      	"eStateNonVentilating")
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    fill_color 	13434879
+			    quidu      	"58B84EEC02E5"
+			    width      	658
+			    height     	132
+			    autoResize 	TRUE)
+			(object StateView "Normal" "eStateVentilating" @6
+			    Parent_View 	@3
+			    location   	(1538, 860)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object ItemLabel
+				Parent_View 	@6
+				location   	(1538, 845)
+				fill_color 	13434879
+				anchor_loc 	1
+				nlines     	2
+				max_width  	536
+				justify    	0
+				label      	"eStateVentilating")
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    fill_color 	13434879
+			    quidu      	"58B84EFF03C2"
+			    width      	632
+			    height     	143
+			    autoResize 	TRUE)
+			(object StateView "StartState" "$UNNAMED$1" @7
+			    Parent_View 	@5
+			    location   	(1280, 488)
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    quidu      	"58B84F5101CE"
+			    autoResize 	TRUE)
+			(object TransView "" @8
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"58B84F780085"
+			    client     	@6
+			    supplier   	@5
+			    vertices   	(list Points
+				(1436, 788)
+				(1304, 697)
+				(1456, 566))
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @9
+			    stereotype 	TRUE
+			    line_color 	3342489
+			    quidu      	"58B84F600289"
+			    client     	@5
+			    supplier   	@6
+			    vertices   	(list Points
+				(1601, 565)
+				(1720, 682)
+				(1610, 788))
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "eStateDrying" @10
+			    Parent_View 	@2
+			    location   	(472, 656)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object ItemLabel
+				Parent_View 	@10
+				location   	(472, 625)
+				fill_color 	13434879
+				anchor_loc 	1
+				nlines     	2
+				max_width  	272
+				justify    	0
+				label      	"eStateDrying")
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    fill_color 	13434879
+			    quidu      	"58B84FB2030D"
+			    width      	368
+			    height     	174
+			    autoResize 	TRUE)
+			(object StateView "Normal" "eStateDrying" @11
+			    Parent_View 	@2
+			    location   	(2726, 625)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object ItemLabel
+				Parent_View 	@11
+				location   	(2726, 550)
+				fill_color 	13434879
+				anchor_loc 	1
+				nlines     	2
+				max_width  	348
+				justify    	0
+				label      	"eStateDrying")
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    fill_color 	13434879
+			    quidu      	"58B84FB2030D"
+			    width      	444
+			    height     	262
+			    autoResize 	TRUE)
+			(object StateView "Normal" "eStateFatalError" @12
+			    Parent_View 	@2
+			    location   	(1488, 1341)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    label      	(object ItemLabel
+				Parent_View 	@12
+				location   	(1488, 1303)
+				fill_color 	13434879
+				anchor_loc 	1
+				nlines     	2
+				max_width  	448
+				justify    	0
+				label      	"eStateFatalError")
+			    icon_style 	"Icon"
+			    line_color 	3342489
+			    fill_color 	13434879
+			    quidu      	"58B850E403CB"
+			    width      	544
+			    height     	188
+			    autoResize 	TRUE)))))
 	logical_presentations 	(list unit_reference_list
 	    (object ClassDiagram "Main"
 		quid       	"58B84B5202B0"
@@ -83,7 +417,7 @@
 		origin_x   	0
 		origin_y   	0
 		items      	(list diagram_item_list
-		    (object ClassView "Class" "Logical View::tStatechart" @1
+		    (object ClassView "Class" "Logical View::tStatechart" @13
 			ShowCompartmentStereotypes 	TRUE
 			IncludeAttribute 	TRUE
 			IncludeOperation 	TRUE
@@ -98,7 +432,7 @@
 			    color      	0
 			    default_color 	TRUE)
 			label      	(object ItemLabel
-			    Parent_View 	@1
+			    Parent_View 	@13
 			    location   	(522, 143)
 			    fill_color 	13434879
 			    nlines     	1
@@ -113,7 +447,7 @@
 			height     	126
 			annotation 	8
 			autoResize 	TRUE)
-		    (object ClassView "Class" "Logical View::xaState" @2
+		    (object ClassView "Class" "Logical View::xaState" @14
 			ShowCompartmentStereotypes 	TRUE
 			IncludeAttribute 	TRUE
 			IncludeOperation 	TRUE
@@ -128,7 +462,7 @@
 			    color      	0
 			    default_color 	TRUE)
 			label      	(object ItemLabel
-			    Parent_View 	@2
+			    Parent_View 	@14
 			    location   	(581, 507)
 			    fill_color 	13434879
 			    nlines     	1
@@ -140,7 +474,7 @@
 			fill_color 	13434879
 			quidu      	"58B84BE401A1"
 			compartment 	(object Compartment
-			    Parent_View 	@2
+			    Parent_View 	@14
 			    location   	(581, 568)
 			    font       	(object Font
 				size       	10
@@ -161,12 +495,12 @@
 			height     	236
 			annotation 	8
 			autoResize 	TRUE)
-		    (object UsesView "" @3
+		    (object UsesView "" @15
 			stereotype 	TRUE
 			line_color 	3342489
 			quidu      	"58B84C060267"
-			client     	@2
-			supplier   	@1
+			client     	@14
+			supplier   	@13
 			vertices   	(list Points
 			    (661, 494)
 			    (644, 257))
