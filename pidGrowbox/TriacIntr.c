@@ -156,7 +156,7 @@ ISR( TIMER0_COMP_vect)
 			stopTimer0();
 		} else {
 			--inductiveRepetitionsCounter;
-			startTriacTriggerDelay(delayBetweenTriacTriggers);
+			startTriacTriggerDelay(delayBetweenTriacTriggers);  // alread start interrupts and timer0
 		}
 	} else {
 		stopTimer0();
@@ -180,7 +180,7 @@ ISR(INT7_vect)
 		withinZeroCross = 0;
 		if (triacFireDurationTcnt0 > 0)  {
 			inductiveRepetitionsCounter = amtInductiveRepetitions;
-			startTriacTriggerDelay(  triggerDelayMaxTcnt0 - triacFireDurationTcnt0);
+			startTriacTriggerDelay(  triggerDelayMaxTcnt0 - triacFireDurationTcnt0);  // does sei and startTimer0
 		}		
 	} else {
 		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ; 
@@ -430,19 +430,21 @@ char * reallyWorkingStrstr(const char *inStr, const char *subStr)
 	return (char *) (inStr - 1);
 }
 
-char * v01Pos;
-char *  v02Pos;
-
 void onDataReceived()        // called by main application thread to calculate the latest data
 {
 	char tempS [5];
 	char hydS [5];
 	uint8_t validMsg = 0;
+	
+	char * v01Pos = (char *) 0;
+	char * v02Pos = (char *) 0;
+
 
 	memset (tempS,0,sizeof(tempS));
 	memset (hydS,0,sizeof(hydS));
 			
-	cli();
+	//cli();
+	disaRXIntUsart1();   // just stop the receiver, triac continues
 		if ((rxState = rxReceived) && ( amtCharRcvd == amtChars))  {      // some valid message check
 			validMsg = 1;
 			if (v01Pos == 0) { 
@@ -458,7 +460,8 @@ void onDataReceived()        // called by main application thread to calculate t
 		}  else  {
 			++ errMsgCnt;
 		}
-	sei();
+	enaRXIntUsart1();	
+	//sei();
 	if (validMsg != 0)  {
 		char* endP = tempS+3;
 		floatType temp = strtoul(tempS ,&endP,0x10) ;
@@ -495,7 +498,17 @@ ISR (USART1_RX_vect)
 	}
 }
 
-void initUsart2()
+void enaRXIntUsart1()
+{
+	UCSR1B   |= (1 << RXCIE1);
+}
+
+void disaRXIntUsart1()
+{
+	UCSR1B   &= ~(1 << RXCIE1);
+}
+
+void initUsart1()
 {
 	
 	rxState = rxIdle;
@@ -505,8 +518,6 @@ void initUsart2()
 	latestTemperature = 0.00;
 	latestHumidity  = 0.00;
 	hygrosenseMsgCnt = 0;
-	v01Pos = (char *) 0;
-	v02Pos = (char *) 0;
 		
 	// Set baud rate
 	 uint16_t UBRR = 143;    // baud 4800   fixed on hygrosense sensor
@@ -520,6 +531,7 @@ void initUsart2()
 	UCSR1B |=  (1<<RXEN1) | (1<< RXCIE1) ;               //     |(1<<TXEN0);
 	//	UCSR0B = 0b00011000;  // rx compl intr ena - tx compl intr ena - dreg empty intr ena - rx ena - tx ena - sz2 (size bit 2)  - 9. bit rx - 9. tx
 
+	enaRXIntUsart1();
 // no change needed:	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
 
 }
@@ -528,7 +540,7 @@ void initUsart2()
 void initHW()
 {
 	initInterrupts();
-	initUsart2();
+	initUsart1();
 	startSecondTick();
 }
 
