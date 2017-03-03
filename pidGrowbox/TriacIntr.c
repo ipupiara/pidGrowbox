@@ -622,7 +622,7 @@ int16_t adcValue(uint8_t  pos)
 floatType getDTbdV(int8_t pos)
 {
 	floatType res = 0;
-	if ((res = dTbdVChache[pos]) == 0)  {
+	if (((res = dTbdVChache[pos]) == 0) && ((graphValues[pos].VHigh - graphValues[pos].VLow)  != 0)) {
 		res = (graphValues[pos].tempHigh - graphValues[pos].tempLow ) / (graphValues[pos].VHigh - graphValues[pos].VLow);
 		dTbdVChache[pos] = res;
 	}
