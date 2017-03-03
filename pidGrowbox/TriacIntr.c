@@ -566,7 +566,7 @@ typedef struct {
 
 } graphValuesRec ;
 
-graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3}};
+graphValuesRec graphValues [amtMux] = {{18.0, 30.5, 1.1, 2.05}};
 //graphValuesRec graphValues [amtMux] = {{1.0, 2.0, 1.1, 2.3},{1.23, 2.34, 4.56, 5.67}};	
 	
 
@@ -574,12 +574,14 @@ uint8_t  adcConnection [amtMux] = {0x00 };
 
 //uint8_t  adcConnection [amtMux] = { 0, (1 << MUX0) | (1<< MUX1) };
 floatType adcRefVoltage[amtMux] = {adcRefVoltage5} ;
+floatType dTbdVChache [amtMux];
 
 uint16_t  adcCnt;
 
 uint16_t  lastADCVal [amtMux];
 floatType debugLastVoltageVal [amtMux];			// a local variable kept global exclusively for debugging reasons
 int8_t  currentMuxPos; 
+
 
 
 void initADC()
@@ -592,6 +594,7 @@ void initADC()
 		adcCnt = 0;
 		memset(lastADCVal,0,sizeof(lastADCVal));
 		memset(debugLastVoltageVal,0,sizeof(debugLastVoltageVal));
+		memset(dTbdVChache,0,sizeof(dTbdVChache));
 		currentMuxPos = 0; 
 }
 
@@ -612,6 +615,16 @@ int16_t adcValue(uint8_t  pos)
 		cli();
 		res = adcValue(pos);
 		sei();
+	}
+	return res;
+}
+
+floatType getDTbdV(int8_t pos)
+{
+	floatType res = 0;
+	if ((res = dTbdVChache[pos]) == 0)  {
+		res = (graphValues[pos].tempHigh - graphValues[pos].tempLow ) / (graphValues[pos].VHigh - graphValues[pos].VLow);
+		dTbdVChache[pos] = res;
 	}
 	return res;
 }
@@ -676,13 +689,13 @@ int8_t startNextADC ()
 
 floatType adcVoltage(uint8_t  pos)      // tobe called outside interrupts
 {
-	int16_t VHex;
+	floatType adcValF;
 	double   VFl;
 
 	VFl = 0.0;
-
-	VHex = adcValue(pos);
-	VFl = (VHex * adcRefVoltage[pos]) / 0x03FF;
+#warning "floatType cast tobe tested"
+	adcValF = (floatType) adcValue(pos);     
+	VFl = (adcValF * adcRefVoltage[pos]) / 1023.0;
 	
 	return VFl;
 }
