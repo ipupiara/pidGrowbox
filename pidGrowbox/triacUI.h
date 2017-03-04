@@ -24,5 +24,7 @@ void displayVoltage();
 
 void displayFatalError();
 
+void displayMeasuredValues(floatType hum, floatType temp);
+
 
 #endif

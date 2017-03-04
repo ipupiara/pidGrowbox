@@ -14,7 +14,7 @@ void displayVoltage()
 	
 	VFl = adcVoltage(0);
 	
-	sprintf((char*)&buffer,"%5.2fV/%4iD",VFl,triacFireDurationTcnt0);
+	snprintf((char*)&buffer,sizeof(buffer),"%5.2fV/%4iD",VFl,triacFireDurationTcnt0);
 
 	lcd_goto(3, 6);
 	lcd_write_str((char*)&buffer);
@@ -28,7 +28,7 @@ void displayDebugVoltageNTriggerDelay()
 
 	VFl = adcVoltage(0);
 
-	sprintf((char*)&buffer,"%5.2fV %4iA %3iD",VFl,adc, triacFireDurationTcnt0);
+	snprintf((char*)&buffer,sizeof(buffer),"%5.2fV %4iA %3iD",VFl,adc, triacFireDurationTcnt0);
 
 	lcd_Line1();
 	lcd_write_str((char*)&buffer);
@@ -61,7 +61,7 @@ void displayCountDown()
 	int8_t secsRem	= secondsRem - (minRem * 60);  // subtraction + multiply by 60 faster than division
 													// 25 us on 1 Mhz Sim 2 
 	char buffer [8];
-	sprintf((char*)&buffer,"%3im%02i",mRem,secsRem);
+	snprintf((char*)&buffer,sizeof(buffer),"%3im%02i",mRem,secsRem);
 
 	lcd_goto(1,9);
 	lcd_write_str((char*)&buffer);
@@ -96,4 +96,16 @@ void initUI()
 	info_printf("initUI\n");
 }
 
+
+void displayMeasuredValues(floatType hum, floatType temp)
+{
+	char buffer [20];
+
+
+	snprintf((char*)&buffer,sizeof(buffer),"h: %5.1f t:%5.1f ",hum,temp);
+
+	
+	lcd_goto(0,0);
+	lcd_write_str((char*)&buffer);
+}
 

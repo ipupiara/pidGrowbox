@@ -197,15 +197,26 @@ ISR(INT7_vect)
 	sei();		  
 }   
 
+void getTimeValues(uint16_t* hrs, uint8_t* mins, uint8_t* secs)
+{
+	cli();
+	*hrs = hoursCounter;
+	*mins = minutesCounter;
+	*secs = secondsCounter;
+	sei();
+}
+
 void printfTime()
 {
-	info_printf("h: %5i m: %29i s: %2i ", hoursCounter, minutesCounter, secondsCounter);  
+	GETTimeValues	
+	info_printf("h: %5i m: %29i s: %2i ", hrs, mins, secs);  
 }
 
 uint32_t overallSeconds() 
 {
 	uint32_t res = 0;
-	res = hoursCounter * 3600 + minutesCounter * 60 + secondsCounter;
+	GETTimeValues
+	res = hrs * 3600 + mins * 60 + secs;
 	return res;
 }
 
@@ -621,6 +632,7 @@ int16_t adcValue(uint8_t  pos)
 
 floatType getDTbdV(int8_t pos)
 {
+	
 	floatType res = 0;
 	if (((res = dTbdVChache[pos]) == 0) && ((graphValues[pos].VHigh - graphValues[pos].VLow)  != 0)) {
 		res = (graphValues[pos].tempHigh - graphValues[pos].tempLow ) / (graphValues[pos].VHigh - graphValues[pos].VLow);
@@ -702,7 +714,7 @@ floatType adcVoltage(uint8_t  pos)      // tobe called outside interrupts
 
 
 // debug method used for testing triac triggering behaviour
-int16_t getTriacDelayValueFromADC(uint8_t pos)
+int16_t getTriacFireDurationFromADC(uint8_t pos)
 {
 	int16_t res = 0;
 	int16_t adcV = adcValue(pos);

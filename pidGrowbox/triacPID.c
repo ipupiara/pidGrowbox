@@ -170,8 +170,16 @@ void printCsvHeader()
 void printCsvValues()
 {
 #ifdef printCsvData
-	printf("%d,%5.1f,%d,%f,%f,%f, %f\n",overallSeconds(),getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
+	GETTimeValues
+	printf("%d:%d:%d,%5.1f,%d,%f,%f,%f, %f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
 #else
 	printfTime();  info_printf("printCsvValues\n");
 #endif
+}
+
+
+void debugSetTriacDelayValueFromAdc()
+{
+	int16_t triacDelay = getTriacFireDurationFromADC(0); 
+	setTriacFireDuration(triacDelay);
 }

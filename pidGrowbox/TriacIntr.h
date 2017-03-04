@@ -10,6 +10,8 @@
 
 #define adcRefVoltage5   5.0
 #define adcRefVoltad2d5  2.56
+
+#define GETTimeValues  uint16_t hrs; uint8_t mins; uint8_t secs; getTimeValues(&hrs,&mins,&secs);
 	
 int8_t durationTimerReachead;
 int8_t runningSecondsTick;
@@ -53,13 +55,14 @@ floatType adcVoltage(uint8_t  pos);
 uint8_t getADCTemperature(uint8_t  pos, floatType* result);
 void startADCSequence();
 int8_t startNextADC ();
-int16_t getTriacDelayValueFromADC(uint8_t pos);
+int16_t getTriacFireDurationFromADC(uint8_t pos);
 uint16_t getLastAdcValue(uint8_t  pos);
 void startSecondTick();
 int16_t getSecondsDurationTimerRemaining();
 int16_t getSecondsRemainingInDurationTimer();
 uint32_t overallSeconds();
 void printfTime();
+void getTimeValues(uint16_t* hrs, uint8_t* mins, uint8_t* secs);
 
 void startHumidifying();
 void stopHumidifying();

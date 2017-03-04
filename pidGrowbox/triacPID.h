@@ -34,5 +34,6 @@ void calcNextTriacDelay();
 
 void onPidStep();
 
+void debugSetTriacDelayValueFromAdc();
 
 #endif

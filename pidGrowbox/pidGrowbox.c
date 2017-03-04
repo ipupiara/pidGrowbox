@@ -13,6 +13,7 @@
 #include "TriacIntr.h"
 #include "triacPID.h"
 #include "StateClass.h"
+#include "triacUI.h"
 
 
 void USART_Init( unsigned int baud )
@@ -80,6 +81,7 @@ int main(void)
  		if (dataReceived == 1)  {
  			dataReceived = 0;
  			onDataReceived();
+			displayMeasuredValues(getCurrentHumidity(),getCurrentTemperature());
 			ev.evType = eValueAssignement;
 			ev.humidity = getCurrentHumidity(); 
 			ev.temperature = getCurrentTemperature();
@@ -100,13 +102,15 @@ int main(void)
  			++csvIntervalCounter;
  			if (csvIntervalCounter >= csvIntervalSecs)   {
  				csvIntervalCounter = 0;
-// 				printCsvValues();
+ 				printCsvValues();
  			}
  			startADCSequence();
 		}   
  		if (adcTick == 1)  {
  			adcTick = 0;
  			startNextADC();
+			debugSetTriacDelayValueFromAdc();
+			displayDebugVoltageNTriggerDelay();
  		}
 		if (durationTimerReachead == 1) {
 			durationTimerReachead = 0;

@@ -233,7 +233,7 @@ uStInt evStateNonVentilating(void)
 void entryStateNonVentilating(void)
 {
 	info_printf("CHumidityStateClass::entryStateNonVentilating\n");
-	startDurationTimer(GetIdleVentilationDelayMinutes());
+	startDurationTimer(GetIdleVentilationDelayMinutes() * 60);
 }
 
 
@@ -265,7 +265,7 @@ void entryStateVentilating(void)
 {
 	info_printf("CHumidityStateClass::entryStateVentilating\n");
 	startVentilating();
-	startDurationTimer(GetIdleVentilationMinutes());
+	startDurationTimer(GetIdleVentilationMinutes() * 60);
 }
 
 void exitStateVentilating(void)
