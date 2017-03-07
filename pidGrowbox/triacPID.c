@@ -180,6 +180,6 @@ void printCsvValues()
 
 void debugSetTriacDelayValueFromAdc()
 {
-	int16_t triacDelay = getTriacFireDurationFromADC(0); 
-	setTriacFireDuration(triacDelay);
+	int16_t triacDuration = getTriacFireDurationFromADC(0); 
+	setTriacFireDuration(triacDuration);
 }

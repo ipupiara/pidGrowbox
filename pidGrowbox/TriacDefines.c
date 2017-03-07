@@ -18,11 +18,13 @@
 
 
 
-void info_printf( char *emsg, ...)
+void info_printf(const char *emsg, ...)
 {
 	va_list ap;
+	va_start(ap, emsg);
 	
 #ifndef printCsvData
+
 	printf( emsg, ap);
 #endif
 	

@@ -50,7 +50,7 @@ uint16_t hoursCounter;
 
 
 void initADC();
-int16_t adcValue(uint8_t pos);
+uint16_t adcValue(uint8_t pos);
 floatType adcVoltage(uint8_t  pos);
 uint8_t getADCTemperature(uint8_t  pos, floatType* result);
 void startADCSequence();

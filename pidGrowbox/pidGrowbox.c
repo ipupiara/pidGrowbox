@@ -70,7 +70,8 @@ int main(void)
 	initPID();
 	initADC();
 	printCsvHeader();
-	startStateCharts();
+//	lcd_init();	
+//	startStateCharts();
 	
 //	startDurationTimer(maxSecsPossible  );
 #warning " timer1 changes tobe tested"
@@ -81,28 +82,29 @@ int main(void)
  		if (dataReceived == 1)  {
  			dataReceived = 0;
  			onDataReceived();
-			displayMeasuredValues(getCurrentHumidity(),getCurrentTemperature());
-			ev.evType = eValueAssignement;
-			ev.humidity = getCurrentHumidity(); 
-			ev.temperature = getCurrentTemperature();
-			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
+//			displayMeasuredValues(getCurrentHumidity(),getCurrentTemperature());
+			//ev.evType = eValueAssignement;
+			//ev.humidity = getCurrentHumidity(); 
+			//ev.temperature = getCurrentTemperature();
+//			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
  		}
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
 			++secsCounter;
-			
-			info_printf("%4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adcValue(0));
-			info_printf("sec %4i\n",secsCounter );
+			printf("sec %4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adcValue(0));
+
+//	didnt work anymore one time....		info_printf("sec %4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adc1);
+
  			++ pidIntervalCounter;
  			if (pidIntervalCounter >=  pidIntervalSecs)  {
  				pidIntervalCounter = 0;
  				
- 				onPidStep();
+ //				onPidStep();
  			}
  			++csvIntervalCounter;
  			if (csvIntervalCounter >= csvIntervalSecs)   {
  				csvIntervalCounter = 0;
- 				printCsvValues();
+ //				printCsvValues();
  			}
  			startADCSequence();
 		}   
@@ -110,12 +112,12 @@ int main(void)
  			adcTick = 0;
  			startNextADC();
 			debugSetTriacDelayValueFromAdc();
-			displayDebugVoltageNTriggerDelay();
+//			displayDebugVoltageNTriggerDelay();
  		}
 		if (durationTimerReachead == 1) {
 			durationTimerReachead = 0;
-			ev.evType = eTimeOutDurationTimer;
-			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
+//			ev.evType = eTimeOutDurationTimer;
+//			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
 		} 
 	}
 }
