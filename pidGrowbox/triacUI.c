@@ -14,7 +14,7 @@ void displayVoltage()
 	
 	VFl = adcVoltage(0);
 	
-	snprintf((char*)&buffer,sizeof(buffer),"%5.2fV/%4iD",VFl,triacFireDurationTcnt0);
+	snprintf((char*)&buffer,sizeof(buffer),"%5.2fV/%4iD",VFl,getTriacFireDuration());
 
 	lcd_goto(3, 6);
 	lcd_write_str((char*)&buffer);
@@ -28,7 +28,7 @@ void displayDebugVoltageNTriggerDelay()
 
 	VFl = adcVoltage(0);
 
-	snprintf((char*)&buffer,sizeof(buffer),"%5.2fV %4iA %3iD",VFl,adc, triacFireDurationTcnt0);
+	snprintf((char*)&buffer,sizeof(buffer),"%5.2fV %4iA %3iD",VFl,adc, getTriacFireDuration());
 
 	lcd_Line1();
 	lcd_write_str((char*)&buffer);

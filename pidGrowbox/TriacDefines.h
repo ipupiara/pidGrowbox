@@ -17,12 +17,29 @@
 //	#define printCsvData     //  if printCsvValues is set, only csv values must be printed out
 	
 	#define maxSecsPossible  0x7FFF
-	#define triggerDelayMaxTcnt0 810     // works properly with 50 Hz Ac and 11 Mhz
 	
-	#define inductiveLoad   1      // to be set to 0 or 1
-	#define triacTriggerLength   0      // delay approx ( n * 2.5 us ) + 5.5    at 11.0592  mhz
-	#define delayBetweenTriacTriggers  16  //  in timer 2 tcnt values , prescaler at   128
-	#define measuredRepetitionIntervalus  200;      //  approx   ( 1s  /(11.0592 E+6  /128) ) * delayBetweenTriacTriggers    [us]
+//	#define useTimer0
+	#define useTimer3
+	
+	#ifdef useTimer0
+		#define triggerDelayMaxTcnt 810     // works properly with 50 Hz Ac and 11 Mhz	
+		#define inductiveLoad   1      // to be set to 0 or 1
+		#define triacTriggerLength   0      // delay approx ( n * 2.5 us ) + 5.5    at 11.0592  mhz
+		#define delayBetweenTriacTriggers  16  //  in timer 2 tcnt values , prescaler at   128
+		#define measuredRepetitionIntervalus  200;      //  approx   ( 1s  /(11.0592 E+6  /128) ) * delayBetweenTriacTriggers    [us]
+		#define triacOcrValueMax 0XFC  // still to be defined
+		#define triacCompVect  TIMER0_COMP_vect
+	#endif
+	
+	#ifdef useTimer3
+		#define triggerDelayMaxTcnt 1620     // works properly with 50 Hz Ac and 11 Mhz
+		#define inductiveLoad   1      // to be set to 0 or 1
+		#define triacTriggerLength   0      // delay approx ( n * 2.5 us ) + 5.5    at 11.0592  mhz
+		#define delayBetweenTriacTriggers  32  //  in timer 2 tcnt values , prescaler at   128
+		#define triacOcrValueMax  triggerDelayMaxTcnt   
+		#define measuredRepetitionIntervalus  200;      //  approx   ( 1s  /(11.0592 E+6  /128) ) * delayBetweenTriacTriggers    [us]
+		#define triacCompVect TIMER3_COMPA_vect 
+	#endif
 	
 typedef float floatType;	
 

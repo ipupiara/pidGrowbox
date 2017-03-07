@@ -20,7 +20,7 @@ int16_t secondsRemainingInDurationTimer;
 
 int16_t secondsInDurationTimer;
 
-uint16_t triacFireDurationTcnt0;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
+uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
 
 
 

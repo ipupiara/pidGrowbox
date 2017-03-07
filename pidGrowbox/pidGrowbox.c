@@ -91,7 +91,7 @@ int main(void)
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
 			++secsCounter;
-			printf("sec %4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adcValue(0));
+			printf("sec %4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i  triD %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adcValue(0),getTriacFireDuration());
 
 //	didnt work anymore one time....		info_printf("sec %4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adc1);
 
