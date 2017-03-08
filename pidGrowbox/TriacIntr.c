@@ -58,6 +58,12 @@ void startTriacTimer()
 	ETIFR  &= ~(1 << OCF3A);    // clear interrupt flags if it should ever have been set by any reason...
 #endif
 
+#ifdef useAtmega644PTimer2
+	TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable
+	TCCR2B = 0b00000101  ; // CTC on CC2A , set clk / 128, timer 2 started
+	TIFR2 = 0x00;
+#endif
+
 }
 
 void stopTriacTimer()
@@ -73,6 +79,12 @@ void stopTriacTimer()
 	ETIMSK   &=  ~(1<<OCIE3A) ;  //  Output Compare A Match Interrupt disable
 	ETIFR  &= ~(1 << OCF3A);		// clear interrupt flags
 #endif
+
+#ifdef useAtmega644PTimer2
+	TCCR2B = 0b00000000  ;  // CTC, timer stopped
+	TIMSK2  = 0x00;
+	TIFR2 = (1<< OCF2A);    // cleared by writing a "logic" one to the flag
+#endif
 }
 
 void resetTriacTimerFlag()
@@ -83,11 +95,17 @@ void resetTriacTimerFlag()
 
 #ifdef useTimer3
 	ETIFR  &= ~(1 << OCF3A);		// clear interrupt flags
-#endif	
+#endif
+
+#ifdef useAtmega644PTimer2
+	TIFR2 = (1<< OCF2A);    // cleared by writing a "logic" one to the flag
+	#warning "tobe tested useAtmega644PTimer2 in resetTriacTimerFlag"
+#endif
+
 }
 
 
-void setOcrDelay(int16_t newOcr0)
+void setOcrDelay(int16_t newOcr)
 {
 #warning "urgent todo, check all the call stacks if timer stop start cli and sei is set ok so that no data/thread violation can occur"	
 	// timer0 must be stopped before running this method (was the case per 17 Feb 2017
@@ -95,15 +113,20 @@ void setOcrDelay(int16_t newOcr0)
 	// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
 	// resulting in a more or less randomly set value.
 //	stopTimer0();
-	if (newOcr0 <= 1) { newOcr0 = 2; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
+	if (newOcr <= 1) { newOcr = 2; }  // .... updating avoids triggering of next clock cycle, but needs overnext.
 #ifdef useTimer0		
 	TCNT0 = 0;
-	OCR0 = newOcr0; 
+	OCR0 = newOcr; 
 #endif
 #ifdef useTimer3
 	TCNT3 = 0;
-	OCR3A = newOcr0;
+	OCR3A = newOcr;
 #endif	 
+
+#ifdef useAtmega644PTimer2
+	OCR2A =	newOcr;
+	TCCR2B = 0  ; 
+#endif
 }
 
 void setTriacTriggerDelayValues(uint8_t lohi)
@@ -188,52 +211,16 @@ uint16_t  getTriacFireDuration()
 	return res;
 }
 
-//#ifdef useTimer0                       // VAAssisstX does not understand this kind of method title ifdef code 
-											// and stopped listing methods here
-//ISR( TIMER0_COMP_vect)
-//{
-		//if (TCNT0 != 0) {
-			//DDRA |= (1<< DDRA0);
-			//PORTA  |= (1<<PORTA0);
-		//}
-////#endif
-////#ifdef useTimer3
-////
-////ISR( TIMER3_COMPA_vect )
-////{
-	////if (TCNT3 != 0) {
-		////DDRA |= (1<< DDRA0);
-		////PORTA  |= (1<<PORTA0);
-	////}
-////#endif	
-	//cli();
-	//if (remainingTriacTriggerDelayCounts <= 0) {
-		//PORTE |= (1<< PORTE6) ;
-////		sei();				// allow interrupts during delay 
-		//delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
-////		cli(); 
-		//PORTE &= ~(1<< PORTE6) ;		// handled synchronous 	
-		//if  ((inductiveRepetitionsCounter <= 0) || (withinZeroCross == 1) ) {   
-			//stopTriacTimer();
-		//} else {
-			//--inductiveRepetitionsCounter;
-			//startTriacTriggerDelay(delayBetweenTriacTriggers);  // alread start interrupts and timer0
-		//}
-	//} else {
-		//stopTriacTimer();
-		//setTriacTriggerDelayValues();
-		//startTriacTimer();
-	//}	
-	//sei();
-//}
 
 
 ISR( triacCompVect )
 {
+#if  defined( useTimer3) || defined( useTimer0)	
 	if (TCNT3 != 0) {
 		DDRA |= (1<< DDRA0);
 		PORTA  |= (1<<PORTA0);
 	}
+#endif	
 
 	cli();
 	if (remainingTriacTriggerDelayCounts <= 0) {
@@ -257,7 +244,7 @@ ISR( triacCompVect )
 }
 
 
-
+#if defined( useTimer3) || defined( useTimer0)
 // int7 on port PE7
 ISR(INT7_vect)
 {
@@ -286,6 +273,55 @@ ISR(INT7_vect)
 	}
 	sei();		  
 }   
+#elif defined (useAtmega644PTimer2)
+ISR(INT0_vect)
+{
+	EIFR  &=  ~(1 << INTF7);
+	cli();
+	if ((PIND & 0x04) != 0) {
+		withinZeroCross = 1;
+		stopTriacTimer();
+	} else {
+		withinZeroCross = 0;
+		
+//		DDRA |= (1<< DDRA0);
+//		PORTA   &= ~ (1<<PORTA0);
+		
+		if (triacFireDurationTcnt > 0)  {
+			inductiveRepetitionsCounter = amtInductiveRepetitions;
+			startTriacTriggerDelay(  triggerDelayMaxTcnt - triacFireDurationTcnt);  // does sei and startTimer0
+		}
+	}
+	sei();
+}
+ISR(INT7_vect)
+{
+	cli();
+	EIFR  &=  ~(1 << INTF7);						// clear interrupt flag
+	if ((PINE & (1 << PINE7)) != 0) {				//  on	high level
+		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ;
+		EICRB  |=   (1<< ISC71)  ;                  // falling edge trigger
+		EIFR  &=  ~(1 << INTF7);					// clear interrupt flag
+		withinZeroCross = 0;
+		
+		DDRA |= (1<< DDRA0);
+		PORTA   &= ~ (1<<PORTA0);
+		
+		if (triacFireDurationTcnt > 0)  {
+			inductiveRepetitionsCounter = amtInductiveRepetitions;
+			startTriacTriggerDelay(  triggerDelayMaxTcnt - triacFireDurationTcnt);  // does sei and startTimer0
+		}
+		
+		} else {										// on low level
+		EICRB &=  ~((1<< ISC70) |  (1<< ISC71))  ;
+		EICRB  |=  (1<< ISC70) |  (1<< ISC71)  ;	// raising up trigger
+		EIFR  &=  ~(1 << INTF7);					// clear interrupt flag
+		withinZeroCross = 1;
+		stopTriacTimer();
+	}
+	sei();
+}
+#endif
 
 void getTimeValues(uint16_t* hrs, uint8_t* mins, uint8_t* secs)
 {
@@ -393,6 +429,22 @@ void initInterrupts()
 		TCCR3B &=  ~((1 <<  CS30) |  (1 <<  CS31) | (1 <<  CS32)) ;     // (0 prescaler )  timer stopped
 		
 		ETIMSK   &=  ~(1<<OCIE3A) ;  //  Output Compare A Match Interrupt Enable
+#endif
+
+#ifdef useAtmega644PTimer2
+		TCCR2A = 0b00000010;  //  CTC
+
+		//TCCR2B = 0b00000101  ; // CTC on CC0A , set clk / 128, timer started
+
+		TCCR2B = 0b00000000  ;  // CTC, timer stopped
+		ASSR = 0x00;
+
+		OCR2A = triacOcrValueMax;  // counter top value  , just anything for start, will later be set by PID
+		TCNT2 = 0x00 ;
+
+		TIMSK2  = 0x00; // disa  Interrupt
+		//		TIMSK2   = 0b00000010;  //  Output Compare A Match Interrupt Enable
+
 #endif
 
 		sei();  // start interrupts if not yet started
