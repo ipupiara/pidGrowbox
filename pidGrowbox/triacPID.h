@@ -6,15 +6,15 @@
 #include <math.h>
 
 #define pidIntervalSecs  60
-#define desiredTemperature  27.0
+#define desiredTemperature  30.0
 #define csvIntervalSecs  20
 
-#define initialTriacDelayValue   0x0110	
+#define initialTriacDelayValue   0x0200	
 
 double currentAmpsValue;
 
-//#define printfPid
-//#define printfAmps
+#define printfPid
+
 
 
 // Select 'double' or 'float' here:

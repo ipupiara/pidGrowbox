@@ -118,7 +118,7 @@ void initPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);  
 #warning "todo check all the signs and values :-)" 
-	InitializePID( -0.45, 1.1, 0.05, 0.5, 2, pidIntervalSecs);
+	InitializePID( -4.5, 1.1, 0.05, 2.5, 2, pidIntervalSecs);
 	setTriacFireDuration(initialTriacDelayValue);
 }
 
@@ -155,7 +155,7 @@ void printPIDState()
 void onPidStep()
 {
 	info_printf("onPidStep\n");
-//	calcNextTriacDelay();
+	calcNextTriacDelay();
 }
 
 void printCsvHeader()

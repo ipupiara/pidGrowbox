@@ -99,19 +99,19 @@ int main(void)
  			if (pidIntervalCounter >=  pidIntervalSecs)  {
  				pidIntervalCounter = 0;
  				
- //				onPidStep();
+ 				onPidStep();
  			}
  			++csvIntervalCounter;
  			if (csvIntervalCounter >= csvIntervalSecs)   {
  				csvIntervalCounter = 0;
- //				printCsvValues();
+ 				printCsvValues();
  			}
- 			startADCSequence();
+// 			startADCSequence();
 		}   
  		if (adcTick == 1)  {
  			adcTick = 0;
  			startNextADC();
-			debugSetTriacDelayValueFromAdc();
+//			debugSetTriacDelayValueFromAdc();
 //			displayDebugVoltageNTriggerDelay();
  		}
 		if (durationTimerReachead == 1) {

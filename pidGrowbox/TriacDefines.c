@@ -32,6 +32,51 @@ void info_printf(const char *emsg, ...)
 }
 
 
+//  Testmethod  ShowVar( "fcsi", 32.4f, 'a', "Test string", 4 ); 
+//void ShowVar( char *szTypes, ... ) 
+//{
+	//va_list vl;
+	//int i;
+	//
+	//va_start( vl, szTypes );
+	//
+	//for( i = 0; szTypes[i] != '\0'; ++i ) {
+		//
+		//union Printable_t {
+			//int     i;
+			//float   f;
+			//char    c;
+			//char   *s;
+		//} Printable;
+		//
+		//switch( szTypes[i] ) {   
+			//case 'i':
+				//Printable.i = va_arg( vl, int );
+				//printf( "%i\n", Printable.i );
+				//break;
+			//
+			//case 'f':
+				//Printable.f = va_arg( vl, double );
+				//printf( "%f\n", Printable.f );
+				//break;
+			//
+			//case 'c':
+				//Printable.c = va_arg( vl, char );
+				//printf_s( "%c\n", Printable.c );
+				//break;
+			        //
+			//case 's':
+				//Printable.s = va_arg( vl, char * );
+				//printf_s( "%s\n", Printable.s );
+				//break;
+			        //
+			//default:
+				//break;
+		//}
+	//}
+	//va_end( vl );
+//}
+//
 
 #define ownEepromMethods 
 
