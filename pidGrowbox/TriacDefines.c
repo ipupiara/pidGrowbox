@@ -15,26 +15,37 @@
 #define DryingLowerLimit     96.0
 
 
-c:\program files (x86)\atmel\atmel toolchain\avr8 gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include
-
-
 void info_printf(const char *emsg, ...)
 {
 	va_list ap;
 	va_start(ap,emsg);
 	
-	char buffer [123];
-	
-	vsnprintf(buffer,sizeof(buffer),emsg,ap);
-	//	printf("buffer : ");
-	printf(buffer);
-	
-	#ifndef printCsvData
-	//	printf( emsg, ap);
+	#ifndef printCsvData	
+		char buffer [0xff];
+		vsnprintf(buffer,sizeof(buffer),emsg,ap);
+		printf(buffer);
+
 	#endif
 	
 	va_end(ap);
 }
+
+
+void csv_printf(const char *emsg, ...)
+{
+	va_list ap;
+	va_start(ap,emsg);
+	
+	#ifdef printCsvData	
+		char buffer [0xff];
+		vsnprintf(buffer,sizeof(buffer),emsg,ap);
+		printf(buffer);
+	#endif
+	
+	va_end(ap);
+}
+
+
 
 
 //  Testmethod  ShowVar( "fcsi", 32.4f, 'a', "Test string", 4 ); 

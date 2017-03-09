@@ -50,9 +50,9 @@ static int uart_putchar(char c, FILE *stream)
 }
 
 
-uint16_t   pidIntervalCounter = 0;   //  introduced to avoid division
-uint16_t   csvIntervalCounter = 0;
-uint16_t   secsCounter = 0;
+uint16_t   pidIntervalCounter;   
+uint16_t   csvIntervalCounter ;
+uint16_t   secsCounter ;
     
 CGrowBoxEvent ev;	
 	    
@@ -75,6 +75,10 @@ int main(void)
 	
 //	startDurationTimer(maxSecsPossible  );
 #warning " timer1 changes tobe tested"
+
+	csvIntervalCounter = 0;
+	pidIntervalCounter = 0;
+	secsCounter = 0;
 	
     while(1)
     {
@@ -91,16 +95,13 @@ int main(void)
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
 			++secsCounter;
-			printf("sec %4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i  triD %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adcValue(0),getTriacFireDuration());
-
-//	didnt work anymore one time....		info_printf("sec %4i amthygMsg %i tempd %6.2f hyg %6.2f, adc %i\n",secsCounter,hygrosenseMsgCnt,getCurrentTemperature(),getCurrentHumidity(),adc1);
 
  			++ pidIntervalCounter;
  			if (pidIntervalCounter >=  pidIntervalSecs)  {
- 				pidIntervalCounter = 0;
- 				
+ 				pidIntervalCounter = 0;				
  				onPidStep();
  			}
+			 
  			++csvIntervalCounter;
  			if (csvIntervalCounter >= csvIntervalSecs)   {
  				csvIntervalCounter = 0;

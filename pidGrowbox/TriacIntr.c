@@ -332,12 +332,13 @@ void getTimeValues(uint16_t* hrs, uint8_t* mins, uint8_t* secs)
 	sei();
 }
 
-void printfTime()
+char* csvTimeString()
 {
+	char buffer [20];
 	GETTimeValues	
-	info_printf("h: %5i m: %29i s: %2i ", hrs, mins, secs);  
+	snprintf(   "h: %5i m: %2i s: %2i ", hrs, mins, secs);  
 }
-
+  
 uint32_t overallSeconds() 
 {
 	uint32_t res = 0;

@@ -57,7 +57,7 @@ void onTriacIdleSecondTick_Keyb()
 	secs = getSecondsDurationTimerRemaining();
 	if ((secs & 0x001f) == 0x0000) {
 		int16_t res = getKeybIntCnt();
-		printf("kybIntCnt: %i lastCh: %X lastV0: %X\n",res , lastCharPressed, lastValueZero);
+		info_printf("kybIntCnt: %i lastCh: %X lastV0: %X\n",res , lastCharPressed, lastValueZero);
 	}
 #endif
 }
@@ -80,7 +80,7 @@ void initKeyPad()
 #endif	
 	
 
-	printf("jtagDebugKeyboardMode\n");
+	info_printf("jtagDebugKeyboardMode\n");
 	initUsartInput();
 
 

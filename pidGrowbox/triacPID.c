@@ -118,7 +118,7 @@ void initPID()
 {
 //	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);  
 #warning "todo check all the signs and values :-)" 
-	InitializePID( -4.5, 1.1, 0.05, 50.0, 2, pidIntervalSecs);
+	InitializePID( 4.5, -1.1, -0.015, -500.0, 2, pidIntervalSecs);
 	setTriacFireDuration(initialTriacDelayValue);
 }
 
@@ -161,22 +161,17 @@ void onPidStep()
 void printCsvHeader()
 {
 	info_printf("printCsvHeader\n");
-#ifdef printCsvData
-	printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal\n");
-	printf("seconds,°C,triacTx,real,real,real\n");
-#endif
+	csv_printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal\n");
+	csv_printf("seconds,°C,triacTx,real,real,real\n");
 }
 
 void printCsvValues()
 {
-#ifdef printCsvData
-	GETTimeValues
-	printf("%d:%d:%d,%5.1f,%d,%f,%f,%f, %f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
-#else
-	printfTime();  info_printf("printCsvValues\n");
-#endif
-}
 
+	GETTimeValues
+	csv_printf("%5d:%02d:%02d,%5.1f,%d,%f,%f,%f, %f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
+
+}
 
 void debugSetTriacDelayValueFromAdc()
 {
