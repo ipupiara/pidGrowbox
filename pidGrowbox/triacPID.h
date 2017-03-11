@@ -5,8 +5,22 @@
 #include<stdint.h>
 #include <math.h>
 
-#define pidIntervalSecs  60
+
 #define desiredTemperature  27.0
+
+#define pidIntervalSecs  60
+
+#define totFactor  4.5   * (60 / pidIntervalSecs)   //  to keep the correction per time the same when changing the step width
+														// need not necessarily be the case this way, maybe this factor would be better let away,
+														// experiment will show .. 
+#define pFactor   -1.1 
+#define iFactor  0.005  
+#define dFactor -500	
+
+
+#define itegralTreshold 1.0
+#define correctionThreshold  150  * (60 / pidIntervalSecs)
+
 #define csvIntervalSecs  20
 
 #define initialTriacDelayValue   0x0200	

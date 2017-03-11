@@ -16,7 +16,7 @@ enum adcScopeEnum
 
 
 int8_t m_started;
-real m_kTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_integral_thresh, m_integral;
+real m_kTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_integral_thresh, m_integral, m_correctionTresh, m_goalValue;
 
 real corrCarryOver;     // carry amount if correction in float gives zero correction in int
 
@@ -26,7 +26,7 @@ real pidError;
 
 
 
-void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, real step_time)
+void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, real step_time, real corrThresh, real goalVal)
 {
     // Initialize controller parameters
 	// PN 3.Oct 2011, added m_kP for better setting of proportional factor only
@@ -40,17 +40,20 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
     // Controller step time and its inverse
     m_stepTime = step_time;
     m_inv_stepTime = 1 / step_time;
+	m_correctionTresh = corrThresh;
 
     // Initialize integral and derivative calculations
     m_integral = 0;
     m_started = 0;
+	
+	m_goalValue = goalVal;
 	
 //	 updateGradAmps();
 
 	 corrCarryOver = 0;
 }
 
-#define correctionThreshold  30
+
 
 
 real pVal, dVal, iVal;
@@ -79,10 +82,10 @@ real nextCorrection(real error)
 
     // Return the PID controller actuator command
 	res = m_kTot*((pVal =m_kP * error) + (iVal = m_kI * m_integral) + (dVal = m_kD * deriv));
-	if (res > correctionThreshold) {
-		res = correctionThreshold;
-	} else if (res < -1*correctionThreshold) {
-		res = -1* correctionThreshold;
+	if (res > m_correctionTresh) {
+		res = m_correctionTresh;
+	} else if (res < -1*m_correctionTresh) {
+		res = -1* m_correctionTresh;
 	}
 
 #ifdef printfPID
@@ -116,9 +119,8 @@ void calcNextTriacDelay()
 
 void initPID()
 {
-//	InitializePID(real kpTot, real kpP, real ki, real kd, real integral_thresh, real step_time);  
-#warning "todo check all the signs and values :-)" 
-	InitializePID( 4.5, -1.1, -0.005, -500.0, 1, pidIntervalSecs);
+//	void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, real step_time, real corrThresh, real goalVal)
+	InitializePID( totFactor, pFactor, iFactor, dFactor, itegralTreshold, pidIntervalSecs,correctionThreshold, desiredTemperature);
 	setTriacFireDuration(initialTriacDelayValue);
 }
 
