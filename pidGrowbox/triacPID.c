@@ -24,7 +24,13 @@ uint8_t idleTickCnt;
 real pidError;
 
 
+#define useTWA
 
+#ifdef useTWA		// interface to Pid
+	void initTWA();
+	void addTwaValue(real val);
+
+#endif
 
 void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, real step_time, real corrThresh, real goalVal)
 {
@@ -51,6 +57,10 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
 //	 updateGradAmps();
 
 	 corrCarryOver = 0;
+	 
+	 #ifdef useTWA
+		initTWA();
+	 #endif
 }
 
 
@@ -103,6 +113,9 @@ void calcNextTriacDelay()
 	int16_t newDelay;
 	int16_t corrInt;
 	pidError = getCurrentTemperature()  - desiredTemperature ;
+	#ifdef useTWA
+		addTwaValue(pidError);
+	#endif
 	corr = nextCorrection(pidError) + corrCarryOver;
 	corrInt = corr;     
 	corrCarryOver = corr - corrInt;
@@ -180,3 +193,67 @@ void debugSetTriacDelayValueFromAdc()
 	int16_t triacDuration = getTriacFireDurationFromADC(0); 
 	setTriacFireDuration(triacDuration);
 }
+
+
+///////////////////////// twa   ////////////////////////////
+
+
+
+
+#ifdef useTWA
+#define amtTwaValues   20
+#define twaStepWidth  3    //  keep every twaStepWidth's value
+real twaDifferenceAbs;
+
+void initTWA();
+void addTwaValue(real val);
+
+typedef struct  {
+	uint8_t amtValues;
+	real totalWeight;
+	uint16_t totTwaPointsAdded;
+	uint8_t currentTwaInterval;
+	real twaResult;
+} twaStruct;
+
+typedef int someint;
+typedef  twaStruct*   PTwaStruct;
+
+
+real calcTotalWeightLinear(uint8_t amtValues)
+{
+	real res= 0.0;
+	
+	
+	res = (amtValues * (amtValues -1)) / 2;
+	
+	return res;
+}
+
+
+
+void initTWAStruct(PTwaStruct pTwaStruct)
+{
+		pTwaStruct->totalWeight =  calcTotalWeightLinear(amtTwaValues);
+		pTwaStruct->totTwaPointsAdded = 0;
+		pTwaStruct->currentTwaInterval = 0;
+	
+}
+
+
+
+void addTwaValue(real val)
+{
+	
+}
+
+
+
+void initTWA()
+{
+
+}
+
+
+
+#endif

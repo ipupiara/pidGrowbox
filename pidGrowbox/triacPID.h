@@ -25,15 +25,8 @@
 
 #define initialTriacDelayValue   0x0200	
 
-double currentAmpsValue;
-
-//#define printfPid
-
-
-
 // Select 'double' or 'float' here:
 typedef floatType real;
-
 
 void initPID();
 
@@ -49,5 +42,7 @@ void calcNextTriacDelay();
 void onPidStep();
 
 void debugSetTriacDelayValueFromAdc();
+
+
 
 #endif
