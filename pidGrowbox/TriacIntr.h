@@ -61,7 +61,6 @@ void startSecondTick();
 int16_t getSecondsDurationTimerRemaining();
 int16_t getSecondsRemainingInDurationTimer();
 uint32_t overallSeconds();
-char* csvTimeString();
 void getTimeValues(uint16_t* hrs, uint8_t* mins, uint8_t* secs);
 
 void startHumidifying();

@@ -6,7 +6,7 @@
 #include <math.h>
 
 #define pidIntervalSecs  60
-#define desiredTemperature  30.0
+#define desiredTemperature  27.0
 #define csvIntervalSecs  20
 
 #define initialTriacDelayValue   0x0200	

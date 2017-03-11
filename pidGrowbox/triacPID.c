@@ -16,7 +16,7 @@ enum adcScopeEnum
 
 
 int8_t m_started;
-real m_kTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_error_thresh, m_integral;
+real m_kTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_integral_thresh, m_integral;
 
 real corrCarryOver;     // carry amount if correction in float gives zero correction in int
 
@@ -35,7 +35,7 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
     m_kTot = kpTot;
     m_kI = ki;
     m_kD = kd;
-    m_error_thresh = error_thresh;
+    m_integral_thresh = error_thresh;
 
     // Controller step time and its inverse
     m_stepTime = step_time;
@@ -59,7 +59,7 @@ real nextCorrection(real error)
 {	
 	real res;
 		
-    if (fabs(error) < m_error_thresh)
+    if (fabs(error) < m_integral_thresh)
          m_integral += m_stepTime * error;
     else  {
 		m_integral = 0.0;
@@ -116,9 +116,9 @@ void calcNextTriacDelay()
 
 void initPID()
 {
-//	InitializePID(real kpTot, real kpP, real ki, real kd, real error_thresh, real step_time);  
+//	InitializePID(real kpTot, real kpP, real ki, real kd, real integral_thresh, real step_time);  
 #warning "todo check all the signs and values :-)" 
-	InitializePID( 4.5, -1.1, -0.015, -500.0, 2, pidIntervalSecs);
+	InitializePID( 4.5, -1.1, -0.005, -500.0, 1, pidIntervalSecs);
 	setTriacFireDuration(initialTriacDelayValue);
 }
 
@@ -161,15 +161,15 @@ void onPidStep()
 void printCsvHeader()
 {
 	info_printf("printCsvHeader\n");
-	csv_printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal\n");
-	csv_printf("seconds,°C,triacTx,real,real,real\n");
+	csv_printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal,goal_temp\n");
+	csv_printf("seconds,°C,triacTx,real,real,real,°C\n");
 }
 
 void printCsvValues()
 {
 
 	GETTimeValues
-	csv_printf("%5d:%02d:%02d,%5.1f,%d,%f,%f,%f, %f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
+	csv_printf("%5d:%02d:%02d,%5.1f,%d,%f,%f,%f, %5.1f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
 
 }
 
