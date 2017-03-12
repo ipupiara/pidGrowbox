@@ -201,8 +201,7 @@ void debugSetTriacDelayValueFromAdc()
 
 
 #ifdef useTWA
-#define amtTwaValues   20
-#define twaStepWidth  3    //  keep every twaStepWidth's value
+#define amtTwaValues   20   // no need so far for dynamically defined amount of values in array
 real twaDifferenceAbs;
 
 void initTWA();
@@ -210,10 +209,14 @@ void addTwaValue(real val);
 
 typedef struct  {
 	uint8_t amtValues;
-	real totalWeight;
-	uint16_t totTwaPointsAdded;
-	uint8_t currentTwaInterval;
+	real totalTwaWeight;
+	uint32_t totTwaPointsAdded;
+	uint8_t currentTwaIntervalPoint;
+	uint8_t twaIntervalWidth;
+	real currentTwaValue;      //  keep every twaStepWidth's value
 	real twaResult;
+	real twaPointArray[amtTwaValues];
+	real shiftFactor ;  // to avoid divisions
 } twaStruct;
 
 typedef int someint;
@@ -223,21 +226,61 @@ typedef  twaStruct*   PTwaStruct;
 real calcTotalWeightLinear(uint8_t amtValues)
 {
 	real res= 0.0;
-	
-	
-	res = (amtValues * (amtValues -1)) / 2;
-	
+	res = (amtValues * (amtValues + 1)) / 2;
 	return res;
 }
 
 
-
-void initTWAStruct(PTwaStruct pTwaStruct)
+real twaValue(PTwaStruct pTwaStruct)
 {
-		pTwaStruct->totalWeight =  calcTotalWeightLinear(amtTwaValues);
-		pTwaStruct->totTwaPointsAdded = 0;
-		pTwaStruct->currentTwaInterval = 0;
+	return pTwaStruct->currentTwaValue;
+}
+
+
+void addNextValueIntoArray(PTwaStruct pTwaStruct, real val)
+{
+	uint8_t  cnt;
+	for (cnt = 0; cnt < amtTwaValues-1 ; ++ cnt) {
+		pTwaStruct->twaPointArray[cnt]	 = pTwaStruct->twaPointArray[cnt+ 1];
+	}
+}
+
+real calcArray(PTwaStruct pTwaStruct)
+{
+	real res = 0.0;
+	uint8_t  cnt;
+	for (cnt = 0; cnt < amtTwaValues  ; ++ cnt) {
+		res += (cnt+ 1)  * pTwaStruct->shiftFactor * pTwaStruct->twaPointArray[cnt+1];       //( (cnt + 1) / amtTwaValues)   *    pTwaStruct->twaPointArray[cnt + 1] ;
+	}
+	res = res / pTwaStruct->totalTwaWeight;
+	return res;
+}
+
+void addValue(PTwaStruct pTwaStruct, real val)
+{
+	++ pTwaStruct->currentTwaIntervalPoint;
+	if (pTwaStruct->currentTwaIntervalPoint = pTwaStruct->twaIntervalWidth) 
+	{
+		pTwaStruct->currentTwaIntervalPoint = 0;
+		addNextValue(pTwaStruct,val);
+		if (pTwaStruct->totTwaPointsAdded >= amtTwaValues)      // up to now, there is no need to calc something senseful with less point
+																// since these values should describe long application run quality of pid
+		{
+			pTwaStruct->currentTwaValue = calcArray(pTwaStruct);
+		}  
+	}
 	
+}
+
+
+void initTWAStruct(PTwaStruct pTwaStruct, uint8_t intervalWidth)
+{
+		pTwaStruct->totalTwaWeight =  calcTotalWeightLinear(amtTwaValues);
+		pTwaStruct->totTwaPointsAdded = 0;
+		pTwaStruct->currentTwaIntervalPoint = 0;
+		pTwaStruct->currentTwaValue = 0.0;	
+		pTwaStruct->twaIntervalWidth = intervalWidth;
+		pTwaStruct->shiftFactor = 1 / amtTwaValues;
 }
 
 
