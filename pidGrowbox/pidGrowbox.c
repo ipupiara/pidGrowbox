@@ -74,7 +74,6 @@ int main(void)
 //	startStateCharts();
 	
 //	startDurationTimer(maxSecsPossible  );
-#warning " timer1 changes tobe tested"
 
 	csvIntervalCounter = 0;
 	pidIntervalCounter = 0;
@@ -121,4 +120,5 @@ int main(void)
 //			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
 		} 
 	}
+#warning "todo update duenda.freeoda.com - handycap page"
 }

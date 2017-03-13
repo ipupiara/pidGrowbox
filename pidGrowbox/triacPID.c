@@ -243,6 +243,7 @@ void addNextValueIntoArray(PTwaStruct pTwaStruct, real val)
 	for (cnt = 0; cnt < amtTwaValues-1 ; ++ cnt) {
 		pTwaStruct->twaPointArray[cnt]	 = pTwaStruct->twaPointArray[cnt+ 1];
 	}
+	pTwaStruct->twaPointArray[amtTwaValues-1] = val;
 }
 
 real calcArray(PTwaStruct pTwaStruct)
@@ -259,12 +260,15 @@ real calcArray(PTwaStruct pTwaStruct)
 void addValue(PTwaStruct pTwaStruct, real val)
 {
 	++ pTwaStruct->currentTwaIntervalPoint;
-	if (pTwaStruct->currentTwaIntervalPoint = pTwaStruct->twaIntervalWidth) 
+	if (pTwaStruct->currentTwaIntervalPoint == pTwaStruct->twaIntervalWidth)    // take every twaIntervalWidth value
+																	// another option might be to take the avg of all twaIntervalWidth points
 	{
 		pTwaStruct->currentTwaIntervalPoint = 0;
-		addNextValue(pTwaStruct,val);
-		if (pTwaStruct->totTwaPointsAdded >= amtTwaValues)      // up to now, there is no need to calc something senseful with less point
+		addNextValueIntoArray(pTwaStruct,val);
+		if (pTwaStruct->totTwaPointsAdded >= amtTwaValues)      // up to now, there is no need to calc something senseful with less points
 																// since these values should describe long application run quality of pid
+																// and is not specially interesting for the first minutes, where the value
+																// anyhow is most of the time far away from goal.
 		{
 			pTwaStruct->currentTwaValue = calcArray(pTwaStruct);
 		}  
@@ -280,21 +284,29 @@ void initTWAStruct(PTwaStruct pTwaStruct, uint8_t intervalWidth)
 		pTwaStruct->currentTwaIntervalPoint = 0;
 		pTwaStruct->currentTwaValue = 0.0;	
 		pTwaStruct->twaIntervalWidth = intervalWidth;
-		pTwaStruct->shiftFactor = 1 / amtTwaValues;
+		pTwaStruct->shiftFactor = 1 / amtTwaValues;      //  factor to avoid multiplications on each twa point
+		memset(pTwaStruct->twaPointArray,0,sizeof(pTwaStruct->twaPointArray));
 }
 
+//////////////////////////    twa  main ///////////////////////////////////////////////
+
+
+twaStruct temperatureTwaS;
+twaStruct absDifferenceTwaS;
 
 
 void addTwaValue(real val)
 {
-	
+	addValue(&temperatureTwaS,getCurrentTemperature());
+	addValue(&absDifferenceTwaS, fabs(getCurrentTemperature() - desiredTemperature));
 }
 
 
 
 void initTWA()
 {
-
+	initTWAStruct(&temperatureTwaS,1);
+	initTWAStruct(&absDifferenceTwaS,3);
 }
 
 

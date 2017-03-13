@@ -107,7 +107,6 @@ void resetTriacTimerFlag()
 
 void setOcrDelay(int16_t newOcr)
 {
-#warning "urgent todo, check all the call stacks if timer stop start cli and sei is set ok so that no data/thread violation can occur"	
 	// timer0 must be stopped before running this method (was the case per 17 Feb 2017
 	// timer must be stopped to set tcnt, because else, on an 
 	// unprotected set, the timer itself could interfere with the *non double buffered feature" write access.
@@ -177,7 +176,6 @@ void calcAmtInductiveRepetitions(int16_t tFDurationTcnt0)
 		amtInductiveRepetitionsF = (tFDurationTcnt0F * 11.63  )  /  measuredRepetitionIntervalus;
 		// always cut off modulo part when converting to int
 		amtInductiveRepetitions = amtInductiveRepetitionsF;   
-#warning "tobe  debugged"
 	} else {
 		amtInductiveRepetitions = 1;
 	}
@@ -377,7 +375,6 @@ void initInterrupts()
 		EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each time, edge needs to be programmed in the interrupt ::::----(((((
 		EIFR  &=  ~(1 << INTF7); 
 		EIMSK |= (1 << INT7);
-#warning "todo start int7 only after initilization of timer0....."		
 
 // Timer 1 as Duration Timer
 	  
@@ -856,7 +853,6 @@ floatType adcVoltage(uint8_t  pos)      // tobe called outside interrupts
 	double   VFl;
 
 	VFl = 0.0;
-#warning "floatType cast tobe tested"
 	adcValF = (floatType) adcValue(pos);     
 	VFl = (adcValF * adcRefVoltage[pos]) / 1023.0;
 	
@@ -906,6 +902,16 @@ void startDrying()
 }
 
 void stopDrying()
+{
+	
+}
+
+void switchOnLight()
+{
+	
+}
+
+void switchOffLight()
 {
 	
 }

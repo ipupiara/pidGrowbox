@@ -60,7 +60,7 @@ void lcd_write(uint8_t dataW, uint8_t toDataIR)
 void lcd_init() 
 {
 #ifdef noScreen
-	inf_printf(">>> noScreen defined  <<<\n");
+	info_printf(">>> noScreen defined  <<<\n");
 #else
 	info_printf(">>> lcd_init screen\n");
 	LCD_CMD_IODIR |= 0b11100000;  // highest 3 Pins as output, leave rest as is
