@@ -7,6 +7,9 @@
 
 TStatechart	 STriacHumidityTemperatureChart;
 TStatechart* PTriacHumidityTemperatureChart;
+
+TStatechart	 SGrowboxI2CChart;
+TStatechart* PGrowboxI2CChart;
 //
 //
 //enum eEventTypes
@@ -37,6 +40,7 @@ enum eEventTypes
 	eStartPressed,
 	eStopPressed,
 	eAdcTick,
+	eTWIDataReceived,
 	eFatalError
 };
 

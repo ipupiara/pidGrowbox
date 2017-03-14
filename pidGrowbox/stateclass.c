@@ -423,6 +423,8 @@ enum eI2CStates
 	eStateGrowboxI2C,
 	eI2CStartState = eStateGrowboxI2C,
 	eStateI2CIdle,
+	eStateI2CIdleOK,
+	eStateI2CIdleError,
 	eStateI2CWaitForResponse,
 	eNumberOfI2CStates
 };
@@ -466,6 +468,70 @@ void exitStateI2CIdle(void)
 }
 
 
+
+uStInt evStateI2CIdleOKChecker(void)
+{
+//	info_printf("check for event in State evStateStateI2CIdleOK\n");
+
+//	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
+//	{
+//		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
+			// No event action.
+//		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+//		return (uStIntHandlingDone);
+	
+//	}
+	return (uStIntNoMatch);
+}
+
+
+void entryStateI2CIdleOK(void)
+{
+//	info_printf("::entryStateStateI2CIdleOK\n");
+}
+
+
+
+
+void exitStateI2CIdleOK(void)
+{
+//	info_printf("::exitStateStateI2CIdleOK\n");
+}
+
+
+
+uStInt evI2CIdleErrorChecker(void)
+{
+//	info_printf("check for event in State evStateI2CIdleError\n");
+
+//	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
+//	{
+//		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
+			// No event action.
+//		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+//		return (uStIntHandlingDone);
+	
+//	}
+	return (uStIntNoMatch);
+}
+
+
+void entryStateI2CIdleError(void)
+{
+//	info_printf("::entryStateI2CIdleError\n");
+}
+
+
+
+
+void exitStateI2CIdleError(void)
+{
+//	info_printf("::exitStateI2CIdleError\n");
+}
+
+
+
+
 uStInt evI2CWaitForResponseChecker(void)
 {
 //	info_printf("check for event in State evStateI2CWaitForResponse\n");
@@ -480,6 +546,8 @@ uStInt evI2CWaitForResponseChecker(void)
 //	}
 	return (uStIntNoMatch);
 }
+
+
 
 
 void entryStateI2CWaitForResponse(void)
@@ -508,16 +576,38 @@ xStateType xaI2CStates[eNumberOfI2CStates] = {
 	 	entryGrowboxI2C,
 	 	tfNull
 	}	,
-		 
+	
+			 
 	{	eStateI2CIdle,
 		eStateGrowboxI2C,
-		-1,             // default child
+		eStateI2CIdleOK,  // default child
 		0,				// keep history
 		evI2CIdleChecker,
 		tfNull,				// default entry ?
 		entryStateI2CIdle,
 		exitStateI2CIdle
 	}	,
+		 
+	{   eStateI2CIdleOK ,
+		eStateI2CIdle,
+		-1,             // default child
+		0,				// keep history
+		evStateI2CIdleOKChecker,
+		tfNull,				// default entry ?
+		entryStateI2CIdleOK,
+		exitStateI2CIdleOK
+	} ,
+
+
+	{	eStateI2CIdleError,
+		eStateI2CIdle,
+		-1,             // default child
+		0,				// keep history
+		evI2CIdleErrorChecker,
+		tfNull,				// default entry ?
+		entryStateI2CIdleError,
+		exitStateI2CIdleError
+	}  ,
 			  
 	{	eStateI2CWaitForResponse,
 		eStateGrowboxI2C,
@@ -538,13 +628,18 @@ void startStateCharts()
 
  	PTriacHumidityTemperatureChart = & STriacHumidityTemperatureChart; 
 	createTStatechart (& STriacHumidityTemperatureChart, xaHumidifyingStates, eNumberOfHumidifyingStates, eHumidifyingStartState);
-	
+	info_printf("HumidityTemperature statechart started\n");
+
+ 	PGrowboxI2CChart = & SGrowboxI2CChart;
+ 	createTStatechart (& SGrowboxI2CChart, xaHumidifyingStates, eNumberOfI2CStates, eI2CStartState);
+	info_printf("I2CStateChart started\n");
 }
 
 
 void stopStateCharts()
 {
 	destructTStatechart(&STriacHumidityTemperatureChart);
+	destructTStatechart(&SGrowboxI2CChart);
 }
 
 

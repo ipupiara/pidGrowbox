@@ -14,6 +14,7 @@
 #include "triacPID.h"
 #include "StateClass.h"
 #include "triacUI.h"
+#include "twi_master.h"
 
 
 void USART_Init( unsigned int baud )
@@ -106,6 +107,9 @@ int main(void)
  				csvIntervalCounter = 0;
  				printCsvValues();
  			}
+			ev.evType = eSecondsTick;
+			processTriacEvent(PGrowboxI2CChart, &ev);
+			 
 // 			startADCSequence();
 		}   
  		if (adcTick == 1)  {
@@ -119,6 +123,11 @@ int main(void)
 //			ev.evType = eTimeOutDurationTimer;
 //			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
 		} 
+		if (twiDataReceived == 1) {
+			twiDataReceived = 0;
+			ev.evType = eTWIDataReceived;
+			processTriacEvent(PGrowboxI2CChart, &ev);
+		}
 	}
 #warning "todo update duenda.freeoda.com - handycap page"
 }
