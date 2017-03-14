@@ -123,6 +123,9 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="common.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="pidGrowbox.c">
       <SubType>compile</SubType>
     </Compile>
@@ -172,6 +175,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="tstatechart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="twi_master.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="twi_master.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

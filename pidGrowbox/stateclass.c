@@ -24,10 +24,10 @@ CGrowBoxEvent* currentEvent;
 
 
 // This defines and names the states the class has.
-enum eStates
+enum eHumidifyingStates
 {
 	eStateGrowBoxKeepingHumidity,
-	eStartState = eStateGrowBoxKeepingHumidity,
+	eHumidifyingStartState = eStateGrowBoxKeepingHumidity,
 	eStateHumidityControlRunning,
 	eStateHumidifying,
 	eStateIdle,
@@ -35,7 +35,7 @@ enum eStates
 	eStateVentilating,
 	eStateDrying,
 	eStateFatalError,
-	eNumberOfStates
+	eNumberOfHumidifyingStates
 };
 
 
@@ -317,20 +317,6 @@ void CHumidityStateClass::defEntryStateGrowBoxKeepingHumidity(void)
 
 
 
-/***   Temperature  ********/
-
-// This defines and names the states the class has.
-enum eTemperatureStates
-{
-	eStateGrowBoxTemperature,
-	eTemperatureStartState = eStateGrowBoxTemperature,
-	eStateTemperatureIdle,
-	eStateHeating,
-	eStateCooling,
-	eNumberOfTemperatureStates
-};
-
-
 
 #ifndef  sdccNULL 
 
@@ -340,11 +326,18 @@ enum eTemperatureStates
 
 t_fvoid  tfNull;
 
+#endif
+
+
+#ifdef  sdccNULL
+
+tfNull = (t_fvoid ) NULL;
+
 #endif 
 
 // attention: sequence must be the same as above enum eStates
 
-xStateType xaStates[eNumberOfStates] = {
+xStateType xaHumidifyingStates[eNumberOfHumidifyingStates] = {
 		{eStateGrowBoxKeepingHumidity,
 			-1,
 			eStateHumidityControlRunning,
@@ -421,17 +414,130 @@ xStateType xaStates[eNumberOfStates] = {
 
 
 
+
+/***   I2C states  ********/
+
+// This defines and names the states the class has.
+enum eI2CStates
+{
+	eStateGrowboxI2C,
+	eI2CStartState = eStateGrowboxI2C,
+	eStateI2CIdle,
+	eStateI2CWaitForResponse,
+	eNumberOfI2CStates
+};
+
+
+
+void entryGrowboxI2C(void)
+{
+	info_printf("::entryStateGrowboxI2C\n");
+}
+
+
+
+uStInt evI2CIdleChecker(void)
+{
+//	info_printf("check for event in State evStateI2CIdle\n");
+
+//	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
+//	{
+//		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
+			// No event action.
+//		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+//		return (uStIntHandlingDone);
+	
+//	}
+	return (uStIntNoMatch);
+}
+
+
+void entryStateI2CIdle(void)
+{
+//	info_printf("::entryStateI2CIdle\n");
+}
+
+
+
+
+void exitStateI2CIdle(void)
+{
+//	info_printf("::exitStateI2CIdle\n");
+}
+
+
+uStInt evI2CWaitForResponseChecker(void)
+{
+//	info_printf("check for event in State evStateI2CWaitForResponse\n");
+
+//	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
+//	{
+//		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
+			// No event action.
+//		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+//		return (uStIntHandlingDone);
+	
+//	}
+	return (uStIntNoMatch);
+}
+
+
+void entryStateI2CWaitForResponse(void)
+{
+//	info_printf("::entryStateI2CWaitForResponse\n");
+}
+
+
+
+
+void exitStateI2CWaitForResponse(void)
+{
+//	info_printf("::exitStateI2CWaitForResponse\n");
+}
+
+
+
+
+xStateType xaI2CStates[eNumberOfI2CStates] = {
+	{	eStateGrowboxI2C,
+	 	-1,
+	 	eStateI2CIdle,             // default child
+	 	0,				// keep history
+	 	tfNull,
+	 	tfNull,				// default entry ?
+	 	entryGrowboxI2C,
+	 	tfNull
+	}	,
+		 
+	{	eStateI2CIdle,
+		eStateGrowboxI2C,
+		-1,             // default child
+		0,				// keep history
+		evI2CIdleChecker,
+		tfNull,				// default entry ?
+		entryStateI2CIdle,
+		exitStateI2CIdle
+	}	,
+			  
+	{	eStateI2CWaitForResponse,
+		eStateGrowboxI2C,
+		-1,             // default child
+		0,				// keep history
+		evI2CWaitForResponseChecker,
+		tfNull,				// default entry ?
+		entryStateI2CWaitForResponse,
+		exitStateI2CWaitForResponse
+	}				  
+	
+};
+
+
+
 void startStateCharts()
 {
 
-#ifdef  sdccNULL 
-
-	tfNull = (t_fvoid ) NULL;
-
-#endif 
-
  	PTriacHumidityTemperatureChart = & STriacHumidityTemperatureChart; 
-	createTStatechart (& STriacHumidityTemperatureChart, xaStates, eNumberOfStates, eStartState);
+	createTStatechart (& STriacHumidityTemperatureChart, xaHumidifyingStates, eNumberOfHumidifyingStates, eHumidifyingStartState);
 	
 }
 

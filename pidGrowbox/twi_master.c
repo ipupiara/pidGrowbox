@@ -276,7 +276,7 @@ void twi_resetAfterCrash()
 {
 	printf("twi reset after crash\n");
 	//  TWI  disabled; 
-#ifndef noI2C	
+#ifdef noI2C	
     TWCR = (0<<TWINT)|(0<<TWEA)|(0<<TWSTA)|(0<<TWSTO)|(0<<TWWC)|(0<<TWEN)|(0<<TWIE);
 
 	twiDataSent = 0;
