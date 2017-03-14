@@ -430,10 +430,14 @@ enum eI2CStates
 };
 
 
+uint8_t i2cSecondCounter;  
+char i2cStateString [15];
+
 
 void entryGrowboxI2C(void)
 {
 	info_printf("::entryStateGrowboxI2C\n");
+	snprintf((char *)&i2cStateString,sizeof(i2cStateString),"i2c ok");
 }
 
 
@@ -442,14 +446,17 @@ uStInt evI2CIdleChecker(void)
 {
 //	info_printf("check for event in State evStateI2CIdle\n");
 
-//	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
-//	{
-//		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
-			// No event action.
-//		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
-//		return (uStIntHandlingDone);
+	if (currentEvent->evType == eSecondsTick) 
+	{
+		++ i2cSecondCounter;
+		if (i2cSecondCounter >= 23)  {
+			BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CWaitForResponse );
+//				 No event action.
+			END_EVENT_HANDLER(PGrowboxI2CChart );
+			return (uStIntHandlingDone);	
+		}
 	
-//	}
+	}
 	return (uStIntNoMatch);
 }
 
@@ -457,6 +464,7 @@ uStInt evI2CIdleChecker(void)
 void entryStateI2CIdle(void)
 {
 //	info_printf("::entryStateI2CIdle\n");
+	i2cSecondCounter = 0;
 }
 
 
@@ -536,14 +544,26 @@ uStInt evI2CWaitForResponseChecker(void)
 {
 //	info_printf("check for event in State evStateI2CWaitForResponse\n");
 
-//	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
-//	{
-//		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
-			// No event action.
-//		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
-//		return (uStIntHandlingDone);
-	
-//	}
+	if (currentEvent->evType == eSecondsTick)
+	{
+		++ i2cSecondCounter;
+		if (i2cSecondCounter >= 3)  {
+			snprintf((char *)&i2cStateString,sizeof(i2cStateString),"i2c err to");
+			BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CIdleError );
+//			No event action.
+			END_EVENT_HANDLER(PGrowboxI2CChart );
+			return (uStIntHandlingDone);
+		}
+		
+	}
+	if (currentEvent->evType == eTWIDataReceived)
+	{
+		snprintf((char *) &i2cStateString,sizeof(i2cStateString),"i2c ok");
+		BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CIdleOK );
+//		No event action.
+		END_EVENT_HANDLER(PGrowboxI2CChart );
+		return (uStIntHandlingDone);			
+	}
 	return (uStIntNoMatch);
 }
 
@@ -553,6 +573,7 @@ uStInt evI2CWaitForResponseChecker(void)
 void entryStateI2CWaitForResponse(void)
 {
 //	info_printf("::entryStateI2CWaitForResponse\n");
+	i2cSecondCounter = 0;
 }
 
 
@@ -628,7 +649,7 @@ void startStateCharts()
 
  	PTriacHumidityTemperatureChart = & STriacHumidityTemperatureChart; 
 	createTStatechart (& STriacHumidityTemperatureChart, xaHumidifyingStates, eNumberOfHumidifyingStates, eHumidifyingStartState);
-	info_printf("HumidityTemperature statechart started\n");
+	info_printf("TriacHumidityTemperature statechart started\n");
 
  	PGrowboxI2CChart = & SGrowboxI2CChart;
  	createTStatechart (& SGrowboxI2CChart, xaHumidifyingStates, eNumberOfI2CStates, eI2CStartState);
