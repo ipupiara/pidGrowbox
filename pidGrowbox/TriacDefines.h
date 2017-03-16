@@ -77,4 +77,32 @@ floatType  GetDryingLowerLimit();
 
 void initDefines();
 
+#define amtOnOffIntervalsPerTimerPort   4
+#define amtOnOffTimerPorts				2       // light and fictive intofridge-ventilation, 
+													// vs. intoGrowbox-ventilation which is controlled via hygrosense 
+
+
+typedef struct TimeClock   {
+	uint8_t hour;
+	uint8_t minute;
+} TimeClock;
+	
+
+typedef struct OnOffInterval {
+	TimeClock onClock;
+	TimeClock offClock;
+} OnOffInterval;
+
+
+typedef struct OnOffTimerPorts  {
+	uint8_t cpuPort;
+	uint8_t cpuPin;
+	OnOffInterval onOffIntervals [amtOnOffIntervalsPerTimerPort];
+} OnOffTimerPorts;
+
+
+uint8_t  isCurrentlyOn(TimeClock now, uint8_t timerPort);
+void sendTWIDataRequest();
+void onTWIDataReceived();
+
 #endif

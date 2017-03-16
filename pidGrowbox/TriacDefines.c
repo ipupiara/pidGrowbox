@@ -1,8 +1,12 @@
 
 #include <stdio.h>
+#include <avr/io.h>
 #include <stdarg.h>
+#include <string.h>
+#include <stdlib.h>
 #include <avr/interrupt.h>
 #include "TriacDefines.h"
+#include "twi_master.h"
 
 //#include "TriacIntr.h"
 
@@ -14,6 +18,8 @@
 #define DryingUpperLimit      98.0
 #define DryingLowerLimit     96.0
 
+
+void initTimerPorts();
 
 void info_printf(const char *emsg, ...)
 {
@@ -261,4 +267,124 @@ floatType  GetDryingUpperLimit()
 floatType  GetDryingLowerLimit()
 {
 	return DryingLowerLimit;
+}
+
+//////// TWI  communication   //////////////
+
+#define rtc1307Address  0x00
+
+uint8_t rxBuffer [10];
+
+
+void sendTWIDataRequest()
+{
+
+}
+
+void onTWIDataReceived()
+{
+	
+}
+
+void sendSetupData()
+{
+	// init configuration of 1307
+	// set CH to 0
+	// 12/23 hour mode to 24
+	//  set 0x07 set sqwe to 0 (disabled), OUT = 0 (or 1 if you like  :-), RS1 and RS0 to 0 (1 hz)
+	//  needs only be done the first time 1307 is used and stayes then persistent in EEPROM.
+	//  therefor check that initial setup has beed done
+	
+	twi_synch_rx(rtc1307Address,(uint8_t *)&rxBuffer,8);
+	if ((rxBuffer[0] & 0x80) != 0x00)  {
+		rxBuffer [0] = 0x00;
+		twi_synch_tx(rtc1307Address,(uint8_t *)&rxBuffer[0],1);
+	}
+	if ((rxBuffer[2] & 0x40) != 0x00)  {
+		rxBuffer [2] &= ~(0x40);
+		twi_synch_tx(rtc1307Address,(uint8_t *)&rxBuffer[2],1);
+	}
+
+	if ((rxBuffer[8] & 0b10010011) != 0x00 ) {
+		rxBuffer[8] &=  ~(0b10010011);
+		twi_synch_tx(rtc1307Address,(uint8_t *)&rxBuffer[8],1);
+	}
+	
+}
+
+OnOffTimerPorts onOffTimerPorts [amtOnOffTimerPorts] = { {0x1B, PORTA0,
+															{ {{1,30},{1,35}},{{12,30},{12,35}},
+															{{18,30},{18,35}}, {{0xFF,30},{1,35}}  }
+															} ,
+															{0x1B, PORTA1,
+																{ {{1,30},{1,35}},{{12,30},{12,35}},
+																{{18,30},{18,35}}, {{0xFF,30},{1,35}}  }
+															}
+														};
+
+uint8_t amtBcd (uint8_t amt1307Formatted)
+{
+	uint8_t res =  ((amt1307Formatted >> 4)   * 10 )   + (amt1307Formatted & 0x0F);
+	return res;
+}
+
+uint16_t amtMinutesSinceMidnight(TimeClock now)  // hour minutes defined as on address 0x01 and 0x02 on 1307, so some bits need to be masked off
+{
+	uint16_t res;
+	res = (amtBcd(now.hour & ~((1<<7) | (1 << 6))) * 60)  + amtBcd(now.minute & ~(1 << 7));
+
+	
+	return res;
+}
+
+uint8_t layesInInterval(TimeClock now,  OnOffInterval* intV)
+{
+	uint8_t res = 0;
+	uint16_t nowMinutes = amtMinutesSinceMidnight(now);
+	uint16_t intervalOnMinutes = amtMinutesSinceMidnight(intV->onClock);
+	uint16_t intervalOffMinutes = amtMinutesSinceMidnight(intV->offClock);
+	
+	if (intervalOnMinutes <= intervalOffMinutes)  {
+		if ((nowMinutes >= intervalOnMinutes) && (nowMinutes <= intervalOffMinutes)) { 
+			res = 1;
+		}	
+	}  else {
+		if	 ((nowMinutes >= intervalOnMinutes) || (nowMinutes <= intervalOffMinutes)) {
+			res = 1;
+		}
+	}
+	return res;
+}
+
+
+uint8_t  isCurrentlyOn(TimeClock now, uint8_t timerPort)
+{
+	uint16_t res = 0;
+	uint8_t cnt = 0;
+	while ((cnt < amtOnOffIntervalsPerTimerPort) && (res == 0)) {
+		res = layesInInterval(now,&onOffTimerPorts[timerPort].onOffIntervals[cnt]);
+		++ cnt;
+	}	
+	return res;
+}
+
+void setTimerPort(TimeClock now, uint8_t timerPort)
+{
+	if (isCurrentlyOn(now,timerPort))  {
+		_SFR_IO8(onOffTimerPorts[timerPort].cpuPort) |= (1 << onOffTimerPorts[timerPort].cpuPin);
+	} else {
+		_SFR_IO8(onOffTimerPorts[timerPort].cpuPort) &= ~(1 << onOffTimerPorts[timerPort].cpuPin);
+	}
+}
+
+void initTimerPorts() 
+{
+	DDRA |= (1 << DDRA0);
+	DDRA |= (1 << DDRA1);
+	memset(&rxBuffer,0,sizeof(rxBuffer));
+	sendSetupData();
+	// init configuration of 1307
+	// set CH to 0
+	// 12/23 hour mode to 24
+	//  set 0x07 set sqwe to 0 (disabled), OUT = 0 (or 1 if you like  :-), RS1 and RS0 to 0 (1 hz)
 }

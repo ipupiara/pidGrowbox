@@ -45,13 +45,13 @@ enum eEventTypes
 };
 
 
-typedef struct  {
+typedef struct CGrowBoxEvent {
 	int evType;
 	floatType humidity;
 	floatType temperature;
-	union {
+	union evData {
 		int8_t keyCode;
-		struct {			// currently not in use
+		struct zeroAdjustingState {			// currently not in use
 			floatType   voltage;  
 			int8_t  potiPos;
 			int8_t  jobType;

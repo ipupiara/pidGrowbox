@@ -450,6 +450,9 @@ uStInt evI2CIdleChecker(void)
 	{
 		++ i2cSecondCounter;
 		if (i2cSecondCounter >= 23)  {
+			
+			// send Request
+			
 			BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CWaitForResponse );
 //				 No event action.
 			END_EVENT_HANDLER(PGrowboxI2CChart );
