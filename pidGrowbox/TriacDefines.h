@@ -100,8 +100,9 @@ typedef struct OnOffTimerPorts  {
 	OnOffInterval onOffIntervals [amtOnOffIntervalsPerTimerPort];
 } OnOffTimerPorts;
 
-
 uint8_t  isCurrentlyOn(TimeClock now, uint8_t timerPort);
+
+
 void sendTWIDataRequest();
 void onTWIDataReceived();
 

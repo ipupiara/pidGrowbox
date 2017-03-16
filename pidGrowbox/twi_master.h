@@ -169,6 +169,8 @@ extern bool_t twi_success(void);
  */
 extern u8_t twi_get_status(void);
 
+void twi_resetAfterCrash(); // pn 16 Mar 2017, made public for twi communication with 1307 rtc chip
+
 #if TWI_REPEATED_START_SUPPORT
 /**
  *  Generate TWI STOP condition.

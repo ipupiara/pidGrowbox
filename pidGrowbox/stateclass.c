@@ -11,6 +11,7 @@
 #include "TriacIntr.h"
 #include "triacPID.h"
 #include "triacUI.h"
+#include "twi_master.h"
 
 extern const uStInt uStIntHandlingDone;
 extern const uStInt uStIntNoMatch;
@@ -451,7 +452,7 @@ uStInt evI2CIdleChecker(void)
 		++ i2cSecondCounter;
 		if (i2cSecondCounter >= 23)  {
 			
-			// send Request
+			sendTWIDataRequest();
 			
 			BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CWaitForResponse );
 //				 No event action.
@@ -529,10 +530,9 @@ uStInt evI2CIdleErrorChecker(void)
 
 void entryStateI2CIdleError(void)
 {
-//	info_printf("::entryStateI2CIdleError\n");
+	info_printf("::entryStateI2CIdleError\n");
+	twi_resetAfterCrash();
 }
-
-
 
 
 void exitStateI2CIdleError(void)
@@ -552,6 +552,7 @@ uStInt evI2CWaitForResponseChecker(void)
 		++ i2cSecondCounter;
 		if (i2cSecondCounter >= 3)  {
 			snprintf((char *)&i2cStateString,sizeof(i2cStateString),"i2c err to");
+			
 			BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CIdleError );
 //			No event action.
 			END_EVENT_HANDLER(PGrowboxI2CChart );
@@ -562,6 +563,7 @@ uStInt evI2CWaitForResponseChecker(void)
 	if (currentEvent->evType == eTWIDataReceived)
 	{
 		snprintf((char *) &i2cStateString,sizeof(i2cStateString),"i2c ok");
+		onTWIDataReceived();
 		BEGIN_EVENT_HANDLER(PGrowboxI2CChart, eStateI2CIdleOK );
 //		No event action.
 		END_EVENT_HANDLER(PGrowboxI2CChart );

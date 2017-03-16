@@ -275,15 +275,19 @@ floatType  GetDryingLowerLimit()
 
 uint8_t rxBuffer [10];
 
+void setTimerPorts(TimeClock now);
 
 void sendTWIDataRequest()
 {
-
+	twi_start_rx(rtc1307Address,(uint8_t *)&rxBuffer,7);
 }
 
 void onTWIDataReceived()
 {
-	
+	TimeClock nowTime;
+	nowTime.hour = (rxBuffer[2]  & 0b00111111);
+	nowTime.minute = (rxBuffer[1] & ~(0x80));
+	setTimerPorts(nowTime);
 }
 
 void sendSetupData()
@@ -321,6 +325,7 @@ OnOffTimerPorts onOffTimerPorts [amtOnOffTimerPorts] = { {0x1B, PORTA0,
 																{{18,30},{18,35}}, {{0xFF,30},{1,35}}  }
 															}
 														};
+
 
 uint8_t amtBcd (uint8_t amt1307Formatted)
 {
@@ -376,6 +381,15 @@ void setTimerPort(TimeClock now, uint8_t timerPort)
 		_SFR_IO8(onOffTimerPorts[timerPort].cpuPort) &= ~(1 << onOffTimerPorts[timerPort].cpuPin);
 	}
 }
+
+void setTimerPorts(TimeClock now)
+{
+	uint8_t cnt;
+	for (cnt = 0; cnt < amtOnOffTimerPorts; ++ cnt)  {
+		setTimerPort( now, cnt);
+	}
+}
+
 
 void initTimerPorts() 
 {

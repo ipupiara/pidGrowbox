@@ -272,6 +272,8 @@ void twi_init(void)
 #endif		
 }
 
+
+#warning "public call of twi_resetAfterCrash() tobe tested "
 void twi_resetAfterCrash()
 {
 	printf("twi reset after crash\n");
