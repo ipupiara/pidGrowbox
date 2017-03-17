@@ -105,5 +105,5 @@ uint8_t  isCurrentlyOn(TimeClock now, uint8_t timerPort);
 
 void sendTWIDataRequest();
 void onTWIDataReceived();
-
+void setClockToTime(uint8_t hours, uint8_t minutes);
 #endif

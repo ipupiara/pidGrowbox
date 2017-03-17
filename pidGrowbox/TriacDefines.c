@@ -402,3 +402,8 @@ void initTimerPorts()
 	// 12/23 hour mode to 24
 	//  set 0x07 set sqwe to 0 (disabled), OUT = 0 (or 1 if you like  :-), RS1 and RS0 to 0 (1 hz)
 }
+
+void setClockToTime(uint8_t hours, uint8_t minutes)
+{
+	
+}
