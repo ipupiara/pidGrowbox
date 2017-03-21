@@ -55,7 +55,7 @@ uint16_t   pidIntervalCounter;
 uint16_t   csvIntervalCounter ;
 uint16_t   secsCounter ;
     
-CGrowBoxEvent ev;	
+//CGrowBoxEvent ev;	
 	    
 		
 int main(void)
@@ -107,8 +107,8 @@ int main(void)
  				csvIntervalCounter = 0;
  				printCsvValues();
  			}
-			ev.evType = eSecondsTick;
-			processTriacEvent(PGrowboxI2CChart, &ev);
+//			ev.evType = eSecondsTick;
+//			processTriacEvent(PGrowboxI2CChart, &ev);
 			 
 // 			startADCSequence();
 		}   
@@ -125,8 +125,8 @@ int main(void)
 		} 
 		if (twiDataReceived == 1) {
 			twiDataReceived = 0;
-			ev.evType = eTWIDataReceived;
-			processTriacEvent(PGrowboxI2CChart, &ev);
+//			ev.evType = eTWIDataReceived;
+//			processTriacEvent(PGrowboxI2CChart, &ev);
 		}
 	}
 #warning "todo update duenda.freeoda.com - handycap page"

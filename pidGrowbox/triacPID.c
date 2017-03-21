@@ -17,6 +17,7 @@ enum adcScopeEnum
 
 int8_t m_started;
 real m_kTot, m_kP, m_kI, m_kD, m_stepTime, m_inv_stepTime, m_prev_error, m_integral_thresh, m_integral, m_correctionTresh, m_goalValue;
+real m_integralTimeDiminuision;
 
 real corrCarryOver;     // carry amount if correction in float gives zero correction in int
 
@@ -32,7 +33,7 @@ real pidError;
 
 #endif
 
-void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, real step_time, real corrThresh, real goalVal)
+void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, real step_time, real corrThresh, real goalVal, real itegralTimeDim)
 {
     // Initialize controller parameters
 	// PN 3.Oct 2011, added m_kP for better setting of proportional factor only
@@ -54,6 +55,8 @@ void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, rea
 	
 	m_goalValue = goalVal;
 	
+	m_integralTimeDiminuision = itegralTimeDim;
+	
 //	 updateGradAmps();
 
 	 corrCarryOver = 0;
@@ -73,7 +76,7 @@ real nextCorrection(real error)
 	real res;
 		
     if (fabs(error) < m_integral_thresh)
-         m_integral += m_stepTime * error;
+         m_integral =  (m_integralTimeDiminuision * m_integral)  + (m_stepTime * error);
     else  {
 		m_integral = 0.0;
 	}
@@ -133,7 +136,8 @@ void calcNextTriacDelay()
 void initPID()
 {
 //	void InitializePID(real kpTot,real kpP, real ki, real kd, real error_thresh, real step_time, real corrThresh, real goalVal)
-	InitializePID( totFactor, pFactor, iFactor, dFactor, itegralTreshold, pidIntervalSecs,correctionThreshold, desiredTemperature);
+	InitializePID( totFactor, pFactor, iFactor, dFactor, itegralTreshold, pidIntervalSecs,
+					correctionThreshold, desiredTemperature, integralTimeDiminuision);
 	setTriacFireDuration(initialTriacDelayValue);
 }
 
@@ -184,7 +188,7 @@ void printCsvValues()
 {
 
 	GETTimeValues
-	csv_printf("%5d:%02d:%02d,%5.1f,%d,%f,%f,%f, %5.1f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
+	csv_printf("%5d:%02d:%02d,%6.2f,%d,%f,%f,%f, %5.1f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
 
 }
 
