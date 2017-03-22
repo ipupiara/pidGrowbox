@@ -13,8 +13,8 @@
 #define totFactor  10   * (60 / pidIntervalSecs)   //  to keep the correction per time the same when changing the step width
 														// need not necessarily be the case this way, maybe this factor would be better let away,
 														// experiment will show .. 
-#define pFactor   -1.1 
-#define iFactor  -0.005  
+#define pFactor   -2.5 
+#define iFactor  -0.0025  
 #define dFactor -500	
 
 
