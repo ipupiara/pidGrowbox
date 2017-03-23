@@ -254,7 +254,7 @@ real calcTwaArray(PTwaStruct pTwaStruct)
 	real res = 0.0;
 	uint8_t  cnt;
 	for (cnt = 0; cnt < amtTwaValues  ; ++ cnt) {
-		res += ( pTwaStruct->shiftFactor * (cnt+ 1))  *  pTwaStruct->twaPointArray[cnt];       //( (cnt + 1) / amtTwaValues)   *    pTwaStruct->twaPointArray[cnt] ;
+		res +=  pTwaStruct->twaPointArray[cnt] * (cnt +1);       //( (cnt + 1) / amtTwaValues)   *    pTwaStruct->twaPointArray[cnt] ;
 	}
 	res = res / pTwaStruct->totalTwaWeight;
 	return res;
