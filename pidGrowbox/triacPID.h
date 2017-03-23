@@ -44,6 +44,9 @@ void onPidStep();
 
 void debugSetTriacDelayValueFromAdc();
 
+real getTwaTemperature();
+
+real getTwaAbsTemperatureDiff();
 
 
 #endif

@@ -180,15 +180,17 @@ void onPidStep()
 void printCsvHeader()
 {
 	info_printf("printCsvHeader\n");
-	csv_printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal,goal_temp\n");
-	csv_printf("seconds,°C,triacTx,real,real,real,°C\n");
+	csv_printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal,goal_temp,twaTemp,twaAbsTempDiff\n");
+	csv_printf("seconds,°C,triacTx,real,real,real,°C,real,real\n");
 }
 
 void printCsvValues()
 {
 
 	GETTimeValues
-	csv_printf("%5d:%02d:%02d,%6.2f,%d,%f,%f,%f, %5.1f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration(),pVal,iVal,dVal,desiredTemperature);
+	csv_printf("%5d:%02d:%02d,%6.2f,%d,%f,%f,%f, %5.1f,%6.2f,%6.2f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration()
+																,pVal,iVal,dVal,desiredTemperature,getTwaTemperature()
+																,getTwaAbsTemperatureDiff());
 
 }
 
@@ -214,20 +216,18 @@ void addTwaValue(real val);
 typedef struct  {
 	uint8_t amtValues;
 	real totalTwaWeight;
-	uint32_t totTwaPointsAdded;
-	uint8_t currentTwaIntervalPoint;
-	uint8_t twaIntervalWidth;
-	real currentTwaValue;      //  keep every twaStepWidth's value
-	real twaResult;
+	uint32_t totTwaValuesAdded;
+	uint8_t intervalWidth;    //  keep every twaStepWidth's value
+								// a different approach might eg. be to calc the avg of these twaIntervalWidth values.....
+	uint8_t intervalCnt;							
+	real currentTwaResult;     
 	real twaPointArray[amtTwaValues];
 	real shiftFactor ;  // to avoid divisions
 } twaStruct;
 
-typedef int someint;
 typedef  twaStruct*   PTwaStruct;
 
-
-real calcTotalWeightLinear(uint8_t amtValues)
+real calcTotalTwaWeightLinear(uint8_t amtValues)
 {
 	real res= 0.0;
 	res = (amtValues * (amtValues + 1)) / 2;
@@ -235,13 +235,13 @@ real calcTotalWeightLinear(uint8_t amtValues)
 }
 
 
-real twaValue(PTwaStruct pTwaStruct)
+real getTwaValue(PTwaStruct pTwaStruct)
 {
-	return pTwaStruct->currentTwaValue;
+	return pTwaStruct->currentTwaResult;
 }
 
 
-void addNextValueIntoArray(PTwaStruct pTwaStruct, real val)
+void addNextTwaValueIntoArray(PTwaStruct pTwaStruct, real val)
 {
 	uint8_t  cnt;
 	for (cnt = 0; cnt < amtTwaValues-1 ; ++ cnt) {
@@ -250,44 +250,42 @@ void addNextValueIntoArray(PTwaStruct pTwaStruct, real val)
 	pTwaStruct->twaPointArray[amtTwaValues-1] = val;
 }
 
-real calcArray(PTwaStruct pTwaStruct)
+real calcTwaArray(PTwaStruct pTwaStruct)
 {
 	real res = 0.0;
 	uint8_t  cnt;
 	for (cnt = 0; cnt < amtTwaValues  ; ++ cnt) {
-		res += (cnt+ 1)  * pTwaStruct->shiftFactor * pTwaStruct->twaPointArray[cnt+1];       //( (cnt + 1) / amtTwaValues)   *    pTwaStruct->twaPointArray[cnt + 1] ;
+		res += (cnt+ 1)  * pTwaStruct->shiftFactor * pTwaStruct->twaPointArray[cnt];       //( (cnt + 1) / amtTwaValues)   *    pTwaStruct->twaPointArray[cnt] ;
 	}
 	res = res / pTwaStruct->totalTwaWeight;
 	return res;
 }
 
-void addValue(PTwaStruct pTwaStruct, real val)
+void addTwaVal(PTwaStruct pTwaStruct, real val)
 {
-	++ pTwaStruct->currentTwaIntervalPoint;
-	if (pTwaStruct->currentTwaIntervalPoint == pTwaStruct->twaIntervalWidth)    // take every twaIntervalWidth value
-																	// another option might be to take the avg of all twaIntervalWidth points
-	{
-		pTwaStruct->currentTwaIntervalPoint = 0;
-		addNextValueIntoArray(pTwaStruct,val);
-		if (pTwaStruct->totTwaPointsAdded >= amtTwaValues)      // up to now, there is no need to calc something senseful with less points
+	++pTwaStruct->intervalCnt;
+	if (pTwaStruct->intervalCnt >= pTwaStruct->intervalWidth) {
+		pTwaStruct->intervalCnt = 0;
+		addNextTwaValueIntoArray(pTwaStruct,val);
+		++pTwaStruct->totTwaValuesAdded;
+		if (pTwaStruct->totTwaValuesAdded >= amtTwaValues)      // up to now, there is no need to calc something sensefull with less points
 																// since these values should describe long application run quality of pid
 																// and is not specially interesting for the first minutes, where the value
 																// anyhow is most of the time far away from goal.
 		{
-			pTwaStruct->currentTwaValue = calcArray(pTwaStruct);
-		}  
+			pTwaStruct->currentTwaResult = calcTwaArray(pTwaStruct);
+		}
 	}
-	
 }
 
 
 void initTWAStruct(PTwaStruct pTwaStruct, uint8_t intervalWidth)
 {
-		pTwaStruct->totalTwaWeight =  calcTotalWeightLinear(amtTwaValues);
-		pTwaStruct->totTwaPointsAdded = 0;
-		pTwaStruct->currentTwaIntervalPoint = 0;
-		pTwaStruct->currentTwaValue = 0.0;	
-		pTwaStruct->twaIntervalWidth = intervalWidth;
+		pTwaStruct->totalTwaWeight =  calcTotalTwaWeightLinear(amtTwaValues);
+		pTwaStruct->totTwaValuesAdded = 0;
+		pTwaStruct->intervalCnt = 0;
+		pTwaStruct->currentTwaResult = 0.0;	
+		pTwaStruct->intervalWidth = intervalWidth;
 		pTwaStruct->shiftFactor = 1 / amtTwaValues;      //  factor to avoid multiplications on each twa point
 		memset(pTwaStruct->twaPointArray,0,sizeof(pTwaStruct->twaPointArray));
 }
@@ -298,21 +296,30 @@ void initTWAStruct(PTwaStruct pTwaStruct, uint8_t intervalWidth)
 twaStruct temperatureTwaS;
 twaStruct absDifferenceTwaS;
 
-
-void addTwaValue(real val)
+real getTwaTemperature()
 {
-	addValue(&temperatureTwaS,getCurrentTemperature());
-	addValue(&absDifferenceTwaS, fabs(getCurrentTemperature() - desiredTemperature));
+	return getTwaValue(&temperatureTwaS);
+}
+
+real getTwaAbsTemperatureDiff()
+{
+	real res;
+	res = getTwaValue(&absDifferenceTwaS);
+	return res;
 }
 
 
+void addTwaValue(real val)
+{
+	addTwaVal(&temperatureTwaS,getCurrentTemperature());
+	addTwaVal(&absDifferenceTwaS, fabs(getCurrentTemperature() - desiredTemperature));
+}
 
 void initTWA()
 {
 	initTWAStruct(&temperatureTwaS,1);
 	initTWAStruct(&absDifferenceTwaS,3);
 }
-
 
 
 #endif
