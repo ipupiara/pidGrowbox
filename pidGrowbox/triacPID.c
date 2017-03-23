@@ -214,7 +214,6 @@ void initTWA();
 void addTwaValue(real val);
 
 typedef struct  {
-	uint8_t amtValues;
 	real totalTwaWeight;
 	uint32_t totTwaValuesAdded;
 	uint8_t intervalWidth;    //  keep every twaStepWidth's value
@@ -255,7 +254,7 @@ real calcTwaArray(PTwaStruct pTwaStruct)
 	real res = 0.0;
 	uint8_t  cnt;
 	for (cnt = 0; cnt < amtTwaValues  ; ++ cnt) {
-		res += (cnt+ 1)  * pTwaStruct->shiftFactor * pTwaStruct->twaPointArray[cnt];       //( (cnt + 1) / amtTwaValues)   *    pTwaStruct->twaPointArray[cnt] ;
+		res += ( pTwaStruct->shiftFactor * (cnt+ 1))  *  pTwaStruct->twaPointArray[cnt];       //( (cnt + 1) / amtTwaValues)   *    pTwaStruct->twaPointArray[cnt] ;
 	}
 	res = res / pTwaStruct->totalTwaWeight;
 	return res;
@@ -286,7 +285,7 @@ void initTWAStruct(PTwaStruct pTwaStruct, uint8_t intervalWidth)
 		pTwaStruct->intervalCnt = 0;
 		pTwaStruct->currentTwaResult = 0.0;	
 		pTwaStruct->intervalWidth = intervalWidth;
-		pTwaStruct->shiftFactor = 1 / amtTwaValues;      //  factor to avoid multiplications on each twa point
+		pTwaStruct->shiftFactor = 1.0 / amtTwaValues;      //  factor to avoid multiplications on each twa point
 		memset(pTwaStruct->twaPointArray,0,sizeof(pTwaStruct->twaPointArray));
 }
 
