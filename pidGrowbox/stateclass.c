@@ -66,7 +66,7 @@ void exitFatalErrorState(void)
 
 uStInt evStateGrowBoxKeepingHumidity(void)
 {
-	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
+//	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
 	if (currentEvent->evType == eReset)  
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateGrowBoxKeepingHumidity );
@@ -116,7 +116,7 @@ void exitStateGrowBoxKeepingHumidity(void)
 
 uStInt evStateHumidityControlRunning(void)
 {
-	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
+//	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
 	if (currentEvent->evType == eReset)  
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateGrowBoxKeepingHumidity );
@@ -150,7 +150,7 @@ void exitStateHumidityControlRunning(void)
 
 uStInt evStateHumidifying(void)
 {
-	info_printf("check for event in State evStateHumidifying\n");
+//	info_printf("check for event in State evStateHumidifying\n");
 	if ((currentEvent->evType == eValueAssignement) && (GetHumidifyingUpperLimit() < currentEvent->humidity))
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateIdle);
@@ -180,7 +180,7 @@ void exitStateHumidifying(void)
 
 uStInt evStateIdle(void)
 {
-	info_printf("check for event in State evStateIdle\n");
+//	info_printf("check for event in State evStateIdle\n");
 
 	if (currentEvent->evType == eValueAssignement) 
 	{	if (GetHumidifyingLowerLimit() > currentEvent->humidity)
@@ -217,7 +217,7 @@ void exitStateIdle(void)
 
 uStInt evStateNonVentilating(void)
 {
-	info_printf("check for event in State evStateNonVentilating\n");
+//	info_printf("check for event in State evStateNonVentilating\n");
 
 	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
 	{
@@ -249,7 +249,7 @@ void exitStateNonVentilating(void)
 
 uStInt evStateVentilating(void)
 {
-	info_printf("check for event in State evStateVentilating\n");
+//	info_printf("check for event in State evStateVentilating\n");
 
 	if ((currentEvent->evType == eTimeOutDurationTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))  {
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateNonVentilating);
@@ -279,7 +279,7 @@ void exitStateVentilating(void)
 
 uStInt evStateDrying(void)
 {
-	info_printf("check for event in State evStateDrying\n");
+//	info_printf("check for event in State evStateDrying\n");
 	if ((currentEvent->evType == eValueAssignement) && (GetDryingLowerLimit() > currentEvent->humidity))
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateIdle);

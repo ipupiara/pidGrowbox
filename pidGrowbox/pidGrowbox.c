@@ -65,6 +65,8 @@ int main(void)
 	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
 	stdout = &mystdout;
 
+	info_printf("\nSTARTUP pidGrowbox together with stateGrowbox\n");	
+	
 	
 	initDefines();
 	initHW();
@@ -80,7 +82,7 @@ int main(void)
 	pidIntervalCounter = 0;
 	secsCounter = 0;
 	
-	info_printf("\nSTARTUP pidGrowbox together with stateGrowbox\n");
+	info_printf("\nSTARTUP DONE pidGrowbox together with stateGrowbox\n");
 	
     while(1)
     {

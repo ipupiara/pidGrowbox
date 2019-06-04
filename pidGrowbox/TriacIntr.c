@@ -621,7 +621,7 @@ void switchVentilating(uint8_t ventilatingNeedsOn)
 #endif	
 }
 
-#ifdef controlheating
+
 
 void initHeatingControl()
 {
@@ -630,17 +630,8 @@ void initHeatingControl()
 	switchHeating(0);
 }
 
-//void toggleHeating()
-//{
-	//if (heatingIsOn > 0) {
-		//switchHeating(0);
-		//info_printf("heating switched OFF");
-	//}  else {
-		//switchHeating(1);
-		//info_printf("heating switched ON");
-	//}
-	//info_printf(", amtMsg %i, amtMsgErr \n",hygrosenseMsgCnt,errMsgCnt);
-//}
+#ifdef controlheating
+
 void controlTemperature(float* temp)
 {  
 	if (*temp < HeatingLowerLimit)  { 
@@ -775,9 +766,9 @@ void initHW()
 	initInterrupts();
 	initUsart1();
 	startSecondTick();
-#ifdef controlheating	
+//#ifdef controlheating   commmented because it is also needed in humidity !
 	initHeatingControl();
-#endif	
+//#endif	
 }
 
 
