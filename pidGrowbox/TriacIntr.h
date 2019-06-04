@@ -22,7 +22,7 @@ int16_t secondsInDurationTimer;
 
 uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
 
-
+int8_t heatingIsOn;
 
 void startDurationTimer(int16_t secs);
 int16_t getSecondsRemainingInDurationTimer();
@@ -40,8 +40,8 @@ void getLatestClimateValues(floatType* pTemp,floatType* pHum);    // interface t
 floatType getCurrentTemperature();
 floatType getCurrentHumidity();
 floatType getCurrentTemperatureVoltage();
-uint8_t  dataReceived;
-void onDataReceived();
+uint8_t  dataReceivedUart1;
+void onDataReceivedUart1();
 
 int8_t adcTick;
 

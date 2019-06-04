@@ -11,13 +11,6 @@
 //#include "TriacIntr.h"
 
 
-#define IdleVentilationDelayMinutes   15.0
-#define IdleVentilationMinutes   5.0
-#define HumidifyingLowerLimit  88.0
-#define HumidifyingUpperLimit   90.0
-#define DryingUpperLimit      98.0
-#define DryingLowerLimit     96.0
-
 
 void initTimerPorts();
 
@@ -26,12 +19,12 @@ void info_printf(const char *emsg, ...)
 	va_list ap;
 	va_start(ap,emsg);
 	
-	#ifndef printCsvData	
+//	#ifndef printCsvData	
 		char buffer [0xff];
 		vsnprintf(buffer,sizeof(buffer),emsg,ap);
 		printf(buffer);
 
-	#endif
+//	#endif
 	
 	va_end(ap);
 }

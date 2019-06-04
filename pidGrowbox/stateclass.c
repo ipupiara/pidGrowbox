@@ -375,23 +375,23 @@ xStateType xaHumidifyingStates[eNumberOfHumidifyingStates] = {
 	/* entering state func		*/	entryStateIdle,
 /* exiting state func		*/		exitStateIdle},
 
-/* name						*/	{eStateNonVentilating,
-	/* parent					*/	eStateIdle,
-	/* default_substate			*/	-1,
-									0,
-	/* event-checking func		*/	evStateNonVentilating,
-	/* default state entry func	*/	NULL,
-	/* entering state func		*/	entryStateNonVentilating,
-/* exiting state func		*/		exitStateNonVentilating},
+		/* name						*/	{eStateNonVentilating,
+			/* parent					*/	eStateIdle,
+			/* default_substate			*/	-1,
+											0,
+			/* event-checking func		*/	evStateNonVentilating,
+			/* default state entry func	*/	NULL,
+			/* entering state func		*/	entryStateNonVentilating,
+		/* exiting state func		*/		exitStateNonVentilating},
 
-/* name						*/	{eStateVentilating,
-	/* parent					*/	eStateIdle,
-	/* default_substate			*/	-1,
-									0,
-	/* event-checking func		*/	evStateVentilating,
-	/* default state entry func	*/	NULL,
-	/* entering state func		*/	entryStateVentilating,
-/* exiting state func		*/		exitStateVentilating},
+		/* name						*/	{eStateVentilating,
+			/* parent					*/	eStateIdle,
+			/* default_substate			*/	-1,
+											0,
+			/* event-checking func		*/	evStateVentilating,
+			/* default state entry func	*/	NULL,
+			/* entering state func		*/	entryStateVentilating,
+		/* exiting state func		*/		exitStateVentilating},
 
 /* name						*/	{eStateDrying,
 	/* parent					*/	eStateGrowBoxKeepingHumidity,
@@ -402,14 +402,14 @@ xStateType xaHumidifyingStates[eNumberOfHumidifyingStates] = {
 	/* entering state func		*/	entryStateDrying,
 /* exiting state func		*/		exitStateDrying},
 	
-	{eStateFatalError,
- 	eStateGrowBoxKeepingHumidity,
- 	-1,
- 	0,
- 	evFatalErrorChecker,
- 	tfNull,
- 	entryFatalErrorState,
- 	exitFatalErrorState}	 	 	 
+				{eStateFatalError,
+					eStateGrowBoxKeepingHumidity,
+					-1,
+					0,
+					evFatalErrorChecker,
+					tfNull,
+					entryFatalErrorState,
+				exitFatalErrorState}
 };
 
 
@@ -656,16 +656,16 @@ void startStateCharts()
 	createTStatechart (& STriacHumidityTemperatureChart, xaHumidifyingStates, eNumberOfHumidifyingStates, eHumidifyingStartState);
 	info_printf("TriacHumidityTemperature statechart started\n");
 
- 	PGrowboxI2CChart = & SGrowboxI2CChart;
- 	createTStatechart (& SGrowboxI2CChart, xaHumidifyingStates, eNumberOfI2CStates, eI2CStartState);
-	info_printf("I2CStateChart started\n");
+ 	//PGrowboxI2CChart = & SGrowboxI2CChart;
+ 	//createTStatechart (& SGrowboxI2CChart, xaHumidifyingStates, eNumberOfI2CStates, eI2CStartState);
+	//info_printf("I2CStateChart started\n");
 }
 
 
 void stopStateCharts()
 {
 	destructTStatechart(&STriacHumidityTemperatureChart);
-	destructTStatechart(&SGrowboxI2CChart);
+//	destructTStatechart(&SGrowboxI2CChart);
 }
 
 

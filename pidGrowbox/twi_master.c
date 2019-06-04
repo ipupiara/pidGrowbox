@@ -1,5 +1,4 @@
 /* =============================================================================
-
     Copyright (c) 2006 Pieter Conradie [www.piconomic.co.za]
     All rights reserved.
     

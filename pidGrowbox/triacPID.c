@@ -188,9 +188,9 @@ void printCsvValues()
 {
 
 	GETTimeValues
-	csv_printf("%5d:%02d:%02d,%6.2f,%d,%f,%f,%f, %5.1f,%6.2f,%6.2f\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration()
+	csv_printf("%5d:%02d:%02d,%6.2f,%d,%f,%f,%f, %5.1f,%6.2f,%6.2f %i\n",hrs,mins,secs,getCurrentTemperature(),getTriacFireDuration()
 																,pVal,iVal,dVal,desiredTemperature,getTwaTemperature()
-																,getTwaAbsTemperatureDiff());
+																,getTwaAbsTemperatureDiff(),heatingIsOn);
 
 }
 

@@ -64,7 +64,7 @@ int main(void)
 	//	USART_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
 	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
 	stdout = &mystdout;
-	info_printf("\nSTARTUP\n");
+
 	
 	initDefines();
 	initHW();
@@ -80,12 +80,14 @@ int main(void)
 	pidIntervalCounter = 0;
 	secsCounter = 0;
 	
+	info_printf("\nSTARTUP pidGrowbox together with stateGrowbox\n");
+	
     while(1)
     {
 	
- 		if (dataReceived == 1)  {
- 			dataReceived = 0;
- 			onDataReceived();
+ 		if (dataReceivedUart1 == 1)  {
+ 			dataReceivedUart1 = 0;
+ 			onDataReceivedUart1();
 //			displayMeasuredValues(getCurrentHumidity(),getCurrentTemperature());
 			//ev.evType = eValueAssignement;
 			//ev.humidity = getCurrentHumidity(); 
@@ -99,7 +101,7 @@ int main(void)
  			++ pidIntervalCounter;
  			if (pidIntervalCounter >=  pidIntervalSecs)  {
  				pidIntervalCounter = 0;				
- 				onPidStep();
+// 				onPidStep();
  			}
 			 
  			++csvIntervalCounter;

@@ -593,8 +593,60 @@ char * reallyWorkingStrstr(const char *inStr, const char *subStr)
 	
 	return (char *) (inStr - 1);
 }
+  
+#define heatingPortDDR  DDRC
+#define heatingPinDDR   DDRC7
+#define heatingPort     PORTC
+#define heatingPin      PORTC7  //  dummy values just for implementing before defining exact port/pin
 
-void onDataReceived()        // called by main application thread to calculate the latest data
+
+
+void switchHeating(int8_t heatingNeedsOn)
+{
+	if (heatingNeedsOn > 0) {
+		heatingPort |=  0xFF;   //(1 < heatingPin);
+		heatingIsOn= 1;
+	}  else   {
+		heatingPort &= ~(0xFF) ;    //(1 < heatingPin);
+		heatingIsOn = 0;
+	}
+}
+
+void initHeatingControl()
+{
+	heatingPortDDR |=   0xff  ;    // (1 < heatingPinDDR);    // define as output
+//	DDRF |= (1< DDRF1);
+	switchHeating(0);
+}
+
+void toggleHeating()
+{
+	if (heatingIsOn > 0) {
+		switchHeating(0);
+		info_printf("heating switched OFF");
+	}  else {
+		switchHeating(1);
+		info_printf("heating switched ON");
+	}
+	info_printf(", amtMsg %i, amtMsgErr \n",hygrosenseMsgCnt,errMsgCnt);
+}
+void controlTemperature(float* temp)
+{  
+	if (*temp < HeatingLowerLimit)  { 
+		switchHeating(1); 
+	}
+	if (*temp > HeatingUpperLimit)  { 
+		switchHeating(0); 
+	}		
+	
+//	toggleHeating();    //  just used for debugging reasons   
+
+//	 CoolingLowerLimit	
+//	 CoolingUpperLimit	
+}
+
+
+void onDataReceivedUart1()        // called by main application thread to calculate the latest data
 {
 	char tempS [5];
 	char hydS [5];
@@ -609,6 +661,7 @@ void onDataReceived()        // called by main application thread to calculate t
 			
 	//cli();
 	disaRXIntUsart1();   // just stop the receiver, triac continues
+//		info_printf("amtChars %i\n",amtCharRcvd);
 		if ((rxState = rxReceived) && ( amtCharRcvd == amtChars))  {      // some valid message check
 			validMsg = 1;
 			if (v01Pos == 0) { 
@@ -636,6 +689,7 @@ void onDataReceived()        // called by main application thread to calculate t
 		
 		latestTemperature = temp;
 		latestHumidity = hyd;	
+		controlTemperature(&temp);
 	}
 }
 
@@ -646,7 +700,7 @@ ISR (USART1_RX_vect)
 	rxCh = UDR1;
 	if (rxCh == startChar)  {
 		amtCharRcvd = 0;	
-		dataReceived = 0;
+		dataReceivedUart1 = 0;
 		rxBuffer [amtCharRcvd] = rxCh;
 		rxState = rxReceiving;
 	} else
@@ -657,7 +711,7 @@ ISR (USART1_RX_vect)
 		}
 		if (rxCh == stopChar) {   // no  chars lost 
 			rxState = rxReceived;
-			dataReceived = 1;
+			dataReceivedUart1 = 1;
 		}
 	}
 }
@@ -676,7 +730,7 @@ void initUsart1()
 {
 	
 	rxState = rxIdle;
-	dataReceived = 0;
+	dataReceivedUart1 = 0;
 	amtCharRcvd = 0;
 	errMsgCnt = 0;
 	latestTemperature = 0.00;
@@ -703,9 +757,11 @@ void initUsart1()
 
 void initHW()
 {
+
 	initInterrupts();
 	initUsart1();
 	startSecondTick();
+	initHeatingControl();
 }
 
 

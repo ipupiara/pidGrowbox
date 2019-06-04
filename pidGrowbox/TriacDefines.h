@@ -18,6 +18,26 @@
 	
 	#define maxSecsPossible  0x7FFF
 	
+	
+	#define IdleVentilationDelayMinutes     30
+	#define IdleVentilationMinutes     2
+
+	#define HumidifyingLowerLimit   90.0
+	#define HumidifyingUpperLimit   92.0
+	#define DryingUpperLimit	94.0
+	#define DryingLowerLimit	93.0
+
+
+//	#define HeatingLowerLimit	27.0
+//	#define HeatingUpperLimit	27.5
+
+	#define HeatingLowerLimit	23.75
+	#define HeatingUpperLimit	24.25
+
+	#define CoolingLowerLimit	29.0
+	#define CoolingUpperLimit	30.0
+
+	
 //	#define useTimer0
 	#define useTimer3
 	
