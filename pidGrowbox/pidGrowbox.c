@@ -55,7 +55,7 @@ uint16_t   pidIntervalCounter;
 uint16_t   csvIntervalCounter ;
 uint16_t   secsCounter ;
     
-//CGrowBoxEvent ev;	
+CGrowBoxEvent ev;	
 	    
 		
 int main(void)
@@ -72,7 +72,7 @@ int main(void)
 	initADC();
 	printCsvHeader();
 //	lcd_init();	
-//	startStateCharts();
+	startStateCharts();
 	
 //	startDurationTimer(maxSecsPossible  );
 
@@ -87,12 +87,13 @@ int main(void)
 	
  		if (dataReceivedUart1 == 1)  {
  			dataReceivedUart1 = 0;
- 			onDataReceivedUart1();
-//			displayMeasuredValues(getCurrentHumidity(),getCurrentTemperature());
-			//ev.evType = eValueAssignement;
-			//ev.humidity = getCurrentHumidity(); 
-			//ev.temperature = getCurrentTemperature();
-//			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
+ 			if (onDataReceivedUart1IsValid() > 0) {
+				//displayMeasuredValues(getCurrentHumidity(),getCurrentTemperature());
+				ev.evType = eValueAssignement;
+				ev.humidity = getCurrentHumidity(); 
+				ev.temperature = getCurrentTemperature();
+				processTriacEvent(PTriacHumidityChart, &ev);
+			 }
  		}
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
@@ -122,8 +123,8 @@ int main(void)
  		}
 		if (durationTimerReachead == 1) {
 			durationTimerReachead = 0;
-//			ev.evType = eTimeOutDurationTimer;
-//			processTriacEvent(PTriacHumidityTemperatureChart, &ev);
+			ev.evType = eTimeOutDurationTimer;
+			processTriacEvent(PTriacHumidityChart, &ev);
 		} 
 		if (twiDataReceived == 1) {
 			twiDataReceived = 0;

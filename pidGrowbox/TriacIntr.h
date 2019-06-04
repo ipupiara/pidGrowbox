@@ -8,6 +8,8 @@
 #include <util/atomic.h>
 #include "TriacDefines.h"
 
+// #define controlheating   // only was used when heating and humidifying needed same relais-port
+
 #define adcRefVoltage5   5.0
 #define adcRefVoltad2d5  2.56
 
@@ -41,7 +43,7 @@ floatType getCurrentTemperature();
 floatType getCurrentHumidity();
 floatType getCurrentTemperatureVoltage();
 uint8_t  dataReceivedUart1;
-void onDataReceivedUart1();
+uint8_t onDataReceivedUart1IsValid();
 
 int8_t adcTick;
 

@@ -69,9 +69,9 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
 	if (currentEvent->evType == eReset)  
 	{
-		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart, eStateGrowBoxKeepingHumidity );
+		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateGrowBoxKeepingHumidity );
 			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityTemperatureChart);
+		END_EVENT_HANDLER(PTriacHumidityChart);
 		
 ///*  left this as an original example for history states
  //
@@ -85,9 +85,9 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 	if (currentEvent->evType == eFatalError)
 	
 	{
-		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart, eStateFatalError );
+		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateFatalError );
 			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityTemperatureChart);
+		END_EVENT_HANDLER(PTriacHumidityChart);
 		
 ///*  left this as an original example for history states
  //
@@ -119,9 +119,9 @@ uStInt evStateHumidityControlRunning(void)
 	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
 	if (currentEvent->evType == eReset)  
 	{
-		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart, eStateGrowBoxKeepingHumidity );
+		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateGrowBoxKeepingHumidity );
 			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityTemperatureChart);
+		END_EVENT_HANDLER(PTriacHumidityChart);
 		
 ///*  left this as an original example for history states
  //
@@ -153,9 +153,9 @@ uStInt evStateHumidifying(void)
 	info_printf("check for event in State evStateHumidifying\n");
 	if ((currentEvent->evType == eValueAssignement) && (GetHumidifyingUpperLimit() < currentEvent->humidity))
 	{
-		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateIdle);
+		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateIdle);
 			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	}
 	return (uStIntNoMatch);
@@ -185,16 +185,16 @@ uStInt evStateIdle(void)
 	if (currentEvent->evType == eValueAssignement) 
 	{	if (GetHumidifyingLowerLimit() > currentEvent->humidity)
 		{
-			BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateHumidifying);
+			BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateHumidifying);
 				// No event action.
-			END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+			END_EVENT_HANDLER(PTriacHumidityChart );
 			return (uStIntHandlingDone);
 		}
 		if (GetDryingUpperLimit() < currentEvent->humidity)
 		{
-			BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateDrying);
+			BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateDrying);
 				// No event action.
-			END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+			END_EVENT_HANDLER(PTriacHumidityChart );
 			return (uStIntHandlingDone);
 		}
 	}
@@ -221,9 +221,9 @@ uStInt evStateNonVentilating(void)
 
 	if ((currentEvent->evType == eTimeOutDurationTimer) || (currentEvent->evType ==  eVentilationButtonPressed))
 	{
-		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateVentilating);
+		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateVentilating);
 			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	
 	}
@@ -252,9 +252,9 @@ uStInt evStateVentilating(void)
 	info_printf("check for event in State evStateVentilating\n");
 
 	if ((currentEvent->evType == eTimeOutDurationTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))  {
-		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateNonVentilating);
+		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateNonVentilating);
 			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	
 	}
@@ -282,9 +282,9 @@ uStInt evStateDrying(void)
 	info_printf("check for event in State evStateDrying\n");
 	if ((currentEvent->evType == eValueAssignement) && (GetDryingLowerLimit() > currentEvent->humidity))
 	{
-		BEGIN_EVENT_HANDLER(PTriacHumidityTemperatureChart,   eStateIdle);
+		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateIdle);
 			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityTemperatureChart );
+		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	}
 	return (uStIntNoMatch);
@@ -652,8 +652,8 @@ xStateType xaI2CStates[eNumberOfI2CStates] = {
 void startStateCharts()
 {
 
- 	PTriacHumidityTemperatureChart = & STriacHumidityTemperatureChart; 
-	createTStatechart (& STriacHumidityTemperatureChart, xaHumidifyingStates, eNumberOfHumidifyingStates, eHumidifyingStartState);
+ 	PTriacHumidityChart = & STriacHumidityChart; 
+	createTStatechart (& STriacHumidityChart, xaHumidifyingStates, eNumberOfHumidifyingStates, eHumidifyingStartState);
 	info_printf("TriacHumidityTemperature statechart started\n");
 
  	//PGrowboxI2CChart = & SGrowboxI2CChart;
@@ -664,7 +664,7 @@ void startStateCharts()
 
 void stopStateCharts()
 {
-	destructTStatechart(&STriacHumidityTemperatureChart);
+	destructTStatechart(&STriacHumidityChart);
 //	destructTStatechart(&SGrowboxI2CChart);
 }
 

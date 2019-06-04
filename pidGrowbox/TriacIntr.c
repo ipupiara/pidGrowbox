@@ -594,6 +594,8 @@ char * reallyWorkingStrstr(const char *inStr, const char *subStr)
 	return (char *) (inStr - 1);
 }
   
+
+  
 #define heatingPortDDR  DDRC
 #define heatingPinDDR   DDRC7
 #define heatingPort     PORTC
@@ -601,7 +603,7 @@ char * reallyWorkingStrstr(const char *inStr, const char *subStr)
 
 
 
-void switchHeating(int8_t heatingNeedsOn)
+void switchHeating(uint8_t heatingNeedsOn)
 {
 	if (heatingNeedsOn > 0) {
 		heatingPort |=  0xFF;   //(1 < heatingPin);
@@ -612,6 +614,15 @@ void switchHeating(int8_t heatingNeedsOn)
 	}
 }
 
+void switchVentilating(uint8_t ventilatingNeedsOn)
+{
+#ifndef  controlheating
+	switchHeating(ventilatingNeedsOn);
+#endif	
+}
+
+#ifdef controlheating
+
 void initHeatingControl()
 {
 	heatingPortDDR |=   0xff  ;    // (1 < heatingPinDDR);    // define as output
@@ -619,17 +630,17 @@ void initHeatingControl()
 	switchHeating(0);
 }
 
-void toggleHeating()
-{
-	if (heatingIsOn > 0) {
-		switchHeating(0);
-		info_printf("heating switched OFF");
-	}  else {
-		switchHeating(1);
-		info_printf("heating switched ON");
-	}
-	info_printf(", amtMsg %i, amtMsgErr \n",hygrosenseMsgCnt,errMsgCnt);
-}
+//void toggleHeating()
+//{
+	//if (heatingIsOn > 0) {
+		//switchHeating(0);
+		//info_printf("heating switched OFF");
+	//}  else {
+		//switchHeating(1);
+		//info_printf("heating switched ON");
+	//}
+	//info_printf(", amtMsg %i, amtMsgErr \n",hygrosenseMsgCnt,errMsgCnt);
+//}
 void controlTemperature(float* temp)
 {  
 	if (*temp < HeatingLowerLimit)  { 
@@ -644,9 +655,9 @@ void controlTemperature(float* temp)
 //	 CoolingLowerLimit	
 //	 CoolingUpperLimit	
 }
+#endif
 
-
-void onDataReceivedUart1()        // called by main application thread to calculate the latest data
+uint8_t onDataReceivedUart1IsValid()        // called by main application thread to calculate the latest data
 {
 	char tempS [5];
 	char hydS [5];
@@ -688,9 +699,12 @@ void onDataReceivedUart1()        // called by main application thread to calcul
 		hyd = hyd / 200;
 		
 		latestTemperature = temp;
-		latestHumidity = hyd;	
+		latestHumidity = hyd;
+#ifdef controlheating			
 		controlTemperature(&temp);
+#endif		
 	}
+	return validMsg;
 }
 
 
@@ -761,7 +775,9 @@ void initHW()
 	initInterrupts();
 	initUsart1();
 	startSecondTick();
+#ifdef controlheating	
 	initHeatingControl();
+#endif	
 }
 
 
@@ -944,22 +960,22 @@ void stopHumidifying()
 
 void startVentilating()
 {
-	
+	switchVentilating(1);
 }
 
 void stopVentilating()
 {
-	
+	switchVentilating(0);	
 }
 
 void startDrying()
 {
-	
+	switchVentilating(1);	
 }
 
 void stopDrying()
 {
-	
+	switchVentilating(0);	
 }
 
 void switchOnLight()
