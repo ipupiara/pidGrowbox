@@ -51,11 +51,26 @@ static int uart_putchar(char c, FILE *stream)
 	return 0;
 }
 
-void startWatchDog()
+void setWatchdogTimerOn()
 {
-//	wdt_enable(0x4);
+	uint8_t val = ((1<<WDP0) | (1<<WDP1)| (1<<WDP2));
+	wdt_enable(val );
+	//wdt_reset();
+	///* Write logical one to WDCE and WDE */
+	//WDTCR |= (1<<WDCE) | (1<<WDE);
+	///* Turn off WDT */
+	//WDTCR = ((1<<WDP0) | (1<<WDP1)| (1<<WDP2) | (1 << WDE));
 }
 
+void setWatchdogTimerOff()
+{
+	//	wdt_enable(0x4);
+	wdt_reset();
+	/* Write logical one to WDCE and WDE */
+	WDTCR |= (1<<WDCE) | (1<<WDE);
+	/* Turn off WDT */
+	WDTCR = ((1<<WDP0) | (1<<WDP1)| (1<<WDP2) );
+}
 
 //for comments see datasheet of AtMega128A on chapter "System Control and Reset"  -> "WatchDog Timer" and ->  "Register Description"
 
@@ -74,14 +89,15 @@ CGrowBoxEvent ev;
 		
 int main(void)
 {
+	setWatchdogTimerOn();
+//	setWatchdogTimerOff();
 	//	USART_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
 	//	USART_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
 	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
 	stdout = &mystdout;
 
 	info_printf("\nSTARTUP pidGrowbox together with stateGrowbox\n");	
-	
-	
+		
 	initDefines();
 	initHW();
 	initPID();
@@ -89,7 +105,6 @@ int main(void)
 	printCsvHeader();
 //	lcd_init();	
 	startStateCharts();
-	startWatchDog();
 	
 //	startDurationTimer(maxSecsPossible  );
 
@@ -98,9 +113,12 @@ int main(void)
 	secsCounter = 0;
 	
 	info_printf("\nSTARTUP DONE pidGrowbox together with stateGrowbox\n");
+
 	
     while(1)
     {
+		resetWatchDog();
+		// while(1) {}   // for testing watchdog
 	
  		if (dataReceivedUart1 == 1)  {
  			dataReceivedUart1 = 0;
