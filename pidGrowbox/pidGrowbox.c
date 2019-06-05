@@ -11,6 +11,7 @@
 #include <string.h>
 #include "TriacDefines.h"
 #include "TriacIntr.h"
+#include <avr/wdt.h>
 #include "triacPID.h"
 #include "StateClass.h"
 #include "triacUI.h"
@@ -50,6 +51,19 @@ static int uart_putchar(char c, FILE *stream)
 	return 0;
 }
 
+void startWatchDog()
+{
+//	wdt_enable(0x4);
+}
+
+
+//for comments see datasheet of AtMega128A on chapter "System Control and Reset"  -> "WatchDog Timer" and ->  "Register Description"
+
+void resetWatchDog()
+{
+	wdt_reset();
+}
+
 
 uint16_t   pidIntervalCounter;   
 uint16_t   csvIntervalCounter ;
@@ -75,6 +89,7 @@ int main(void)
 	printCsvHeader();
 //	lcd_init();	
 	startStateCharts();
+	startWatchDog();
 	
 //	startDurationTimer(maxSecsPossible  );
 
@@ -100,6 +115,7 @@ int main(void)
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
 			++secsCounter;
+//			resetWatchDog();
 
  			++ pidIntervalCounter;
  			if (pidIntervalCounter >=  pidIntervalSecs)  {
