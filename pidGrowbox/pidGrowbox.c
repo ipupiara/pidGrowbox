@@ -133,7 +133,6 @@ int main(void)
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
 			++secsCounter;
-//			resetWatchDog();
 
  			++ pidIntervalCounter;
  			if (pidIntervalCounter >=  pidIntervalSecs)  {

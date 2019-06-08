@@ -117,20 +117,20 @@ void exitStateGrowBoxKeepingHumidity(void)
 uStInt evStateHumidityControlRunning(void)
 {
 //	info_printf("check for event in State evStateGrowBoxKeepingHumidity\n");
-	if (currentEvent->evType == eReset)  
-	{
-		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateGrowBoxKeepingHumidity );
-			// No event action.
-		END_EVENT_HANDLER(PTriacHumidityChart);
-		
-///*  left this as an original example for history states
- //
-		//BEGIN_EVENT_HANDLER(CHumidityStateClass,   eStateGrowBoxKeepingHumidity | u32WithHistory);
+//	if (currentEvent->evType == eReset)  
+	//{
+		//BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateGrowBoxKeepingHumidity );
 			//// No event action.
-		//END_EVENT_HANDLER(CHumidityStateClass );
-//*/
-		//return (uStIntHandlingDone);
-	}
+		//END_EVENT_HANDLER(PTriacHumidityChart);
+		//
+/////*  left this as an original example for history states
+ ////
+		////BEGIN_EVENT_HANDLER(CHumidityStateClass,   eStateGrowBoxKeepingHumidity | u32WithHistory);
+			////// No event action.
+		////END_EVENT_HANDLER(CHumidityStateClass );
+////*/
+		////return (uStIntHandlingDone);
+	//}
 	return (uStIntNoMatch);
 }
 

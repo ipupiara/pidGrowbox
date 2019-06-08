@@ -16,14 +16,14 @@
 	
 	#define printCsvData     //  if printCsvValues is set, only csv values must be printed out
 	
-	#define maxSecsPossible  0x7FFF
+	#define maxSecsPossible  0xFFFF
 	
 	
 	#define IdleVentilationDelayMinutes     30
 	#define IdleVentilationMinutes     1
 
-	#define HumidifyingLowerLimit   85.0
-	#define HumidifyingUpperLimit  87.0
+	#define HumidifyingLowerLimit   80.0
+	#define HumidifyingUpperLimit  85.0
 	#define DryingUpperLimit	98.5
 	#define DryingLowerLimit	97.5
 

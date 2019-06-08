@@ -352,10 +352,10 @@ ISR(TIMER1_COMPA_vect)
 		}
 	}
 	
-	if (secondsRemainingInDurationTimer >= 0) {
+	if (secondsRemainingInDurationTimer > 0) {
 		secondsRemainingInDurationTimer --;
 		secondsInDurationTimer ++;
-		if (secondsRemainingInDurationTimer <= 0) {
+		if (secondsRemainingInDurationTimer = 0) {
 			stopDurationTimer();
 			durationTimerReachead = 1;
 		} 
@@ -395,7 +395,7 @@ void initInterrupts()
 //			TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
 			TIMSK |= (1 << OCIE1A)  ;  //  Output Compare A Match Interrupt Enable
 
-		secondsRemainingInDurationTimer = -1;
+		secondsRemainingInDurationTimer = 0;
 
 // Timer 0 as Triac Trigger Delay Timer
 #ifdef useTimer0	  

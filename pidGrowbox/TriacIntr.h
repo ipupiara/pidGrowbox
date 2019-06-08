@@ -15,12 +15,12 @@
 
 #define GETTimeValues  uint16_t hrs; uint8_t mins; uint8_t secs; getTimeValues(&hrs,&mins,&secs);
 	
-int8_t durationTimerReachead;
-int8_t runningSecondsTick;
+uint8_t durationTimerReachead;
+uint8_t runningSecondsTick;
 
-int16_t secondsRemainingInDurationTimer;
+uint16_t secondsRemainingInDurationTimer;
 
-int16_t secondsInDurationTimer;
+uint16_t secondsInDurationTimer;
 
 uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
 
