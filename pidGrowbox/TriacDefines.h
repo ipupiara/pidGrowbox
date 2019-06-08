@@ -19,8 +19,8 @@
 	#define maxSecsPossible  0xFFFF
 	
 	
-	#define IdleVentilationDelayMinutes     30
-	#define IdleVentilationMinutes     1
+	#define IdleVentilationDelayMinutes     27
+	#define IdleVentilationMinutes     3
 
 	#define HumidifyingLowerLimit   80.0
 	#define HumidifyingUpperLimit  85.0
