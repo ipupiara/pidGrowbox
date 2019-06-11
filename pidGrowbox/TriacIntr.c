@@ -355,7 +355,7 @@ ISR(TIMER1_COMPA_vect)
 	if (secondsRemainingInDurationTimer > 0) {
 		secondsRemainingInDurationTimer --;
 		secondsInDurationTimer ++;
-		if (secondsRemainingInDurationTimer = 0) {
+		if (secondsRemainingInDurationTimer == 0) {
 			stopDurationTimer();
 			durationTimerReachead = 1;
 		} 

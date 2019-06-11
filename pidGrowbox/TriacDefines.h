@@ -22,10 +22,10 @@
 	#define IdleVentilationDelayMinutes     27
 	#define IdleVentilationMinutes     3
 
-	#define HumidifyingLowerLimit   80.0
-	#define HumidifyingUpperLimit  85.0
+	#define HumidifyingLowerLimit   60.0
+	#define HumidifyingUpperLimit  65.0
 	#define DryingUpperLimit	98.5
-	#define DryingLowerLimit	97.5
+	#define DryingLowerLimit	98.0
 
 
 //	#define HeatingLowerLimit	27.0
