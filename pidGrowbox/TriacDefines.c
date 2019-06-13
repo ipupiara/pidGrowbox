@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
+#include "TriacIntr.h"
 #include "TriacDefines.h"
 #include "twi_master.h"
 
@@ -23,6 +24,7 @@ void info_printf(const char *emsg, ...)
 		char buffer [0xff];
 		vsnprintf(buffer,sizeof(buffer),emsg,ap);
 		printf(buffer);
+//		addToOutUart(buffer,strlen(buffer));
 
 //	#endif
 	

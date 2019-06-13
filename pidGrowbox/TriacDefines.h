@@ -12,6 +12,7 @@
 
 	#include <inttypes.h>
 
+//	#define UseStdOutForUsart0 
 	#define JT_F_CPU 11095200	
 	
 	#define printCsvData     //  if printCsvValues is set, only csv values must be printed out

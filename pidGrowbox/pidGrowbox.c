@@ -18,6 +18,8 @@
 #include "twi_master.h"
 
 
+#ifdef UseStdOutForUsart0 
+
 void USART_Init( unsigned int baud )
 {
 	// Set baud rate
@@ -50,6 +52,8 @@ static int uart_putchar(char c, FILE *stream)
 	UDR0 = c;
 	return 0;
 }
+
+#endif
 
 void setWatchdogTimerOn()
 {
@@ -91,15 +95,21 @@ int main(void)
 {
 	setWatchdogTimerOn();
 //	setWatchdogTimerOff();
+
+#ifdef  UseStdOutForUsart0
+
 	//	USART_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
 	//	USART_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
 	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
 	stdout = &mystdout;
-
-	info_printf("\nSTARTUP pidGrowbox together with stateGrowbox\n");	
-		
+// #else  initHW will init circular buffer
+#endif
+	
 	initDefines();
 	initHW();
+	
+	info_printf("\nSTARTUP after initHW() pidGrowbox together with stateGrowbox\n");
+	
 	initPID();
 	initADC();
 	printCsvHeader();
