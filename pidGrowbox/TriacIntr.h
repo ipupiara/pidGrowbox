@@ -72,6 +72,6 @@ void stopVentilating();
 void startDrying();
 void stopDrying();
 
-void addToOutUart(uint8_t* txt, uint16_t len);
+uint16_t addToOutUart0(char* txt, uint16_t len);
 
 #endif

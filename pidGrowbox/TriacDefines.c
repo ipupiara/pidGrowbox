@@ -23,8 +23,8 @@ void info_printf(const char *emsg, ...)
 //	#ifndef printCsvData	
 		char buffer [0xff];
 		vsnprintf(buffer,sizeof(buffer),emsg,ap);
-		printf(buffer);
-//		addToOutUart(buffer,strlen(buffer));
+//		printf(buffer);
+		addToOutUart0(buffer,strlen(buffer));
 
 //	#endif
 	
@@ -40,7 +40,7 @@ void csv_printf(const char *emsg, ...)
 	#ifdef printCsvData	
 		char buffer [0xff];
 		vsnprintf(buffer,sizeof(buffer),emsg,ap);
-		printf(buffer);
+		info_printf(buffer);
 	#endif
 	
 	va_end(ap);

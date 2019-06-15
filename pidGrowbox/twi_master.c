@@ -250,7 +250,7 @@ void twi_init(void)
 	succeededRxAmt = 0;
 	failedRxAmt = 0;
 */
-	printf("TWI init\n");
+	info_printf("TWI init\n");
 
 #ifndef noI2C
     // Initialise variable
@@ -267,7 +267,7 @@ void twi_init(void)
     TWCR = (0<<TWINT)|(0<<TWEA)|(0<<TWSTA)|(0<<TWSTO)|(0<<TWWC)|(1<<TWEN)|(0<<TWIE);
 #else
 	twi_status = TWI_STATUS_DONE;
-	printf("twi_init  no I2C started\n");
+	info_printf("twi_init  no I2C started\n");
 #endif		
 }
 
@@ -275,7 +275,7 @@ void twi_init(void)
 #warning "public call of twi_resetAfterCrash() tobe tested "
 void twi_resetAfterCrash()
 {
-	printf("twi reset after crash\n");
+	info_printf("twi reset after crash\n");
 	//  TWI  disabled; 
 #ifdef noI2C	
     TWCR = (0<<TWINT)|(0<<TWEA)|(0<<TWSTA)|(0<<TWSTO)|(0<<TWWC)|(0<<TWEN)|(0<<TWIE);

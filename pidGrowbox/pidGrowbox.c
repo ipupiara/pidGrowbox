@@ -93,7 +93,7 @@ CGrowBoxEvent ev;
 		
 int main(void)
 {
-	setWatchdogTimerOn();
+//	setWatchdogTimerOn();   // set this one off during debugging !
 //	setWatchdogTimerOff();
 
 #ifdef  UseStdOutForUsart0
@@ -177,5 +177,4 @@ int main(void)
 //			processTriacEvent(PGrowboxI2CChart, &ev);
 		}
 	}
-#warning "todo update duenda.freeoda.com - handycap page"
 }

@@ -180,8 +180,8 @@ void onPidStep()
 void printCsvHeader()
 {
 	info_printf("printCsvHeader\n");
-	csv_printf("time,temp_inBox,triacFireDuration,pVal,iVal,dVal,goal_temp,twaTemp,twaAbsTempDiff\n");
-	csv_printf("seconds,°C,triacTx,real,real,real,°C,real,real\n");
+	csv_printf("time,temp_inBox,humid_inBox,triacFireDuration,pVal,iVal,dVal,goal_temp,twaTemp,twaAbsTempDiff\n");
+	csv_printf("seconds,°C,triacTx,real,real,real,°C,real,real,heatVentOnOff\n");
 }
 
 void printCsvValues()

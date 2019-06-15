@@ -990,68 +990,73 @@ void switchOffLight()
 /*******  next generation print to uart out port ************/
 
 #define maxUInt16_t  0xFFFF
-#define outbufferSize 512 
-uint8_t outbuffer [outbufferSize];
-uint16_t  peekPos;
-uint16_t  tailPos;
-uint16_t  intLost;
-uint8_t   interruptSequenceFinished;
+#define outbufferSize 0x200
+#define initialTailPos outbufferSize - 1
+#define noNextCharPos  maxUInt16_t
+char outbuffer [outbufferSize];
+uint16_t  peekPos;    // first free place on buffer to place a next character  
+uint16_t  tailPos;    // last printed out character on buffer
 
 
+uint8_t  isUdrInterruptRunning()
+{
+	return ( UCSR0B  &  (1 << UDRIE0))   ;
+}
 
-uint16_t next(uint16_t ptr) 
+void enableUDRInterrupt()
+{
+	UCSR0B |=  (1 << UDRIE0)   ;	
+}
+
+void disableUDRInterrupt()
+{
+	UCSR0B &=  ~(1 << UDRIE0)   ;	
+}
+
+// returns next position of ptr in the circular buffer
+//  must be called between cli and sei for consistent data reason
+uint16_t nextPos(uint16_t ptr) 
 {  
-	
-	uint16_t  res = maxUInt16_t;
-	cli();
+	uint16_t  res;
 	if ((res = ++ptr) >= outbufferSize)   {
 		res = 0;
 	}
-	sei();
-
 	return (res);
 }
 
-uint16_t nextCharPosForPrintOnBuffer()
+// returns next position on buffer and advances tailPos 
+// the character at this position has then to be printed  if buffer is not empty
+// if empty maxInt16 is returned   (impossible value)
+//  must be called between cli and sei for consistent data reason
+uint16_t getNextCharPosOnBufferForPrint()
 {
-	uint16_t res = maxUInt16_t;
+	uint16_t res = noNextCharPos;
 	uint16_t  ptr;
-	cli();
-	if ( (ptr = next(tailPos)) != peekPos)  {               //  buffer not empty
-		res = tailPos;
+	if ( (ptr = nextPos(tailPos)) != peekPos)  {               //  buffer not empty
+		res = ptr;
 		tailPos = ptr;
 	}
-	sei();
 	return res;
 }
 
 
-uint16_t addToOutUart0(uint8_t* txt, uint16_t len)
+uint16_t addToOutUart0(char* txt, uint16_t len)
 {
     uint16_t amtAdded = 0;
 	uint16_t ptr;
 	uint16_t length = len;
-    cli();
-	 while ((length > 0) &&  ((ptr = next(peekPos)) != tailPos))     {   // buffer not full
-		outbuffer [peekPos] =  txt[amtAdded];                //  todo  tobe tested carefully
+	cli();
+	while ((length > 0) &&   ((ptr = nextPos(peekPos)) != tailPos )) { 
+		outbuffer [peekPos] =  txt[amtAdded];
 		-- length;
 		++ amtAdded;
 		peekPos = ptr;
-	}  
-	uint16_t loopCnt = 0;
-	if ( (len > 0) && (interruptSequenceFinished == 1))  {
-		while (  (loopCnt < maxUInt16_t )  && ( (UCSR0A & (1<<UDRE0)) == 0)) {
-			uint16_t chP = nextCharPosForPrintOnBuffer();
-			if (chP != maxUInt16_t) {
-				UDR0 = outbuffer[chP];    // start print out to usart0
-			}
-			++ loopCnt;
-		}  
-	}  //  if (finished == 0)  an outputbuffer empty interrupt will happen
-	//   if finished == 1  and loopCnt gets >=  maxUint16_t   then an implementation error happened or 
-	//   an unplanned hardware access to uart0 from some faulty code 
-	sei();
-	return(length);
+	}	
+	sei();  
+	if ( (amtAdded > 0) && ( ! isUdrInterruptRunning()))  {
+		enableUDRInterrupt();
+	}	 
+	return(amtAdded);
 }
 
 void USART0_Init( unsigned int baud )
@@ -1060,15 +1065,10 @@ void USART0_Init( unsigned int baud )
 	
 	UBRR0H = (unsigned char)(baud>>8);
 	UBRR0L = (unsigned char)baud;
-	// Enable receiver and transmitter
 	UCSR0A =  (UCSR0A & 0b11111100) ;
 	
-	UCSR0B=    (1<<TXEN0);
-	//	UCSR0B = 0b00011000;  // rx compl intr ena - tx compl intr ena - dreg empty intr ena - rx ena - tx ena - sz2 (size bit 2)  - 9. bit rx - 9. tx
-
-	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
-	
-	UCSR0B    |= (1 << UDRIE0);
+	UCSR0B =   ( (1<<TXEN0) )  ;  
+	UCSR0C =   ( (1 << UCSZ00  ) | (1 << UCSZ01) );
 }
 
 
@@ -1076,10 +1076,8 @@ void USART0_Init( unsigned int baud )
 void initOutUart0()
 {
 	memset(outbuffer,0,outbufferSize);
-	peekPos = 0;   // first free place on buffr
-	tailPos = maxUInt16_t;   // last printed character , will return 0 when asked for next
-	intLost = 0;
-	interruptSequenceFinished = 1;
+	peekPos = 0;   // first free place on buffer
+	tailPos = initialTailPos ;   
 	//	USART_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
 	//	USART_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
 	USART0_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
@@ -1089,12 +1087,11 @@ void initOutUart0()
 ISR(USART0_UDRE_vect)
 {
 	cli();
-	uint16_t chP = nextCharPosForPrintOnBuffer();
-	if (chP != maxUInt16_t) { 
+	uint16_t chP = getNextCharPosOnBufferForPrint();
+	if (chP != noNextCharPos) { 
 		UDR0 = outbuffer[chP];
-		interruptSequenceFinished = 0;
 	}  else {
-		 interruptSequenceFinished = 1;	
+		disableUDRInterrupt();
 	}
 	sei();
 }
