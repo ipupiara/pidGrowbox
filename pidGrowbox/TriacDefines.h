@@ -20,7 +20,7 @@
 	#define maxSecsPossible  0xFFFF
 	
 	
-	#define IdleVentilationDelayMinutes     27
+	#define IdleVentilationDelayMinutes     17
 	#define IdleVentilationMinutes     3
 
 	#define HumidifyingLowerLimit   60.0
@@ -43,7 +43,7 @@
 	#define useTimer3
 	
 	#ifdef useTimer0
-		#define triggerDelayMaxTcnt 810     // works properly with 50 Hz Ac and 11 Mhz	
+		#define triggerDelayMaxTcnt 810     // works properly with 50 Hz Ac and 11,0592 Mhz	
 		#define inductiveLoad   1      // to be set to 0 or 1
 		#define triacTriggerLength   0      // delay approx ( n * 2.5 us ) + 5.5    at 11.0592  mhz
 		#define delayBetweenTriacTriggers  16  //  in timer 2 tcnt values , prescaler at   128

@@ -42,16 +42,17 @@ static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 
 //stdout = fdevopen((FILE *)uart_putchar, NULL, 0);
 
-static int uart_putchar(char c, FILE *stream)
-{
-	while (!(UCSR0A & (1<<UDRE0)));
-	if (c == '\n')
-	{
-		uart_putchar('\r',&mystdout);
-	}
-	UDR0 = c;
-	return 0;
-}
+//static int uart_putchar(char c, FILE *stream)
+//{
+//#warning tobe tested whenever this code should be used again		
+	//if (c == '\n')
+	//{
+		//uart_putchar('\r',&mystdout);
+	//}
+	//while (!(UCSR0A & (1<<UDRE0)));
+	//UDR0 = c;
+	//return 0;
+//}
 
 #endif
 
@@ -93,7 +94,7 @@ CGrowBoxEvent ev;
 		
 int main(void)
 {
-//	setWatchdogTimerOn();   // set this one off during debugging !
+	setWatchdogTimerOn();   // set this one off during debugging !
 //	setWatchdogTimerOff();
 
 #ifdef  UseStdOutForUsart0
@@ -111,7 +112,7 @@ int main(void)
 	info_printf("\nSTARTUP after initHW() pidGrowbox together with stateGrowbox\n");
 	
 	initPID();
-	initADC();
+//	initADC();
 	printCsvHeader();
 //	lcd_init();	
 	startStateCharts();

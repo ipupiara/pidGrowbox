@@ -79,7 +79,7 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 			//// No event action.
 		//END_EVENT_HANDLER(CHumidityStateClass );
 //*/
-		//return (uStIntHandlingDone);
+		return (uStIntHandlingDone);
 	}
 	
 	if (currentEvent->evType == eFatalError)
@@ -95,7 +95,7 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 			//// No event action.
 		//END_EVENT_HANDLER(CHumidityStateClass );
 //*/
-		//return (uStIntHandlingDone);
+		return (uStIntHandlingDone);
 	}
 
 	return (uStIntNoMatch);

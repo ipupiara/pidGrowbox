@@ -10,4 +10,4 @@ echo "STATUS:"
 git status
 echo " "
 echo "git diff --name-status master origin/master :"
-git diff --name-status master origin/master
+git diff --name-status master origin/master 

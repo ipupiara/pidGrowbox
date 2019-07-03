@@ -102,7 +102,7 @@ typedef struct
 
 
 
-void createTStatechart(TStatechart* t, xStateType* const xaStates,
+void createTStatechart(TStatechart* tChart, xStateType* const xaStates,
 	const uStInt u32NS, const uStInt u32InitialState);
 
 

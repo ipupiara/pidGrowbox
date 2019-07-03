@@ -32,39 +32,39 @@ void verifyStateNames(TStatechart* t)
 
 
 
-void generateAncestries(TStatechart* t)
+void generateAncestries(TStatechart* tChart)
 {
 	uStInt		u32StateBeingProcessed,
 				u32CurrentAncestor;
 	int i1;
 
 	for (u32StateBeingProcessed=0;
-		u32StateBeingProcessed < t->m_u32NumStates;
+		u32StateBeingProcessed < tChart->m_u32NumStates;
 			u32StateBeingProcessed++)
 		{
-			t->m_xaStateData[u32StateBeingProcessed].m_vi32AncestrySize = 0;
+			tChart->m_xaStateData[u32StateBeingProcessed].m_vi32AncestrySize = 0;
 			for (i1= maxDepth-1; i1> 0; --i1)
 			{
-				t->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1] = 
-					t->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1-1];
+				tChart->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1] = 
+					tChart->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1-1];
 			}
-			t->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[0] =
+			tChart->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[0] =
 					u32StateBeingProcessed;
-			++ t->m_xaStateData[u32StateBeingProcessed].m_vi32AncestrySize;
+			++ tChart->m_xaStateData[u32StateBeingProcessed].m_vi32AncestrySize;
 			u32CurrentAncestor = u32StateBeingProcessed;
-			while (-1 != t->m_pxaUserStateDefns[u32CurrentAncestor].
+			while (-1 != tChart->m_pxaUserStateDefns[u32CurrentAncestor].
 				m_i32ParentStateName)
 			{
 				for (i1= maxDepth-1; i1> 0; --i1)
 				{
-					t->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1] = 
-						t->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1-1];
+					tChart->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1] = 
+						tChart->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[i1-1];
 				}
-				t->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[0] =
-					t->m_pxaUserStateDefns[u32CurrentAncestor].m_i32ParentStateName;
-				++ t->m_xaStateData[u32StateBeingProcessed].m_vi32AncestrySize;
+				tChart->m_xaStateData[u32StateBeingProcessed].m_vi32Ancestry[0] =
+					tChart->m_pxaUserStateDefns[u32CurrentAncestor].m_i32ParentStateName;
+				++ tChart->m_xaStateData[u32StateBeingProcessed].m_vi32AncestrySize;
 
-				u32CurrentAncestor = t->m_pxaUserStateDefns[u32CurrentAncestor].
+				u32CurrentAncestor = tChart->m_pxaUserStateDefns[u32CurrentAncestor].
 					m_i32ParentStateName;
 		}
 	}
@@ -72,15 +72,15 @@ void generateAncestries(TStatechart* t)
 
 
 
-void resetHistoryReturns(TStatechart* t)
+void resetHistoryReturns(TStatechart* tChart)
 {
 	uStInt		u32StateBeingProcessed;
 
 	for (u32StateBeingProcessed=0;
-		u32StateBeingProcessed<t->m_u32NumStates;
+		u32StateBeingProcessed<tChart->m_u32NumStates;
 			u32StateBeingProcessed++)
 	{
-		t->m_xaStateData[u32StateBeingProcessed].m_stIntHistoryReturnState = -1;
+		tChart->m_xaStateData[u32StateBeingProcessed].m_stIntHistoryReturnState = -1;
 	}
 	
 }
@@ -88,48 +88,48 @@ void resetHistoryReturns(TStatechart* t)
 
 
   
-void setInitialState(TStatechart* t, uStInt u32InitialState)
+void setInitialState(TStatechart* tChart, uStInt u32InitialState)
 {
 	stInt	i32ChildToEnter;
-	if (0 != t->m_pxaUserStateDefns[u32InitialState].m_pfDefaultStateEntry)
+	if (0 != tChart->m_pxaUserStateDefns[u32InitialState].m_pfDefaultStateEntry)
 	{
-		t->m_pxaUserStateDefns[u32InitialState].m_pfDefaultStateEntry();
+		tChart->m_pxaUserStateDefns[u32InitialState].m_pfDefaultStateEntry();
 //		xStateType xs;
 //		xs = t->m_pxaUserStateDefns[u32InitialState];
 //		xs.m_pfDefaultStateEntry();
 	}
 
-	if (0 != t->m_pxaUserStateDefns[u32InitialState].m_pfEnteringState)
+	if (0 != tChart->m_pxaUserStateDefns[u32InitialState].m_pfEnteringState)
 	{
-		t->m_pxaUserStateDefns[u32InitialState].m_pfEnteringState();
+		tChart->m_pxaUserStateDefns[u32InitialState].m_pfEnteringState();
 //		xStateType xs;
 //		xs = t->m_pxaUserStateDefns[u32InitialState];
 //		xs.m_pfEnteringState();
 	}	
 
-	t->m_u32CurrentState = u32InitialState;
+	tChart->m_u32CurrentState = u32InitialState;
 
-	i32ChildToEnter = t->m_pxaUserStateDefns[u32InitialState].
+	i32ChildToEnter = tChart->m_pxaUserStateDefns[u32InitialState].
 		m_i32DefaultChildToEnter;		
 
 	while (-1 != i32ChildToEnter)
 	{
 //		xStateType xs;
-		if (0 != t->m_pxaUserStateDefns[i32ChildToEnter].
+		if (0 != tChart->m_pxaUserStateDefns[i32ChildToEnter].
 			m_pfDefaultStateEntry)
 		{
-			t->m_pxaUserStateDefns[i32ChildToEnter].m_pfDefaultStateEntry();
+			tChart->m_pxaUserStateDefns[i32ChildToEnter].m_pfDefaultStateEntry();
 //			xs = t->m_pxaUserStateDefns[i32ChildToEnter];
 //			xs.m_pfDefaultStateEntry();
 		} 
-		if (0 != t->m_pxaUserStateDefns[i32ChildToEnter].m_pfEnteringState)
+		if (0 != tChart->m_pxaUserStateDefns[i32ChildToEnter].m_pfEnteringState)
 		{
-			t->m_pxaUserStateDefns[i32ChildToEnter].m_pfEnteringState();
+			tChart->m_pxaUserStateDefns[i32ChildToEnter].m_pfEnteringState();
 //			xs = t->m_pxaUserStateDefns[i32ChildToEnter];
 //			xs.m_pfEnteringState();
 		}
-		t->m_u32CurrentState = i32ChildToEnter;
-		i32ChildToEnter = t->m_pxaUserStateDefns[i32ChildToEnter].
+		tChart->m_u32CurrentState = i32ChildToEnter;
+		i32ChildToEnter = tChart->m_pxaUserStateDefns[i32ChildToEnter].
 			m_i32DefaultChildToEnter;
 	}
 
@@ -143,23 +143,23 @@ void setInitialState(TStatechart* t, uStInt u32InitialState)
 
 
 
-void createTStatechart(TStatechart* t, xStateType* const xaStates,
+void createTStatechart(TStatechart* tChart, xStateType* const xaStates,
 	const uStInt u32NS, const uStInt u32InitialState)
 {
 //	int16_t sz;
-	t->m_u32NumStates= u32NS;
-	t->m_pxaUserStateDefns = xaStates;
+	tChart->m_u32NumStates= u32NS;
+	tChart->m_pxaUserStateDefns = xaStates;
 
 //	t->m_xaStateData = new xInternalState[t->m_u32NumStates];
 //	sz = t->m_u32NumStates * sizeof(xInternalState);
 //	printf("size of used heap %i\n",sz);
-	t->m_xaStateData = malloc (t->m_u32NumStates * sizeof(xInternalState));
+	tChart->m_xaStateData = malloc (tChart->m_u32NumStates * sizeof(xInternalState));
 //	verifyStateNames(t);  // dont use this line
-	generateAncestries(t);
-	resetHistoryReturns(t);
-	setInitialState(t,u32InitialState);
+	generateAncestries(tChart);
+	resetHistoryReturns(tChart);
+	setInitialState(tChart,u32InitialState);
 
-	t->m_i32ExitingStatesIndex = -1;
+	tChart->m_i32ExitingStatesIndex = -1;
 	
 
 	/*
@@ -182,16 +182,16 @@ void createTStatechart(TStatechart* t, xStateType* const xaStates,
 }
 
 
-void destructTStatechart(TStatechart* t)
+void destructTStatechart(TStatechart* tChart)
 {
 //	delete [] t->m_xaStateData;
-	free(t->m_xaStateData);
+	free(tChart->m_xaStateData);
 }
 
 
 
 
-bool stateIsAncestorOf(TStatechart* t,stInt i32Ancestor, uStInt u32Child)
+bool stateIsAncestorOf(TStatechart* tChart,stInt i32Ancestor, uStInt u32Child)
 {
 	bool	bInAncestry = 0;
 	stInt i;
@@ -210,9 +210,9 @@ bool stateIsAncestorOf(TStatechart* t,stInt i32Ancestor, uStInt u32Child)
 */	
 		bInAncestry = 0;
 
-	for ( i=t->m_xaStateData[u32Child].m_vi32AncestrySize - 1; i>=0; i--)
+	for ( i=tChart->m_xaStateData[u32Child].m_vi32AncestrySize - 1; i>=0; i--)
 	{
-		if (i32Ancestor == t->m_xaStateData[u32Child].m_vi32Ancestry[i])
+		if (i32Ancestor == tChart->m_xaStateData[u32Child].m_vi32Ancestry[i])
 		{
 			bInAncestry = 1;
 		}
@@ -266,7 +266,7 @@ bool inState(TStatechart* t, const stInt u32State)
 
 */
 
-bool ProcessEvent(TStatechart* t)
+bool ProcessEvent(TStatechart* tChart)
 {
 	uStInt	u32result;			 
 
@@ -274,11 +274,11 @@ bool ProcessEvent(TStatechart* t)
 	bool	bMatchFound;
 //	xStateType xs;
 
-	t->m_i32ExitingStatesIndex = -1;
-	memset(t->m_vu32exitingStates,0,sizeof(t->m_vu32exitingStates));
+	tChart->m_i32ExitingStatesIndex = -1;
+	memset(tChart->m_vu32exitingStates,0,sizeof(tChart->m_vu32exitingStates));
 
 	bMatchFound = 0;
-	i32StateBeingTried = t->m_u32CurrentState;
+	i32StateBeingTried = tChart->m_u32CurrentState;
 	while ((-1 != i32StateBeingTried) && (!bMatchFound))
 	{
 
@@ -290,11 +290,11 @@ bool ProcessEvent(TStatechart* t)
 
 //		t->m_vu32exitingStates.insert(t->m_vu32exitingStates.end(), static_cast<uStInt>(i32StateBeingTried));
 
-		t->m_i32ExitingStatesIndex++;
-		t->m_vu32exitingStates[t->m_i32ExitingStatesIndex] = i32StateBeingTried;
+		tChart->m_i32ExitingStatesIndex++;
+		tChart->m_vu32exitingStates[tChart->m_i32ExitingStatesIndex] = i32StateBeingTried;
 		
 //		xStateType xs;
-		u32result = t->m_pxaUserStateDefns[i32StateBeingTried].m_pfu32EventChecker();
+		u32result = tChart->m_pxaUserStateDefns[i32StateBeingTried].m_pfu32EventChecker();
 
 //		xs = t->m_pxaUserStateDefns[i32StateBeingTried].m_pfu32EventChecker();
 //		u32result = xs.m_pfu32EventChecker();
@@ -308,7 +308,7 @@ bool ProcessEvent(TStatechart* t)
 				<< ".\n";
 		}
 #endif
-		i32StateBeingTried = t->m_pxaUserStateDefns[i32StateBeingTried].
+		i32StateBeingTried = tChart->m_pxaUserStateDefns[i32StateBeingTried].
 			m_i32ParentStateName;
 	}
 
@@ -336,20 +336,20 @@ bool ProcessEvent(TStatechart* t)
 //			needed for performing correct state re-entries later.
 //
   
-void beginEventAction(TStatechart* t, uStInt u32DestState,
+void beginEventAction(TStatechart* tChart, uStInt u32DestState,
 	uStInt* u32LastStateExited)
 {
 	int i1;
 
 	uStInt	u32StateBeingLeft = 0xff; //= 0xffffffff;
-	for ( i1=0; i1<=t->m_i32ExitingStatesIndex; i1++)
+	for ( i1=0; i1<=tChart->m_i32ExitingStatesIndex; i1++)
 	{
 		
-		u32StateBeingLeft = t->m_vu32exitingStates[i1];
+		u32StateBeingLeft = tChart->m_vu32exitingStates[i1];
 
-		if (0 != t->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState)
+		if (0 != tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState)
 		{
-			t->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState();
+			tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState();
 
 //			xStateType xs;
 //			xs = t->m_pxaUserStateDefns[u32StateBeingLeft];
@@ -358,22 +358,22 @@ void beginEventAction(TStatechart* t, uStInt u32DestState,
 		}
 		*u32LastStateExited = u32StateBeingLeft;
 
-		if (t->m_pxaUserStateDefns[t->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName].m_keepHistory)
+		if (tChart->m_pxaUserStateDefns[tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName].m_keepHistory)
 		{
-			t->m_xaStateData[t->m_pxaUserStateDefns[u32StateBeingLeft].
+			tChart->m_xaStateData[tChart->m_pxaUserStateDefns[u32StateBeingLeft].
 				m_i32ParentStateName].m_stIntHistoryReturnState =
 				u32StateBeingLeft;
 		}
 	}
 
-	u32StateBeingLeft = t->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName;
+	u32StateBeingLeft = tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName;
 
 	while ((-1 != u32StateBeingLeft) &&
-		(!stateIsAncestorOf(t,u32StateBeingLeft, u32DestState)))
+		(!stateIsAncestorOf(tChart,u32StateBeingLeft, u32DestState)))
 	{
-		if (0 != t->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState)
+		if (0 != tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState)
 		{
-			t->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState();
+			tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState();
 //			xStateType xs;
 //			xs = t->m_pxaUserStateDefns[u32StateBeingLeft];
 //			xs.m_pfLeavingState();
@@ -382,11 +382,11 @@ void beginEventAction(TStatechart* t, uStInt u32DestState,
 		*u32LastStateExited = u32StateBeingLeft;
 
 		u32StateBeingLeft =
-			t->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName;
+			tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName;
 
-		if (t->m_pxaUserStateDefns[t->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName].m_keepHistory)
+		if (tChart->m_pxaUserStateDefns[tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName].m_keepHistory)
 		{
-			t->m_xaStateData[t->m_pxaUserStateDefns[u32StateBeingLeft].
+			tChart->m_xaStateData[tChart->m_pxaUserStateDefns[u32StateBeingLeft].
 				m_i32ParentStateName].m_stIntHistoryReturnState =
 				u32StateBeingLeft;
 		}
@@ -396,18 +396,18 @@ void beginEventAction(TStatechart* t, uStInt u32DestState,
 	// the one we were about to exit->  If so, exit it also.
 	if (u32StateBeingLeft == u32DestState)
 	{
-		if (0 != t->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState)
+		if (0 != tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState)
 		{
-			t->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState();
+			tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_pfLeavingState();
 //			xStateType xs;
 //			xs = t->m_pxaUserStateDefns[u32StateBeingLeft];
 //			xs.m_pfLeavingState();
 		}
-		t->u32LastStateExited = u32StateBeingLeft;
+		tChart->u32LastStateExited = u32StateBeingLeft;
 
-		if (t->m_pxaUserStateDefns[t->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName].m_keepHistory)
+		if (tChart->m_pxaUserStateDefns[tChart->m_pxaUserStateDefns[u32StateBeingLeft].m_i32ParentStateName].m_keepHistory)
 		{
-			t->m_xaStateData[t->m_pxaUserStateDefns[u32StateBeingLeft].
+			tChart->m_xaStateData[tChart->m_pxaUserStateDefns[u32StateBeingLeft].
 				m_i32ParentStateName].m_stIntHistoryReturnState =
 				u32StateBeingLeft;
 		}
@@ -436,7 +436,7 @@ void beginEventAction(TStatechart* t, uStInt u32DestState,
 // Returns:	the new simple state's name.
 //
   
-uStInt enterDestinationState(TStatechart* t,
+uStInt enterDestinationState(TStatechart* tChart,
 	const uStInt u32NewState, 
 	const uStInt u32IndexOfFirstStateToEnter)
 {
@@ -447,10 +447,10 @@ uStInt enterDestinationState(TStatechart* t,
 	ue = u32IndexOfFirstStateToEnter;
 	do
 	{
-		if (0 != t->m_pxaUserStateDefns[t->m_xaStateData[u32NewState].
+		if (0 != tChart->m_pxaUserStateDefns[tChart->m_xaStateData[u32NewState].
 			m_vi32Ancestry[ue]].m_pfEnteringState)
 		{
-			t->m_pxaUserStateDefns[t->m_xaStateData[u32NewState].
+			tChart->m_pxaUserStateDefns[tChart->m_xaStateData[u32NewState].
 				m_vi32Ancestry[ue]].m_pfEnteringState();
 
 //			xs = t->m_pxaUserStateDefns[u32NewState];
@@ -458,21 +458,21 @@ uStInt enterDestinationState(TStatechart* t,
 		}
 		ue++;
 	}	
-	while (ue <= t->m_xaStateData[u32NewState].m_vi32AncestrySize - 1);
+	while (ue <= tChart->m_xaStateData[u32NewState].m_vi32AncestrySize - 1);
 
 	u32StateTransitionallyIn = u32NewState;
-	while ((-1 != t->m_xaStateData[u32StateTransitionallyIn].
+	while ((-1 != tChart->m_xaStateData[u32StateTransitionallyIn].
 			m_stIntHistoryReturnState) ||
-		(-1 != t->m_pxaUserStateDefns[u32StateTransitionallyIn].m_i32DefaultChildToEnter) )
+		(-1 != tChart->m_pxaUserStateDefns[u32StateTransitionallyIn].m_i32DefaultChildToEnter) )
 	{
-		if (-1 != t->m_xaStateData[u32StateTransitionallyIn].m_stIntHistoryReturnState)
-			u32StateTransitionallyIn =	 t->m_xaStateData[u32StateTransitionallyIn].m_stIntHistoryReturnState;
+		if (-1 != tChart->m_xaStateData[u32StateTransitionallyIn].m_stIntHistoryReturnState)
+			u32StateTransitionallyIn =	 tChart->m_xaStateData[u32StateTransitionallyIn].m_stIntHistoryReturnState;
 		else
-			u32StateTransitionallyIn=t->m_pxaUserStateDefns[u32StateTransitionallyIn].m_i32DefaultChildToEnter;
-		if (0 != t->m_pxaUserStateDefns[u32StateTransitionallyIn].
+			u32StateTransitionallyIn=tChart->m_pxaUserStateDefns[u32StateTransitionallyIn].m_i32DefaultChildToEnter;
+		if (0 != tChart->m_pxaUserStateDefns[u32StateTransitionallyIn].
 			m_pfEnteringState)
 		{
-			t->m_pxaUserStateDefns[u32StateTransitionallyIn].m_pfEnteringState();
+			tChart->m_pxaUserStateDefns[u32StateTransitionallyIn].m_pfEnteringState();
 //			xs = t->m_pxaUserStateDefns[u32StateTransitionallyIn];
 //			xs.m_pfEnteringState();
 
@@ -503,7 +503,7 @@ uStInt enterDestinationState(TStatechart* t,
   
   
   
-void endEventAction(TStatechart* t, uStInt u32DestState,
+void endEventAction(TStatechart* tChart, uStInt u32DestState,
 	uStInt u32LastStateExited)
 {
 	
@@ -511,11 +511,11 @@ void endEventAction(TStatechart* t, uStInt u32DestState,
 	stInt ue;
 	stInt i1;
 	
-	if (stateIsAncestorOf(t,u32LastStateExited, u32DestState))
+	if (stateIsAncestorOf(tChart,u32LastStateExited, u32DestState))
 	{
-		for (ue=0; ue<t->m_xaStateData[u32DestState].m_vi32AncestrySize; ue++)
+		for (ue=0; ue<tChart->m_xaStateData[u32DestState].m_vi32AncestrySize; ue++)
 		{
-			if (t->m_xaStateData[u32DestState].m_vi32Ancestry[ue] ==
+			if (tChart->m_xaStateData[u32DestState].m_vi32Ancestry[ue] ==
 				u32LastStateExited)
 			{
 				i32IndexOfFirstStateToEnter = ue;
@@ -526,22 +526,22 @@ void endEventAction(TStatechart* t, uStInt u32DestState,
 	else
 	{
 		stInt	i32MaxIndex;
-		if (t->m_xaStateData[u32DestState].m_vi32AncestrySize >
-			t->m_xaStateData[t->u32LastStateExited].m_vi32AncestrySize)
+		if (tChart->m_xaStateData[u32DestState].m_vi32AncestrySize >
+			tChart->m_xaStateData[tChart->u32LastStateExited].m_vi32AncestrySize)
 		{
-			i32MaxIndex = t->m_xaStateData[u32LastStateExited].m_vi32AncestrySize - 1;
+			i32MaxIndex = tChart->m_xaStateData[u32LastStateExited].m_vi32AncestrySize - 1;
 		}
 		else
 		{
-			i32MaxIndex = t->m_xaStateData[u32DestState].m_vi32AncestrySize - 1;
+			i32MaxIndex = tChart->m_xaStateData[u32DestState].m_vi32AncestrySize - 1;
 		}
 
 		for ( i1=0; i1<=i32MaxIndex; i1++)
 		{
 			i32IndexOfFirstStateToEnter = i1;
 
-			if (t->m_xaStateData[u32LastStateExited].m_vi32Ancestry[i1] !=
-				t->m_xaStateData[u32DestState].m_vi32Ancestry[i1])
+			if (tChart->m_xaStateData[u32LastStateExited].m_vi32Ancestry[i1] !=
+				tChart->m_xaStateData[u32DestState].m_vi32Ancestry[i1])
 			{
 //				assert(0 != i1);	
 				break;
@@ -549,7 +549,7 @@ void endEventAction(TStatechart* t, uStInt u32DestState,
 		}
 	}
 	
-	t->m_u32CurrentState = enterDestinationState(t,
+	tChart->m_u32CurrentState = enterDestinationState(tChart,
 		u32DestState,
 		i32IndexOfFirstStateToEnter);
 	return;
