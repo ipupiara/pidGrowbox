@@ -29,11 +29,11 @@
 	#define DryingLowerLimit	98.0
 
 
-//	#define HeatingLowerLimit	27.0
-//	#define HeatingUpperLimit	27.5
+	#define HeatingLowerLimit	27.0
+	#define HeatingUpperLimit	27.5
 
-	#define HeatingLowerLimit	23.75
-	#define HeatingUpperLimit	24.25
+//	#define HeatingLowerLimit	23.75
+//	#define HeatingUpperLimit	24.25
 
 	#define CoolingLowerLimit	29.0
 	#define CoolingUpperLimit	30.0

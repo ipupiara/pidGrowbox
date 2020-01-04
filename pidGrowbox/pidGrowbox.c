@@ -115,7 +115,7 @@ int main(void)
 //	initADC();
 	printCsvHeader();
 //	lcd_init();	
-	startStateCharts();
+//	startStateCharts();
 	
 //	startDurationTimer(maxSecsPossible  );
 
@@ -138,7 +138,7 @@ int main(void)
 				ev.evType = eValueAssignement;
 				ev.humidity = getCurrentHumidity(); 
 				ev.temperature = getCurrentTemperature();
-				processTriacEvent(PTriacHumidityChart, &ev);
+//				processTriacEvent(PTriacHumidityChart, &ev);
 			 }
  		}
 		if (runningSecondsTick == 1)  {
@@ -170,7 +170,7 @@ int main(void)
 		if (durationTimerReachead == 1) {
 			durationTimerReachead = 0;
 			ev.evType = eTimeOutDurationTimer;
-			processTriacEvent(PTriacHumidityChart, &ev);
+//			processTriacEvent(PTriacHumidityChart, &ev);
 		} 
 		if (twiDataReceived == 1) {
 			twiDataReceived = 0;
