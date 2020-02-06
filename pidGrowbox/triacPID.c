@@ -6,6 +6,7 @@
 #include "TriacDefines.h"
 #include "triacPID.h"
 #include "TriacIntr.h"
+#include "st7565r.h"
 
 
 enum adcScopeEnum
@@ -139,6 +140,7 @@ void initPID()
 	InitializePID( totFactor, pFactor, iFactor, dFactor, itegralTreshold, pidIntervalSecs,
 					correctionThreshold, desiredTemperature, integralTimeDiminuision);
 	setTriacFireDuration(initialTriacDelayValue);
+//	lcd_init();
 }
 
 void resetPID()
@@ -184,6 +186,79 @@ void printCsvHeader()
 	csv_printf("seconds,°C,triacTx,real,real,real,°C,real,real,heatVentOnOff\n");
 }
 
+void displayTime(uint8_t line, uint8_t pos)
+{
+	GETTimeValues      
+	char buffer [8];
+	lcd_goto(line,pos);
+	
+	memset(buffer,0,sizeof(buffer));
+	sprintf((char *)&buffer,"%5d",hrs);
+	lcd_write_str((char *)&buffer);
+	lcd_write_char(':');
+	
+	memset(buffer,0,sizeof(buffer));
+	sprintf((char *)&buffer,"%2d",mins);
+	lcd_write_str((char *)&buffer);
+	lcd_write_char(':');
+	
+	memset(buffer,0,sizeof(buffer));
+	sprintf((char *)&buffer,"%2d",secs);
+	lcd_write_str((char *)&buffer);
+}
+
+void displayTempHumid(uint8_t line, uint8_t pos)
+{
+	lcd_goto(line,pos);	
+	char buffer [13];
+	lcd_goto(line,pos);
+		
+	memset(buffer,0,sizeof(buffer));
+	sprintf((char *)&buffer,"%6.2f",getCurrentTemperature());
+	lcd_write_str("T ");
+	lcd_write_str((char *)&buffer);
+	
+	memset(buffer,0,sizeof(buffer));
+	sprintf((char *)&buffer,"%6.2f",getCurrentHumidity());
+	lcd_write_str(" H ");
+	lcd_write_str((char *)&buffer);	
+}
+
+void displayGoalTempHumid(uint8_t line, uint8_t pos)
+{
+	lcd_goto(line,pos);
+	char buffer [13];
+	lcd_goto(line,pos);
+	
+	memset(buffer,0,sizeof(buffer));
+	sprintf((char *)&buffer,"%6.2f",desiredTemperature);
+	lcd_write_str("T ");
+	lcd_write_str((char *)&buffer);
+	
+	memset(buffer,0,sizeof(buffer));
+	sprintf((char *)&buffer,"%6.2f",getCurrentHumidity());
+	lcd_write_str(" H ");
+	lcd_write_str((char *)&buffer);
+}
+
+void displayScreen()
+{
+	//lcd_clrscr();
+	//lcd_goto(0,0);
+	//lcd_write_str("pidGB");
+	//displayTime(0,8);
+	//displayTempHumid(1,0);
+	//displayGoalTempHumid(2,0);
+	//
+	//
+	//lcd_goto(1,0);
+	//lcd_write_str("since");
+	//lcd_goto(3,0);
+	//lcd_write_str("press * to continue");
+	//
+
+}
+
 void printCsvValues()
 {
 
@@ -192,7 +267,7 @@ void printCsvValues()
 																,getCurrentHumidity(),getTriacFireDuration()
 																,pVal,iVal,dVal,desiredTemperature,getTwaTemperature()
 																,getTwaAbsTemperatureDiff(),heatingIsOn);
-
+//	displayScreen();
 }
 
 void debugSetTriacDelayValueFromAdc()

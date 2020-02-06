@@ -40,7 +40,7 @@
 
 	
 //	#define useTimer0
-	#define useTimer3
+//	#define useTimer3
 	
 	#ifdef useTimer0
 		#define triggerDelayMaxTcnt 810     // works properly with 50 Hz Ac and 11,0592 Mhz	

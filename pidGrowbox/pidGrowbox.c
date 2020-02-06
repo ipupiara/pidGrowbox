@@ -72,9 +72,9 @@ void setWatchdogTimerOff()
 	//	wdt_enable(0x4);
 	wdt_reset();
 	/* Write logical one to WDCE and WDE */
-	WDTCR |= (1<<WDCE) | (1<<WDE);
+	WDTCSR |= (1<<WDCE) | (1<<WDE);
 	/* Turn off WDT */
-	WDTCR = ((1<<WDP0) | (1<<WDP1)| (1<<WDP2) );
+	WDTCSR = ((1<<WDP0) | (1<<WDP1)| (1<<WDP2) );
 }
 
 //for comments see datasheet of AtMega128A on chapter "System Control and Reset"  -> "WatchDog Timer" and ->  "Register Description"
@@ -114,8 +114,8 @@ int main(void)
 	initPID();
 //	initADC();
 	printCsvHeader();
-//	lcd_init();	
-//	startStateCharts();
+	
+//	startStateCharts();    // currently only needed for ventilate
 	
 //	startDurationTimer(maxSecsPossible  );
 

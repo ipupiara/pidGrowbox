@@ -104,20 +104,21 @@ void csv_printf(const char *emsg, ...)
 // ATTENTION: use of EEPROM needs BOD Level of at least 2.7 V, otherwise EEPROM memory
 // is likely to crash on restore when done at mcu startup
 
+
 void EEPROM_write(unsigned int uiAddress, unsigned char ucData)
 {
 	// Wait for completion of previous write 
-	while(EECR & (1<<EEWE));
+	while(EECR & (1<<EEPE));
 	// Set up address and Data Registers 
 	EEAR = uiAddress;
 	EEDR = ucData;
 	cli();
-	
+	/*
 	// Write logical one to EEMPE 
-	//EECR |= (1<<EEMPE);
+	EECR |= (1<<EEMPE);
 	// Start eeprom write by setting EEPE 
-	//EECR |= (1<<EEPE);
-	
+	EECR |= (1<<EEPE);
+	*/
 
 	// standard EEPROM code does not work under all optimization levels (-o directive of compiler)
     // for timing reasons (max. 4 cpu cycles between the two sbi commands for safety reasons)
@@ -131,7 +132,7 @@ void EEPROM_write(unsigned int uiAddress, unsigned char ucData)
 unsigned char EEPROM_read(unsigned int uiAddress)
 {
 	// Wait for completion of previous write 
-	while(EECR & (1<<EEWE))
+	while(EECR & (1<<EEPE))
 	;
 	// Set up address register 
 	EEAR = uiAddress;
@@ -141,16 +142,16 @@ unsigned char EEPROM_read(unsigned int uiAddress)
 	return EEDR;
 }
 
-void eeprom_write_byte (uint8_t *adr, uint8_t val)
+void eeprom_write_byte (uint16_t adr, uint8_t val)
 {
 	uint8_t checkRes = 0;
 	uint16_t adre = (uint16_t) adr;
 	EEPROM_write(adre,*(&val));
 	checkRes = EEPROM_read(adre); 
 	if (val != checkRes) {
-		info_printf("eeprom stored %X, but check returned %X\n",val,checkRes);
+		printf("eeprom stored %X, but check returned %X\n",val,checkRes);
 	} else {
-		info_printf("reread ok returned %X\n",checkRes);
+//		printf("reread ok returned %X\n",checkRes);
 	}
 }
 
@@ -388,8 +389,8 @@ void setTimerPorts(TimeClock now)
 
 void initTimerPorts() 
 {
-	DDRA |= (1 << DDRA0);
-	DDRA |= (1 << DDRA1);
+	DDRA |= (1 << DDA0);
+	DDRA |= (1 << DDA1);
 	memset(&rxBuffer,0,sizeof(rxBuffer));
 	sendSetupData();
 	// init configuration of 1307

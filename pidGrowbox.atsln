@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Atmel Studio Solution File, Format Version 11.00
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "pidGrowbox", "pidGrowbox\pidGrowbox.cproj", "{5F34E13D-33B4-4496-8A7D-5BB056270ADE}"

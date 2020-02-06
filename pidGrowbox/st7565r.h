@@ -3,6 +3,9 @@
 	#define ST7565R_H
 
 
+#define noScreen
+
+
 void lcd_init(void);
 
 void lcd_clrscr();

@@ -132,74 +132,74 @@ void setOcrDelay(int16_t newOcr)
 
 void setTriacTriggerDelayValues(uint8_t lohi)
 {
-	if (lohi == 1) {
-		setOcrDelay( 5);
-		remainingTriacTriggerDelayCounts -= 10;
-	} else {
-		if (remainingTriacTriggerDelayCounts <= triacOcrValueMax) {
-			setOcrDelay ( remainingTriacTriggerDelayCounts);
-			remainingTriacTriggerDelayCounts = 0;
-			} else {
-			setOcrDelay( triacOcrValueMax);
-			remainingTriacTriggerDelayCounts -= triacOcrValueMax;
-		}
-	}
+	//if (lohi == 1) {
+		//setOcrDelay( 5);
+		//remainingTriacTriggerDelayCounts -= 10;
+	//} else {
+		//if (remainingTriacTriggerDelayCounts <= triacOcrValueMax) {
+			//setOcrDelay ( remainingTriacTriggerDelayCounts);
+			//remainingTriacTriggerDelayCounts = 0;
+			//} else {
+			//setOcrDelay( triacOcrValueMax);
+			//remainingTriacTriggerDelayCounts -= triacOcrValueMax;
+		//}
+	//}
 }
 
 
 void startTriacTriggerDelay( int16_t delayDuration)  
 {
-	uint8_t  lohi = 0;
-	cli();
-	stopTriacTimer();
-	if (delayDuration <= 0) { 
-		delayDuration = 1;   // just a very short duration, but one that will happen in future
-	}
-	if (delayDuration > delayBetweenTriacTriggers)  {
-		lohi = 1;
-	}
-	remainingTriacTriggerDelayCounts = delayDuration;
-	setTriacTriggerDelayValues(lohi);	
-	startTriacTimer();
-	resetTriacTimerFlag();
-	sei();
+	//uint8_t  lohi = 0;
+	//cli();
+	//stopTriacTimer();
+	//if (delayDuration <= 0) { 
+		//delayDuration = 1;   // just a very short duration, but one that will happen in future
+	//}
+	//if (delayDuration > delayBetweenTriacTriggers)  {
+		//lohi = 1;
+	//}
+	//remainingTriacTriggerDelayCounts = delayDuration;
+	//setTriacTriggerDelayValues(lohi);	
+	//startTriacTimer();
+	//resetTriacTimerFlag();
+	//sei();
 }
 
 void calcAmtInductiveRepetitions(int16_t tFDurationTcnt0)
 {
-	if ( inductiveLoad == 1)  {
-		floatType amtInductiveRepetitionsF = 0.0;
-		floatType tFDurationTcnt0F = tFDurationTcnt0;
-		//		amtInductiveRepetitions = ((triacFireDurationTcnt2 * ( 1  /(11.0592e+6  /128) )) * 1.0e+6  ) /  measuredRepetitionIntervalus;
-//		float tcnt0TickDurationUs  = 128 / 11.0592e+6; 
-//		float calculatedRepetitionInterval = delayBetweenTriacTriggers * tcnt0TickDurationUs + 5;   // trigger takes approx 3- 5us
-//                  measured was 200  and calculated was 190 what is quite ok. measured should be a bit higher than calculated 
-//                  for all the loss during stop and start of timer  , etc.....
-		amtInductiveRepetitionsF = (tFDurationTcnt0F * 11.63  )  /  measuredRepetitionIntervalus;
-		// always cut off modulo part when converting to int
-		amtInductiveRepetitions = amtInductiveRepetitionsF;   
-	} else {
-		amtInductiveRepetitions = 1;
-	}
+	//if ( inductiveLoad == 1)  {
+		//floatType amtInductiveRepetitionsF = 0.0;
+		//floatType tFDurationTcnt0F = tFDurationTcnt0;
+		////		amtInductiveRepetitions = ((triacFireDurationTcnt2 * ( 1  /(11.0592e+6  /128) )) * 1.0e+6  ) /  measuredRepetitionIntervalus;
+////		float tcnt0TickDurationUs  = 128 / 11.0592e+6; 
+////		float calculatedRepetitionInterval = delayBetweenTriacTriggers * tcnt0TickDurationUs + 5;   // trigger takes approx 3- 5us
+////                  measured was 200  and calculated was 190 what is quite ok. measured should be a bit higher than calculated 
+////                  for all the loss during stop and start of timer  , etc.....
+		//amtInductiveRepetitionsF = (tFDurationTcnt0F * 11.63  )  /  measuredRepetitionIntervalus;
+		//// always cut off modulo part when converting to int
+		//amtInductiveRepetitions = amtInductiveRepetitionsF;   
+	//} else {
+		//amtInductiveRepetitions = 1;
+	//}
 }
 
 void setTriacFireDuration(uint16_t durationTcnt)
 {
-	uint16_t  tfDuration;
-	
-	if (durationTcnt < triggerDelayMaxTcnt) {
-		if (durationTcnt > 0) {
-			tfDuration = durationTcnt;}
-		else {
-			tfDuration = 0;
-		}
-	} else {
-		tfDuration = triggerDelayMaxTcnt;
-	}
-	calcAmtInductiveRepetitions(durationTcnt);
-	cli();
-	triacFireDurationTcnt = tfDuration;
-	sei();
+	//uint16_t  tfDuration;
+	//
+	//if (durationTcnt < triggerDelayMaxTcnt) {
+		//if (durationTcnt > 0) {
+			//tfDuration = durationTcnt;}
+		//else {
+			//tfDuration = 0;
+		//}
+	//} else {
+		//tfDuration = triggerDelayMaxTcnt;
+	//}
+	//calcAmtInductiveRepetitions(durationTcnt);
+	//cli();
+	//triacFireDurationTcnt = tfDuration;
+	//sei();
 }
 
 uint16_t  getTriacFireDuration()
@@ -213,35 +213,35 @@ uint16_t  getTriacFireDuration()
 
 
 
-ISR( triacCompVect )
-{
-#if  defined( useTimer3) || defined( useTimer0)	
-	if (TCNT3 != 0) {
-		DDRA |= (1<< DDRA0);
-		PORTA  |= (1<<PORTA0);
-	}
-#endif	
-
-	cli();
-	if (remainingTriacTriggerDelayCounts <= 0) {
-		PORTE |= (1<< PORTE6) ;
-		sei();				// allow interrupts during delay
-		delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
-		cli();
-		PORTE &= ~(1<< PORTE6) ;		// handled synchronous
-		if  ((inductiveRepetitionsCounter <= 0) || (withinZeroCross == 1) ) {
-			stopTriacTimer();
-		} else {
-			--inductiveRepetitionsCounter;
-			startTriacTriggerDelay(delayBetweenTriacTriggers);  // already start interrupts and timer0
-		}
-	} else {
-		stopTriacTimer();
-		setTriacTriggerDelayValues(0);
-		startTriacTimer();
-	}
-	sei();
-}
+//ISR( triacCompVect )
+//{
+////#if  defined( useTimer3) || defined( useTimer0)	
+	////if (TCNT3 != 0) {
+		////DDRA |= (1<< DDRA0);
+		////PORTA  |= (1<<PORTA0);
+	////}
+////#endif	
+////
+	////cli();
+	////if (remainingTriacTriggerDelayCounts <= 0) {
+		////PORTE |= (1<< PORTE6) ;
+		////sei();				// allow interrupts during delay
+		////delay6pnt2d5us(triacTriggerLength);   // approx 5 us of triac trigger , try later half or even less, measured 7 with oscilloscope
+		////cli();
+		////PORTE &= ~(1<< PORTE6) ;		// handled synchronous
+		////if  ((inductiveRepetitionsCounter <= 0) || (withinZeroCross == 1) ) {
+			////stopTriacTimer();
+		////} else {
+			////--inductiveRepetitionsCounter;
+			////startTriacTriggerDelay(delayBetweenTriacTriggers);  // already start interrupts and timer0
+		////}
+	////} else {
+		////stopTriacTimer();
+		////setTriacTriggerDelayValues(0);
+		////startTriacTimer();
+	////}
+	////sei();
+//}
 
 #warning "0-x signal is currently compared on 311 comparator at VCC, which is an unprecise common voltage value, should be changed to a lower voltage range"
 #if defined( useTimer3) || defined( useTimer0)
@@ -294,6 +294,8 @@ ISR(INT0_vect)
 	}
 	sei();
 }
+
+
 ISR(INT7_vect)
 {
 	cli();
@@ -371,12 +373,12 @@ void initInterrupts()
 	
 ///////   0-x detector input pint INT7 on PE7  
 		
-		DDRE  &=  ~(1 << DDRE7 ) ;    // input pin
-		DDRE |=  (1 << DDRE6);		// ouput pin, triac trigger
-
-		EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each time, edge needs to be programmed in the interrupt ::::----(((((
-		EIFR  &=  ~(1 << INTF7); 
-		EIMSK |= (1 << INT7);
+		//DDRE  &=  ~(1 << DDRE7 ) ;    // input pin
+		//DDRE |=  (1 << DDRE6);		// ouput pin, triac trigger
+//
+		//EICRB   |=  (1<< ISC70) |  (1<< ISC71)  ;   // rising edge  ( each time, edge needs to be programmed in the interrupt ::::----(((((
+		//EIFR  &=  ~(1 << INTF7); 
+		//EIMSK |= (1 << INT7);
 
 // Timer 1 as Duration Timer
 	  
@@ -395,7 +397,7 @@ void initInterrupts()
 		
 //		TIMSK  &=  ~(1 << OCIE1A)  ;// disa  Interrupt    since timsk in atmega128 is global for 3 timers
 //			TIMSK1   = 0b00000010;  //  Output Compare A Match Interrupt Enable 
-			TIMSK |= (1 << OCIE1A)  ;  //  Output Compare A Match Interrupt Enable
+			TIMSK1 |= (1 << OCIE1A)  ;  //  Output Compare A Match Interrupt Enable
 
 		secondsRemainingInDurationTimer = 0;
 
@@ -599,19 +601,19 @@ char * reallyWorkingStrstr(const char *inStr, const char *subStr)
 
   
 #define heatingPortDDR  DDRC
-#define heatingPinDDR   DDRC7
+#define heatingPinDDR   DDRC4
 #define heatingPort     PORTC
-#define heatingPin      PORTC7  //  dummy values just for implementing before defining exact port/pin
+#define heatingPin      PORTC4  //  dummy values just for implementing before defining exact port/pin
 
 
 
 void switchHeating(uint8_t heatingNeedsOn)
 {
 	if (heatingNeedsOn > 0) {
-		heatingPort |=  0xFF;   //(1 < heatingPin);
+		heatingPort |=  0xff;  // (1 < heatingPin);
 		heatingIsOn= 1;
 	}  else   {
-		heatingPort &= ~(0xFF) ;    //(1 < heatingPin);
+		heatingPort &= 0x00;   //~(1 < heatingPin);
 		heatingIsOn = 0;
 	}
 }
@@ -627,7 +629,8 @@ void switchVentilating(uint8_t ventilatingNeedsOn)
 
 void initHeatingControl()
 {
-	heatingPortDDR |=   0xff  ;    // (1 < heatingPinDDR);    // define as output
+//	heatingPortDDR |= (1 < heatingPinDDR);    // define as output
+	heatingPortDDR |=    0xff;
 //	DDRF |= (1< DDRF1);
 	switchHeating(0);
 }
@@ -932,15 +935,15 @@ floatType adcVoltage(uint8_t  pos)      // tobe called outside interrupts
 int16_t getTriacFireDurationFromADC(uint8_t pos)
 {
 	int16_t res = 0;
-	int16_t adcV = adcValue(pos);
-	floatType adcF = adcV * 1.0;  // tobe tested
-	floatType maxDelay = triggerDelayMaxTcnt ;  // tobe tested
-	
-	floatType  adcFactor = adcF / 1023.0;
-	
-	floatType resF = adcFactor * maxDelay;
-	res = (int16_t)  resF ; // tobe tested maybe needs to use conversion methods
-	
+	//int16_t adcV = adcValue(pos);
+	//floatType adcF = adcV * 1.0;  // tobe tested
+	//floatType maxDelay = triggerDelayMaxTcnt ;  // tobe tested
+	//
+	//floatType  adcFactor = adcF / 1023.0;
+	//
+	//floatType resF = adcFactor * maxDelay;
+	//res = (int16_t)  resF ; // tobe tested maybe needs to use conversion methods
+	//
 	return res;
 }
 
