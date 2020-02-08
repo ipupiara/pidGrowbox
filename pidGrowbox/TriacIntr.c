@@ -600,20 +600,20 @@ char * reallyWorkingStrstr(const char *inStr, const char *subStr)
   
 
   
-#define heatingPortDDR  DDRC
-#define heatingPinDDR   DDRC4
-#define heatingPort     PORTC
-#define heatingPin      PORTC4  //  dummy values just for implementing before defining exact port/pin
+#define heatingPortDDR  DDRB
+#define heatingPinDDR   DDB0
+#define heatingPort     PORTB
+#define heatingPin      PB0  
 
 
 
 void switchHeating(uint8_t heatingNeedsOn)
 {
 	if (heatingNeedsOn > 0) {
-		heatingPort |=  0xff;  // (1 < heatingPin);
+		heatingPort |= (1 << heatingPin);
 		heatingIsOn= 1;
 	}  else   {
-		heatingPort &= 0x00;   //~(1 < heatingPin);
+		heatingPort &= ~(1 << heatingPin);
 		heatingIsOn = 0;
 	}
 }
@@ -629,8 +629,8 @@ void switchVentilating(uint8_t ventilatingNeedsOn)
 
 void initHeatingControl()
 {
-//	heatingPortDDR |= (1 < heatingPinDDR);    // define as output
-	heatingPortDDR |=    0xff;
+	heatingPortDDR |= (1 << heatingPinDDR);    // define as output
+//	heatingPortDDR |=    0xff;
 //	DDRF |= (1< DDRF1);
 	switchHeating(0);
 }
@@ -995,31 +995,23 @@ void switchOffLight()
 //#define printerReadyInterruptEnablePin   TXCIE0
 //#define printerReadyInterruptVect  USART0_TX_vect  // TXC0 was  never set during debugging - hardware broken ?
 //#define printerGiveTXaGingg
-#define usart0ReadyInterruptEnablePin   UDRIE0
-#define usart0ReadyInterruptVect  USART0_UDRE_vect
+
 #define maxUInt16_t  0xFFFF
-#define outbufferSize 0x200
+#define outbufferSize 0x100
 #define initialTailPos outbufferSize - 1
-#define noNextCharPos  maxUInt16_t
 char outbuffer [outbufferSize];
 uint16_t  peekPos;    // first free place on buffer to place a next character  
 uint16_t  tailPos;    // last printed out character on buffer
 
 
-
-uint8_t  isPrinterReadyInterruptEnabled()
-{
-	return ( UCSR0B  &  (1 << usart0ReadyInterruptEnablePin))   ;
-}
-
 void enablePrinterReadyInterrupt()
 {
-	UCSR0B |=  (1 << usart0ReadyInterruptEnablePin)   ;	
+	UCSR0B |=  (1 << UDRIE0)   ;	
 }
 
 void disablePrinterReadyInterrupt()
 {	
-	UCSR0B &=  ~(1 << usart0ReadyInterruptEnablePin)   ;	
+	UCSR0B &=  ~(1 << UDRIE0)   ;	
 }
 
 // returns next position of ptr in the circular buffer
@@ -1033,22 +1025,9 @@ uint16_t nextPos(uint16_t ptr)
 	return (res);
 }
 
-// returns next position on buffer and advances tailPos 
-// the character at this position has then to be printed  if buffer is not empty
-// if empty maxInt16 is returned   (impossible value)
-//  must be called between cli and sei for consistent data reason
-uint16_t getNextCharPosOnBufferForPrint()
-{
-	uint16_t res = noNextCharPos;
-	uint16_t  ptr;
-	if ( (ptr = nextPos(tailPos)) != peekPos)  {               //  buffer not empty
-		res = ptr;
-		tailPos = ptr;
-	}
-	return res;
-}
-
-
+// concurrency of this method might be enhanced by creating a threadsafe method that return
+// next pos to print/orNoNextPos and setting peekpos=ptr within cli sei. then the current outer cli sei
+// can be omitted
 uint16_t addToOutUart0(char* txt, uint16_t len)
 {
     uint16_t amtAdded = 0;
@@ -1060,28 +1039,33 @@ uint16_t addToOutUart0(char* txt, uint16_t len)
 		-- length;
 		++ amtAdded;
 		peekPos = ptr;
-	}	
-	sei();  
-	if ( (amtAdded > 0) && ( ! isPrinterReadyInterruptEnabled()))  {
-		enablePrinterReadyInterrupt();
-#ifdef printerGiveTXaGingg       // did not work, hardware or error in Datasheet of atmega128a  (use this cpu never again!)
-		UCSR0A |= (1  << TXC0 );
-#endif		
-	}	 
+	}	// lazy handling, if buffer full, cut printing, it is only for info that is not urgently needed
+	sei();   
+	enablePrinterReadyInterrupt();  
 	return(amtAdded);
 }
 
-void USART0_Init( unsigned int baud )
+ISR(USART0_UDRE_vect)
+{
+	cli();
+	if  ((UCSR0A & (1 << UDRE0)) != 0 )  {  // do this check anyhow 
+		uint16_t ptr;
+		if  ((ptr = nextPos(tailPos)) != peekPos)  {               //  buffer not empty 
+			UDR0 = outbuffer[ptr];
+			}  else {
+			disablePrinterReadyInterrupt();  // be sure not to end in endless interrupt calls
+		}
+	}
+}
+
+void USART0_InitBoud( unsigned int baud )
 {
 	// Set baud rate
 	
 	UBRR0H = (unsigned char)(baud>>8);
 	UBRR0L = (unsigned char)baud;
 	UCSR0A =  (UCSR0A & 0b11111100) ;
-	
-	
-	UCSR0B =   ( (1<<TXEN0) )  ;  
-	
+	UCSR0B =   ( (1<<TXEN0) | (1<< UDRIE0) )  ;  	
 	UCSR0C =   ( (1 << UCSZ00  ) | (1 << UCSZ01) );
 }
 
@@ -1090,29 +1074,13 @@ void initOutUart0()
 {
 	memset(outbuffer,0,outbufferSize);
 	peekPos = 0;   // first free place on buffer
-	tailPos = initialTailPos ;   
+	tailPos = outbufferSize - 1 ;   //  last char on buffer, means buffer empty, if peekPos == 0
 	//	USART0_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
 	//	USART0_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
-	USART0_Init (35 );   // baud 19.2k  at 11.0592 mhz, single uart speed
+	USART0_InitBoud (35 );   // baud 19.2k  at 11.0592 mhz, single uart speed
 //	USART0_Init (23 );   // baud 28.8k  at 11.0592 mhz, single uart speed
 //	USART0_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
 }
 
-
-ISR(usart0ReadyInterruptVect)
-{
-	cli();
-	UCSR0B &=  ~(1 << usart0ReadyInterruptEnablePin)   ;   
-	if ( (UCSR0A <<   UDRE0) )  {			// prevent duplicate interrupt, was a problem during debugging. works better, but still crashes 
-		uint16_t chP = getNextCharPosOnBufferForPrint();
-		if (chP != noNextCharPos) { 
-			UDR0 = outbuffer[chP]; 
-			enablePrinterReadyInterrupt();
-		}  else {
-			disablePrinterReadyInterrupt();
-		}
-	}
-	sei();
-}
 
 #endif

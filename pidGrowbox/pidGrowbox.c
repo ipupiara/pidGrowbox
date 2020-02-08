@@ -35,7 +35,6 @@ void USART_Init( unsigned int baud )
 	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
 }
 
-
 static int uart_putchar(char c, FILE *stream);
 
 static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);  // first opened will be stdout and errout
@@ -94,7 +93,7 @@ CGrowBoxEvent ev;
 		
 int main(void)
 {
-	setWatchdogTimerOn();   // set this one off during debugging !
+//	setWatchdogTimerOn();   // set this one off during debugging !
 //	setWatchdogTimerOff();
 
 #ifdef  UseStdOutForUsart0
@@ -115,7 +114,7 @@ int main(void)
 //	initADC();
 	printCsvHeader();
 	
-//	startStateCharts();    // currently only needed for ventilate
+	startStateCharts();    // currently only needed for ventilate
 	
 //	startDurationTimer(maxSecsPossible  );
 
@@ -138,7 +137,7 @@ int main(void)
 				ev.evType = eValueAssignement;
 				ev.humidity = getCurrentHumidity(); 
 				ev.temperature = getCurrentTemperature();
-//				processTriacEvent(PTriacHumidityChart, &ev);
+				processTriacEvent(PTriacHumidityChart, &ev);
 			 }
  		}
 		if (runningSecondsTick == 1)  {
@@ -170,7 +169,7 @@ int main(void)
 		if (durationTimerReachead == 1) {
 			durationTimerReachead = 0;
 			ev.evType = eTimeOutDurationTimer;
-//			processTriacEvent(PTriacHumidityChart, &ev);
+			processTriacEvent(PTriacHumidityChart, &ev);
 		} 
 		if (twiDataReceived == 1) {
 			twiDataReceived = 0;

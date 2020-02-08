@@ -55,7 +55,7 @@ void clr_scr()
 
 void displayCountDown()
 {
-	int16_t secondsRem = getSecondsDurationTimerRemaining();
+	int16_t secondsRem = getSecondsRemainingInDurationTimer();
 	int32_t minRem  = secondsRem / 60; ;        //(250 us on 1Mhz Simulator)
 	int16_t mRem = minRem;
 	int8_t secsRem	= secondsRem - (minRem * 60);  // subtraction + multiply by 60 faster than division

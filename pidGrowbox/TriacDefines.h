@@ -72,6 +72,50 @@
 		#define triacCompVect  TIMER2_COMPA_vect
 	#endif
 	
+	//#define useAtmega324a
+	#ifdef  useAtmega324a
+	
+		#define  DDA0  DDRA0
+		#define  DDA1  DDRA1
+		#define  DDA2  DDRA2
+		#define  DDA3  DDRA3
+		#define  DDA4  DDRA4
+		#define  DDA5  DDRA5
+		#define  DDA6  DDRA6
+		#define  DDA7  DDRA7
+		
+		#define  DDB0  DDRB0
+		#define  DDB1  DDRB1
+		#define  DDB2  DDRB2
+		#define  DDB3  DDRB3
+		#define  DDB4  DDRB4
+		#define  DDB5  DDRB5
+		#define  DDB6  DDRB6
+		#define  DDB7  DDRB7
+		
+		#define  DDC0  DDRC0
+		#define  DDC1  DDRC1
+		#define  DDC2  DDRC2
+		#define  DDC3  DDRC3
+		#define  DDC4  DDRC4
+		#define  DDC5  DDRC5
+		#define  DDC6  DDRC6
+		#define  DDC7  DDRC7
+		
+		#define  DDD0  DDRD0
+		#define  DDD1  DDRD1
+		#define  DDD2  DDRD2
+		#define  DDD3  DDRD3
+		#define  DDD4  DDRD4
+		#define  DDD5  DDRD5
+		#define  DDD6  DDRD6
+		#define  DDD7  DDRD7
+		
+	
+	#endif
+	
+	
+	
 typedef float floatType;	
 
 // takes approx  2 us at 10 Mhz with -o0 (no opts. !) ,with all  call/ret, push N Pop
