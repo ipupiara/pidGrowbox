@@ -23,6 +23,7 @@
 #define correctionThreshold  150  * (60 / pidIntervalSecs)
 
 #define csvIntervalSecs  20
+//#define csvIntervalSecs  1   // just for debugging 
 
 #define initialTriacDelayValue   0x0200	
 

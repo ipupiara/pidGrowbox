@@ -8,7 +8,7 @@
 #include <util/atomic.h>
 #include "TriacDefines.h"
 
-#define controlheating   // only was used when heating and humidifying needed same relais-port
+//#define controlheating   // only was used when heating and humidifying needed same relais-port
 
 #define adcRefVoltage5   5.0
 #define adcRefVoltad2d5  2.56

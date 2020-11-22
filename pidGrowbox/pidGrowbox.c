@@ -35,9 +35,9 @@ void USART_Init( unsigned int baud )
 	UCSR0C = 0b00000110; // "00" async usart - "00" disa parity - 1 (or 2) stop bit - sz1 - sz0 (set t0 8 bit) - clk polarity (sync only)
 }
 
-static int uart_putchar(char c, FILE *stream);
+//static int uart_putchar(char c, FILE *stream);
 
-static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);  // first opened will be stdout and errout
+//static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);  // first opened will be stdout and errout
 
 //stdout = fdevopen((FILE *)uart_putchar, NULL, 0);
 
@@ -57,8 +57,8 @@ static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 
 void setWatchdogTimerOn()
 {
-	uint8_t val = ((1<<WDP0) | (1<<WDP1)| (1<<WDP2));
-	wdt_enable(val );
+	uint8_t val = ((1<<WDP0) | (1<<WDP3));    //  8seconds
+   	wdt_enable(val );
 	//wdt_reset();
 	///* Write logical one to WDCE and WDE */
 	//WDTCR |= (1<<WDCE) | (1<<WDE);
@@ -93,15 +93,15 @@ CGrowBoxEvent ev;
 		
 int main(void)
 {
-//	setWatchdogTimerOn();   // set this one off during debugging !
+	setWatchdogTimerOn();   // set this one off during debugging !
 //	setWatchdogTimerOff();
 
 #ifdef  UseStdOutForUsart0
 
 	//	USART_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
 	//	USART_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
-	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
-	stdout = &mystdout;
+//	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
+//	stdout = &mystdout;
 // #else  initHW will init circular buffer
 #endif
 	
@@ -109,7 +109,6 @@ int main(void)
 	initHW();
 	
 	info_printf("\nSTARTUP after initHW() pidGrowbox together with stateGrowbox\n");
-	
 	initPID();
 //	initADC();
 	printCsvHeader();

@@ -13,6 +13,8 @@
 #include "triacUI.h"
 #include "twi_master.h"
 
+//#define debugStatechart
+
 extern const uStInt uStIntHandlingDone;
 extern const uStInt uStIntNoMatch;
 
@@ -71,6 +73,10 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateGrowBoxKeepingHumidity );
 			// No event action.
+		#ifdef debugStatechart
+			info_printf("eventhandler evStateGrowBoxKeepingHumidity proceeding to eStateGrowBoxKeepingHumidity\n");
+		#endif	
+	
 		END_EVENT_HANDLER(PTriacHumidityChart);
 		
 ///*  left this as an original example for history states
@@ -87,6 +93,10 @@ uStInt evStateGrowBoxKeepingHumidity(void)
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart, eStateFatalError );
 			// No event action.
+		#ifdef debugStatechart
+			info_printf("eventhandler evStateGrowBoxKeepingHumidity proceeding to eStateFatalError\n");
+		#endif	
+
 		END_EVENT_HANDLER(PTriacHumidityChart);
 		
 ///*  left this as an original example for history states
@@ -155,6 +165,9 @@ uStInt evStateHumidifying(void)
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateIdle);
 			// No event action.
+		#ifdef debugStatechart
+			info_printf("eventhandler evStateHumidifying proceeding to eStateIdle\n");
+		#endif	
 		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	}
@@ -187,6 +200,9 @@ uStInt evStateIdle(void)
 		{
 			BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateHumidifying);
 				// No event action.
+			#ifdef debugStatechart
+				info_printf("eventhandler evStateIdle proceeding to eStateHumidifying\n");
+			#endif		
 			END_EVENT_HANDLER(PTriacHumidityChart );
 			return (uStIntHandlingDone);
 		}
@@ -194,6 +210,10 @@ uStInt evStateIdle(void)
 		{
 			BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateDrying);
 				// No event action.
+			#ifdef debugStatechart
+				info_printf("eventhandler evStateIdle proceeding to eStateDrying\n");
+			#endif		
+	
 			END_EVENT_HANDLER(PTriacHumidityChart );
 			return (uStIntHandlingDone);
 		}
@@ -223,6 +243,10 @@ uStInt evStateNonVentilating(void)
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateVentilating);
 			// No event action.
+		#ifdef debugStatechart
+			info_printf("eventhandler evStateNonVentilating proceeding to eStateVentilating\n");
+		#endif		
+	
 		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	
@@ -254,6 +278,10 @@ uStInt evStateVentilating(void)
 	if ((currentEvent->evType == eTimeOutDurationTimer)  || (currentEvent->evType ==  eVentilationStopButtonPressed))  {
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateNonVentilating);
 			// No event action.
+		#ifdef debugStatechart
+			info_printf("eventhandler evStateVentilating proceeding to eStateNonVentilating\n");
+		#endif	
+
 		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	
@@ -284,6 +312,10 @@ uStInt evStateDrying(void)
 	{
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateIdle);
 			// No event action.
+		#ifdef debugStatechart
+			info_printf("eventhandler evStateDrying proceeding to eStateIdle\n");
+		#endif	
+	
 		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	}
@@ -358,8 +390,8 @@ xStateType xaHumidifyingStates[eNumberOfHumidifyingStates] = {
 				exitStateHumidityControlRunning},
 
 /* name						*/	{eStateHumidifying,
-	/* parent					*/	eStateGrowBoxKeepingHumidity,
-	/* default_substate			*/	0,
+	/* parent					*/	eStateHumidityControlRunning,
+	/* default_substate			*/	-1,
 									0,     //(  keep history)
 	/* event-checking func		*/	evStateHumidifying,
 	/* default state entry func	*/	NULL,
@@ -367,7 +399,7 @@ xStateType xaHumidifyingStates[eNumberOfHumidifyingStates] = {
 /* exiting state func		*/		exitStateHumidifying},
 
 /* name						*/	{eStateIdle,
-	/* parent					*/	eStateGrowBoxKeepingHumidity,
+	/* parent					*/	eStateHumidityControlRunning,
 	/* default_substate			*/	eStateVentilating,
 									0,
 	/* event-checking func		*/	evStateIdle,
@@ -394,7 +426,7 @@ xStateType xaHumidifyingStates[eNumberOfHumidifyingStates] = {
 		/* exiting state func		*/		exitStateVentilating},
 
 /* name						*/	{eStateDrying,
-	/* parent					*/	eStateGrowBoxKeepingHumidity,
+	/* parent					*/	eStateHumidityControlRunning,
 	/* default_substate			*/	-1,
 									0,
 	/* event-checking func		*/	evStateDrying,
@@ -672,6 +704,9 @@ void stopStateCharts()
 bool processTriacEvent(TStatechart* tStCh,CGrowBoxEvent* ev)
 {
 	currentEvent = ev;
+	#ifdef debugStatechart
+		info_printf("processTriacEvent: firing event: %i\n",ev->evType);
+	#endif	
 	return ProcessEvent(tStCh);
 }
 

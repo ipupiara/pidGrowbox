@@ -949,6 +949,8 @@ int16_t getTriacFireDurationFromADC(uint8_t pos)
 
 void startHumidifying()
 {
+#ifndef controlTemperature
+#endif
 	
 }
 
@@ -997,7 +999,7 @@ void switchOffLight()
 //#define printerGiveTXaGingg
 
 #define maxUInt16_t  0xFFFF
-#define outbufferSize 0x100
+#define outbufferSize 0x300
 #define initialTailPos outbufferSize - 1
 char outbuffer [outbufferSize];
 uint16_t  peekPos;    // first free place on buffer to place a next character  
@@ -1052,10 +1054,12 @@ ISR(USART0_UDRE_vect)
 		uint16_t ptr;
 		if  ((ptr = nextPos(tailPos)) != peekPos)  {               //  buffer not empty 
 			UDR0 = outbuffer[ptr];
-			}  else {
+			tailPos = ptr;
+		}  else {
 			disablePrinterReadyInterrupt();  // be sure not to end in endless interrupt calls
 		}
 	}
+	sei();
 }
 
 void USART0_InitBoud( unsigned int baud )
@@ -1065,7 +1069,7 @@ void USART0_InitBoud( unsigned int baud )
 	UBRR0H = (unsigned char)(baud>>8);
 	UBRR0L = (unsigned char)baud;
 	UCSR0A =  (UCSR0A & 0b11111100) ;
-	UCSR0B =   ( (1<<TXEN0) | (1<< UDRIE0) )  ;  	
+	UCSR0B =    (1<<TXEN0)    ;  	
 	UCSR0C =   ( (1 << UCSZ00  ) | (1 << UCSZ01) );
 }
 
