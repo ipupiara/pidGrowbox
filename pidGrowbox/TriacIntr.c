@@ -1020,7 +1020,7 @@ void disablePrinterReadyInterrupt()
 
 #define nextPosition(ptr) ((ptr + 1)  >= outbufferSize ? 0 : (ptr+1))
 
-uint16_t nextPos(uint16_t ptr) 
+uint16_t nextPos(uint16_t ptr)    //  must be called betweeen cli and sei  (mutex)
 {  
 	uint16_t  res;
 	if ((res = ++ptr) >= outbufferSize)   {
@@ -1037,7 +1037,7 @@ uint16_t addToOutUart0(char* txt, uint16_t len)
     uint16_t amtAdded = 0;
 	uint16_t ptr;
 	uint16_t length = len;
-	disablePrinterReadyInterrupt();   // just added once because something crashed the system when uart output added. cli sei ok?
+//	disablePrinterReadyInterrupt();   // just added once because something crashed the system when uart output added. cli sei ok?
 	cli();
 	while ((length > 0) &&   ((ptr = nextPosition(peekPos)) != tailPos )) { 
 		outbuffer [peekPos] =  txt[amtAdded];

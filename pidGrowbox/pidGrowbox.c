@@ -92,8 +92,7 @@ CGrowBoxEvent ev;
 		
 int main(void)
 {
-	setWatchdogTimerOn();   // set this one off during debugging !
-//	setWatchdogTimerOff();
+
 
 #ifdef  UseStdOutForUsart0
 	//	USART_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
@@ -115,6 +114,9 @@ int main(void)
 	startStateCharts();    // currently only needed for ventilate
 	
 //	startDurationTimer(maxSecsPossible  );
+
+	setWatchdogTimerOn();   // set this one off during debugging !
+	//	setWatchdogTimerOff();
 
 	csvIntervalCounter = 0;
 	pidIntervalCounter = 0;
