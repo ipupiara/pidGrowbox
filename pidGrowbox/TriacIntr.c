@@ -1020,7 +1020,7 @@ void disablePrinterReadyInterrupt()
 
 #define nextPosition(ptr) ((ptr + 1)  >= outbufferSize ? 0 : (ptr+1))
 
-uint16_t nextPos(uint16_t ptr)    //  must be called betweeen cli and sei  (mutex)
+uint16_t nextPos(uint16_t ptr)    //  must be called between cli and sei  (mutex)
 {  
 	uint16_t  res;
 	if ((res = ++ptr) >= outbufferSize)   {

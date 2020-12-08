@@ -26,7 +26,7 @@ uint8_t idleTickCnt;
 real pidError;
 
 
-#define useTWA
+//#define useTWA
 
 #ifdef useTWA		// interface to Pid
 	void initTWA();
