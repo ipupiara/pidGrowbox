@@ -22,6 +22,9 @@ void disaRXIntUsart1();
 
 void initOutUart0();
 
+void initRelais1();
+
+void controlTemperature(float* temp);
 
 int16_t getSecondsRemainingInDurationTimer()
 {
@@ -599,59 +602,7 @@ char * reallyWorkingStrstr(const char *inStr, const char *subStr)
 }
   
 
-  
-#define heatingPortDDR  DDRB
-#define heatingPinDDR   DDB0
-#define heatingPort     PORTB
-#define heatingPin      PB0  
 
-
-
-void switchHeating(uint8_t heatingNeedsOn)
-{
-	if (heatingNeedsOn > 0) {
-		heatingPort |= (1 << heatingPin);
-		heatingIsOn= 1;
-	}  else   {
-		heatingPort &= ~(1 << heatingPin);
-		heatingIsOn = 0;
-	}
-}
-
-void switchVentilating(uint8_t ventilatingNeedsOn)
-{
-#ifndef  controlheating
-	switchHeating(ventilatingNeedsOn);
-#endif	
-}
-
-
-
-void initHeatingControl()
-{
-	heatingPortDDR |= (1 << heatingPinDDR);    // define as output
-//	heatingPortDDR |=    0xff;
-//	DDRF |= (1< DDRF1);
-	switchHeating(0);
-}
-
-#ifdef controlheating
-
-void controlTemperature(float* temp)
-{  
-	if (*temp < HeatingLowerLimit)  { 
-		switchHeating(1); 
-	}
-	if (*temp > HeatingUpperLimit)  { 
-		switchHeating(0); 
-	}		
-	
-//	toggleHeating();    //  just used for debugging reasons   
-
-//	 CoolingLowerLimit	
-//	 CoolingUpperLimit	
-}
-#endif
 
 uint8_t onDataReceivedUart1IsValid()        // called by main application thread to calculate the latest data
 {
@@ -774,9 +725,9 @@ void initHW()
 	initInterrupts();
 	initUsart1();
 	startSecondTick();
-//#ifdef controlheating  - commmented this because the same relais is also needed for humidity  control !  needs some  redesign 
-	initHeatingControl();
-//#endif	
+	initRelais1();
+
+	
 }
 
 
@@ -947,11 +898,51 @@ int16_t getTriacFireDurationFromADC(uint8_t pos)
 	return res;
 }
 
+
+////////////////// start heating , ventilating  methods ////////////////////
+ 
+ #define relais1PortDDR  DDRB
+ #define relais1PinDDR   DDB0
+ #define relais1Port     PORTB
+ #define relais1Pin      PB0
+
+
+
+ void switchRelais1(uint8_t relaisNeedsOn)
+ {
+	 if (relaisNeedsOn > 0) {
+		 relais1Port |= (1 << relais1Pin);
+		 relais1On= 1;
+		 }  else   {
+		 relais1Port &= ~(1 << relais1Pin);
+		 relais1On = 0;
+	 }
+ }
+
+
+
+ void initRelais1()
+ {
+	 relais1PortDDR |= (1 << relais1PinDDR);    // define as output
+	 switchRelais1(0);
+ }
+
+
+ void controlTemperature(float* temp)
+ {
+#ifdef controlheating	
+	 if (*temp < HeatingLowerLimit)  {
+		 switchRelais1(1);
+	 }
+	 if (*temp > HeatingUpperLimit)  {
+		 switchRelais1(0);
+	 }
+#endif	 
+ }
+
 void startHumidifying()
 {
-#ifndef controlTemperature
-#endif
-	
+
 }
 
 void stopHumidifying()
@@ -959,35 +950,40 @@ void stopHumidifying()
 	
 }
 
+void startVentilator(uint8_t  on)
+{
+#ifndef controlheating	
+	if (on == 1)   {
+		switchRelais1(1);
+	}  else
+	{
+		switchRelais1(0);	
+	}
+#endif	
+}
+
 void startVentilating()
 {
-	switchVentilating(1);
+	startVentilator(1);
 }
 
 void stopVentilating()
 {
-	switchVentilating(0);	
+	startVentilator(0);	
 }
 
 void startDrying()
 {
-	switchVentilating(1);	
+	startVentilator(1);	
 }
 
 void stopDrying()
 {
-	switchVentilating(0);	
+	startVentilator(0);	
 }
 
-void switchOnLight()
-{
-	
-}
 
-void switchOffLight()
-{
-	
-}
+////////////////// end heating , ventilating  methods ////////////////////
 
 
 #ifndef UseStdOutForUsart0

@@ -24,7 +24,7 @@ uint16_t secondsInDurationTimer;
 
 uint16_t triacFireDurationTcnt;   // centi-millis-secs, not exactly but approximate, PID will handle the rest
 
-int8_t heatingIsOn;
+int8_t relais1On;
 
 void startDurationTimer(int16_t secs);
 int16_t getSecondsRemainingInDurationTimer();

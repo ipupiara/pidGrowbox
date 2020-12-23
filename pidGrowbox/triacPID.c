@@ -172,18 +172,18 @@ void printPIDState()
 */
 }
 
-
-void onPidStep()
-{
-	info_printf("onPidStep\n");
-	calcNextTriacDelay();
-}
+//
+//void onPidStep()
+//{
+	//info_printf("onPidStep\n");
+	//calcNextTriacDelay();
+//}
 
 void printCsvHeader()
 {
 	info_printf("printCsvHeader\n");
 	csv_printf("time,temp_inBox,humid_inBox,triacFireDuration,pVal,iVal,dVal,goal_temp,twaTemp,twaAbsTempDiff\n");
-	csv_printf("seconds,°C,triacTx,real,real,real,°C,real,real,heatVentOnOff\n");
+	csv_printf("seconds,°C,triacTx,real,real,real,°C,real,real,relais1OnOff\n");
 }
 
 void displayTime(uint8_t line, uint8_t pos)
@@ -266,7 +266,7 @@ void printCsvValues()
 	csv_printf("%5d:%02d:%02d,T %6.2f,H %6.2f,%d,%f,%f,%f, %5.1f,%6.2f,%6.2f %i\n",hrs,mins,secs,getCurrentTemperature()
 																,getCurrentHumidity(),getTriacFireDuration()
 																,pVal,iVal,dVal,desiredTemperature,getTwaTemperature()
-																,getTwaAbsTemperatureDiff(),heatingIsOn);
+																,getTwaAbsTemperatureDiff(),relais1On);
 //	displayScreen();
 }
 
