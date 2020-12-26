@@ -292,8 +292,7 @@ uStInt evStateVentilating(void)
 		return (uStIntHandlingDone);
 	
 	}
-	if (currentEvent->evType == eDurationTimerTickTwo )
-	{
+	if (currentEvent->evType == eDurationTimerTickTwo ) {
 		info_printf("eDurationTimerTickTwo in evStateVentilating \n");
 		return (uStIntHandlingDone);
 	}
@@ -319,19 +318,17 @@ void exitStateVentilating(void)
 uStInt evStateDrying(void)
 {
 //	info_printf("check for event in State evStateDrying\n");
-	if ((currentEvent->evType == eValueAssignement) && (GetDryingLowerLimit() > currentEvent->humidity))
-	{
+	if ((currentEvent->evType == eValueAssignement) && (GetDryingLowerLimit() > currentEvent->humidity))  {
 		BEGIN_EVENT_HANDLER(PTriacHumidityChart,   eStateIdle);
 			// No event action.
 		#ifdef debugStatechart
-			info_printf("eventhandler evStateDrying proceeding to eStateIdle\n");
+			info_printf("eventhandler evStateDrying proceeding to eStateDrying\n");
 		#endif	
 	
 		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	}
-	if (currentEvent->evType == eDurationTimerTickTwo )
-	{
+	if (currentEvent->evType == eDurationTimerTickTwo )  {
 		info_printf("eDurationTimerTickTwo in evStateDrying \n");
 		return (uStIntHandlingDone);
 	}
