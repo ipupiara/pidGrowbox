@@ -224,15 +224,16 @@ uStInt evStateIdle(void)
 
 void entryStateIdle(void)
 {
-	info_printf("CHumidityStateClass::entryStateIdle\n");
+//	info_printf("CHumidityStateClass::entryStateIdle\n");
 }
 
 
 void exitStateIdle(void)
 {
-	info_printf("CHumidityStateClass::exitStateIdle\n");
+//	info_printf("CHumidityStateClass::exitStateIdle\n");
 }
 
+uint8_t  firstTick;
 
 
 uStInt evStateNonVentilating(void)
@@ -251,13 +252,18 @@ uStInt evStateNonVentilating(void)
 		return (uStIntHandlingDone);
 	
 	}
+	if (currentEvent->evType == eDurationTimerTickTwo )
+	{
+		info_printf("eDurationTimerTickTwo in evStateNonVentilating \n");
+		return (uStIntHandlingDone);
+	}
 	return (uStIntNoMatch);
 }
 
 
 void entryStateNonVentilating(void)
 {
-	info_printf("CHumidityStateClass::entryStateNonVentilating\n");
+//	info_printf("CHumidityStateClass::entryStateNonVentilating\n");
 	startDurationTimer(GetIdleVentilationDelayMinutes() * 60);
 }
 
@@ -266,7 +272,7 @@ void entryStateNonVentilating(void)
 
 void exitStateNonVentilating(void)
 {
-	info_printf("CHumidityStateClass::exitStateNonVentilating\n");
+//	info_printf("CHumidityStateClass::exitStateNonVentilating\n");
 	stopDurationTimer();
 }
 
@@ -286,20 +292,25 @@ uStInt evStateVentilating(void)
 		return (uStIntHandlingDone);
 	
 	}
+	if (currentEvent->evType == eDurationTimerTickTwo )
+	{
+		info_printf("eDurationTimerTickTwo in evStateVentilating \n");
+		return (uStIntHandlingDone);
+	}
 	return (uStIntNoMatch);
 }
 
 
 void entryStateVentilating(void)
 {
-	info_printf("CHumidityStateClass::entryStateVentilating\n");
+//	info_printf("CHumidityStateClass::entryStateVentilating\n");
 	startVentilating();
 	startDurationTimer(GetIdleVentilationMinutes() * 60);
 }
 
 void exitStateVentilating(void)
 {
-	info_printf("CHumidityStateClass::exitStateVentilating\n");
+//	info_printf("CHumidityStateClass::exitStateVentilating\n");
 	stopVentilating();
 	stopDurationTimer();
 }
@@ -319,20 +330,25 @@ uStInt evStateDrying(void)
 		END_EVENT_HANDLER(PTriacHumidityChart );
 		return (uStIntHandlingDone);
 	}
+	if (currentEvent->evType == eDurationTimerTickTwo )
+	{
+		info_printf("eDurationTimerTickTwo in evStateDrying \n");
+		return (uStIntHandlingDone);
+	}
 	return (uStIntNoMatch);
 }
 
 
 void entryStateDrying(void)
 {
-	info_printf("CHumidityStateClass::entryStateDrying\n");
+//	info_printf("CHumidityStateClass::entryStateDrying\n");
 	startDrying();
 }
 
 
 void exitStateDrying(void)
 {
-	info_printf("CHumidityStateClass::exitStateDrying\n");
+//	info_printf("CHumidityStateClass::exitStateDrying\n");
 	stopDrying();
 }
 
@@ -683,7 +699,7 @@ xStateType xaI2CStates[eNumberOfI2CStates] = {
 
 void startStateCharts()
 {
-
+	firstTick = 0;
  	PTriacHumidityChart = & STriacHumidityChart; 
 	createTStatechart (& STriacHumidityChart, xaHumidifyingStates, eNumberOfHumidifyingStates, eHumidifyingStartState);
 	info_printf("TriacHumidityTemperature statechart started\n");
@@ -703,6 +719,7 @@ void stopStateCharts()
 
 bool processTriacEvent(TStatechart* tStCh,CGrowBoxEvent* ev)
 {
+	firstTick = 0;
 	currentEvent = ev;
 	#ifdef debugStatechart
 		info_printf("processTriacEvent: firing event: %i\n",ev->evType);

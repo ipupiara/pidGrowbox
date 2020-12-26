@@ -179,12 +179,6 @@ void printPIDState()
 	//calcNextTriacDelay();
 //}
 
-void printCsvHeader()
-{
-	info_printf("printCsvHeader\n");
-	csv_printf("time,temp_inBox,humid_inBox,triacFireDuration,pVal,iVal,dVal,goal_temp,twaTemp,twaAbsTempDiff\n");
-	csv_printf("seconds,°C,triacTx,real,real,real,°C,real,real,relais1OnOff\n");
-}
 
 void displayTime(uint8_t line, uint8_t pos)
 {
@@ -259,15 +253,18 @@ void displayScreen()
 
 }
 
+void printCsvHeader()
+{
+	info_printf("printCsvHeader\n");
+	csv_printf("time,temp_inBox,humid_inBox,relais1OnOff,dry low limit,dry high limit\n");
+}
+
+
 void printCsvValues()
 {
-
 	GETTimeValues
-	csv_printf("%5d:%02d:%02d,T %6.2f,H %6.2f,%d,%f,%f,%f, %5.1f,%6.2f,%6.2f %i\n",hrs,mins,secs,getCurrentTemperature()
-																,getCurrentHumidity(),getTriacFireDuration()
-																,pVal,iVal,dVal,desiredTemperature,getTwaTemperature()
-																,getTwaAbsTemperatureDiff(),relais1On);
-//	displayScreen();
+	info_printf("%5d:%02d:%02d,T %6.2f,H %6.2f, %i,%5.1f,%5.1f\n",hrs,mins,secs,getCurrentTemperature()
+																,getCurrentHumidity(),relais1On,DryingLowerLimit,DryingUpperLimit);
 }
 
 void debugSetTriacDelayValueFromAdc()

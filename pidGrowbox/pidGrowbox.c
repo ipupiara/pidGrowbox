@@ -57,8 +57,8 @@ void USART_Init( unsigned int baud )
 
 void setWatchdogTimerOn()
 {
-	uint8_t val = ((1<<WDP0) | (1<<WDP3));    //  8seconds
-   	wdt_enable(val );
+	uint8_t val = ((1<<WDP0) | (1<<WDP1) | (1<<WDP2) );    //  8seconds
+   	wdt_enable(val ); // will not use any value of WDP3, only 0,1 and 3 (eg. 8 seconds can not be set, only max 2 seconds) !
 	//wdt_reset();
 	///* Write logical one to WDCE and WDE */
 	//WDTCR |= (1<<WDCE) | (1<<WDE);
@@ -95,6 +95,7 @@ int main(void)
 {
 	setWatchdogTimerOn();   // set this one off during debugging !
 //	setWatchdogTimerOff();
+ 
 
 #ifdef  UseStdOutForUsart0
 
@@ -174,6 +175,11 @@ int main(void)
 			twiDataReceived = 0;
 //			ev.evType = eTWIDataReceived;
 //			processTriacEvent(PGrowboxI2CChart, &ev);
+		}
+		if (durationTimerReachedTwo == 1) {
+			durationTimerReachedTwo = 0;
+			ev.evType = eDurationTimerTickTwo;
+			processTriacEvent(PTriacHumidityChart, &ev);
 		}
 	}
 }

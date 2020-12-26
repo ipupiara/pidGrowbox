@@ -41,6 +41,7 @@ enum eEventTypes
 	eStopPressed,
 	eAdcTick,
 	eTWIDataReceived,
+	eDurationTimerTickTwo,
 	eFatalError
 };
 

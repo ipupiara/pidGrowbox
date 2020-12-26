@@ -6,6 +6,7 @@ git add checkOriginMaster.bat
 git add pidGrowbox/pidGrowbox.cproj
 git add tools/*
 git add pidGrowbox/pidGrowbox.mdl
+git add .gitignore
 echo " "
 echo "STATUS:"
 git status

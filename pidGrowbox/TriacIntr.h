@@ -17,6 +17,7 @@
 	
 uint8_t durationTimerReachead;
 uint8_t runningSecondsTick;
+uint8_t durationTimerReachedTwo;
 
 uint16_t secondsRemainingInDurationTimer;
 

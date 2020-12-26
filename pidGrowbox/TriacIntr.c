@@ -362,13 +362,15 @@ ISR(TIMER1_COMPA_vect)
 	if (secondsRemainingInDurationTimer > 0) {
 		secondsRemainingInDurationTimer --;
 		secondsInDurationTimer ++;
+		if (secondsInDurationTimer == 2) {
+			durationTimerReachedTwo = 1;
+		}
 		if (secondsRemainingInDurationTimer == 0) {
 			stopDurationTimer();
 			durationTimerReachead = 1;
 		} 
 	}
 	runningSecondsTick = 1;
-	
 }
 
 void initInterrupts()
@@ -955,6 +957,7 @@ void startVentilator(uint8_t  on)
 #ifndef controlheating	
 	if (on == 1)   {
 		switchRelais1(1);
+//		 while (1){} //  was used to test watchdog, so that something sounds a bit, worked well with asm code in "wdt_enable(val );"
 	}  else
 	{
 		switchRelais1(0);	
@@ -996,7 +999,7 @@ void stopDrying()
 
 #define maxUInt16_t  0xFFFF
 #define outbufferSize 0x300
-#define initialTailPos outbufferSize - 1
+
 char outbuffer [outbufferSize];
 uint16_t  peekPos;    // first free place on buffer to place a next character  
 uint16_t  tailPos;    // last printed out character on buffer
@@ -1031,6 +1034,7 @@ uint16_t addToOutUart0(char* txt, uint16_t len)
     uint16_t amtAdded = 0;
 	uint16_t ptr;
 	uint16_t length = len;
+	disablePrinterReadyInterrupt();   // just added once because something crashed the system when uart output added. cli sei ok?
 	cli();
 	while ((length > 0) &&   ((ptr = nextPos(peekPos)) != tailPos )) { 
 		outbuffer [peekPos] =  txt[amtAdded];
@@ -1054,7 +1058,10 @@ ISR(USART0_UDRE_vect)
 		}  else {
 			disablePrinterReadyInterrupt();  // be sure not to end in endless interrupt calls
 		}
-	}
+	} 
+	//else if  (nextPos(tailPos) == peekPos) {
+		//disablePrinterReadyInterrupt();
+	//}
 	sei();
 }
 
@@ -1072,7 +1079,7 @@ void USART0_InitBoud( unsigned int baud )
 
 void initOutUart0()
 {
-	memset(outbuffer,0,outbufferSize);
+	memset(outbuffer,0,sizeof(outbufferSize));
 	peekPos = 0;   // first free place on buffer
 	tailPos = outbufferSize - 1 ;   //  last char on buffer, means buffer empty, if peekPos == 0
 	//	USART0_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
