@@ -263,7 +263,7 @@ void printCsvHeader()
 void printCsvValues()
 {
 	GETTimeValues
-	info_printf("%5d:%02d:%02d,T %6.2f,H %6.2f, %i,%5.1f,%5.1f\n",hrs,mins,secs,getCurrentTemperature()
+	info_printf("%5d:%02d:%02d,T %6.2f,H %6.2f, %i,%5.1f,%5.1fn",hrs,mins,secs,getCurrentTemperature()
 																,getCurrentHumidity(),relais1On,DryingLowerLimit,DryingUpperLimit);
 }
 

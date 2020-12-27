@@ -86,7 +86,6 @@ void resetWatchDog()
 
 uint16_t   pidIntervalCounter;   
 uint16_t   csvIntervalCounter ;
-uint16_t   secsCounter ;
     
 CGrowBoxEvent ev;	
 	    
@@ -95,10 +94,8 @@ int main(void)
 {
 	setWatchdogTimerOn();   // set this one off during debugging !
 //	setWatchdogTimerOff();
- 
 
 #ifdef  UseStdOutForUsart0
-
 	//	USART_Init( 143 );   // baud 4800 at 11.0592 mhz, single uart speed
 	//	USART_Init( 71 );   // baud 9600 at 11.0592 mhz, single uart speed
 //	USART_Init (11 );   // baud 57.6k  at 11.0592 mhz, single uart speed
@@ -113,6 +110,7 @@ int main(void)
 	initPID();
 //	initADC();
 	printCsvHeader();
+//	while(1) {}     //  for testing watchdog
 	
 	startStateCharts();    // currently only needed for ventilate
 	
@@ -120,8 +118,7 @@ int main(void)
 
 	csvIntervalCounter = 0;
 	pidIntervalCounter = 0;
-	secsCounter = 0;
-	
+
 	info_printf("\nSTARTUP DONE pidGrowbox together with stateGrowbox\n");
 
 	
@@ -142,8 +139,7 @@ int main(void)
  		}
 		if (runningSecondsTick == 1)  {
 			runningSecondsTick = 0;
-			++secsCounter;
-
+			
  			++ pidIntervalCounter;
  			if (pidIntervalCounter >=  pidIntervalSecs)  {
  				pidIntervalCounter = 0;				
@@ -151,7 +147,7 @@ int main(void)
  			}
 			 
  			++csvIntervalCounter;
- 			if (csvIntervalCounter >= csvIntervalSecs)   {
+ 			if (csvIntervalCounter >= csvIntervalSecs)   {     //  todo check if he can loose 1 sec here, fix it if possible (printing delay vs. state timeout ?)
  				csvIntervalCounter = 0;
  				printCsvValues();
  			}

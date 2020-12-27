@@ -349,15 +349,14 @@ uint32_t overallSeconds()
 
 ISR(TIMER1_COMPA_vect)
 {
-	++ secondsCounter;
-	if (secondsCounter == 59) {
+	if (secondsCounter == 59) { 
 		++ minutesCounter;
 		secondsCounter = 0;
 		if (minutesCounter == 59) {
 			++ hoursCounter;
 			minutesCounter = 0;
 		}
-	}
+	} else { ++ secondsCounter; }
 	
 	if (secondsRemainingInDurationTimer > 0) {
 		secondsRemainingInDurationTimer --;
