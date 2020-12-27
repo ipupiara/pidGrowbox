@@ -340,6 +340,7 @@ void entryStateDrying(void)
 {
 //	info_printf("CHumidityStateClass::entryStateDrying\n");
 	startDrying();
+	startDurationTimer(1 * 60);
 }
 
 
