@@ -25,8 +25,8 @@
 
 	#define HumidifyingLowerLimit   80.0
 	#define HumidifyingUpperLimit  85.0
-	#define DryingUpperLimit	107.5
-	#define DryingLowerLimit	107.0
+	#define DryingUpperLimit	107.25
+	#define DryingLowerLimit	106.75
 
 
 	#define HeatingLowerLimit	27.0

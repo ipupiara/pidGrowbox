@@ -1016,6 +1016,10 @@ void disablePrinterReadyInterrupt()
 
 // returns next position of ptr in the circular buffer
 //  must be called between cli and sei for consistent data reason
+
+
+#define nextPosition(ptr) ((ptr + 1)  >= outbufferSize ? 0 : (ptr+1))
+
 uint16_t nextPos(uint16_t ptr) 
 {  
 	uint16_t  res;
@@ -1035,7 +1039,7 @@ uint16_t addToOutUart0(char* txt, uint16_t len)
 	uint16_t length = len;
 	disablePrinterReadyInterrupt();   // just added once because something crashed the system when uart output added. cli sei ok?
 	cli();
-	while ((length > 0) &&   ((ptr = nextPos(peekPos)) != tailPos )) { 
+	while ((length > 0) &&   ((ptr = nextPosition(peekPos)) != tailPos )) { 
 		outbuffer [peekPos] =  txt[amtAdded];
 		-- length;
 		++ amtAdded;
@@ -1051,16 +1055,13 @@ ISR(USART0_UDRE_vect)
 	cli();
 	if  ((UCSR0A & (1 << UDRE0)) != 0 )  {  // do this check anyhow 
 		uint16_t ptr;
-		if  ((ptr = nextPos(tailPos)) != peekPos)  {               //  buffer not empty 
+		if  ((ptr = nextPosition(tailPos)) != peekPos)  {               //  buffer not empty 
 			UDR0 = outbuffer[ptr];
 			tailPos = ptr;
 		}  else {
-			disablePrinterReadyInterrupt();  // be sure not to end in endless interrupt calls
+			disablePrinterReadyInterrupt();  // be sure not to end in endless interrupt calls, as with AtMega128  
 		}
 	} 
-	//else if  (nextPos(tailPos) == peekPos) {
-		//disablePrinterReadyInterrupt();
-	//}
 	sei();
 }
 

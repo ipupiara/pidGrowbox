@@ -22,7 +22,7 @@
 #define integralTimeDiminuision    0.9
 #define correctionThreshold  150  * (60 / pidIntervalSecs)
 
-#define csvIntervalSecs  20
+#define csvIntervalSecs  59
 //#define csvIntervalSecs  1   // just for debugging 
 
 #define initialTriacDelayValue   0x0200	
